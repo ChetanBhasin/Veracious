@@ -1,11 +1,9 @@
-package core
+package models.mining.oldAlgo
 
 /**
- * Created by chetan on 24/03/15.
+ * Created by basso on 07/04/15.
  */
-package object algorithms {
-
-  import org.apache.spark.{SparkContext, _}
+package object oldAlgo {
 
   private val conf = new SparkConf().setAppName("Veracious-Algorithms").setMaster("local")
   val sc = new SparkContext(conf)
