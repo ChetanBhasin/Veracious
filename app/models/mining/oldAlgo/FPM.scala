@@ -1,7 +1,4 @@
-package core.algorithms
-
-import org.apache.spark.mllib.fpm.FPGrowth
-import org.apache.spark.rdd.RDD
+package models.mining.oldAlgo
 
 /**
  * Frequent pattern detection using FP-Growth algorithm

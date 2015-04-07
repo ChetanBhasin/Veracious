@@ -1,15 +1,11 @@
-package core.algorithms
-
-import org.apache.spark.mllib.clustering.KMeans
-import org.apache.spark.mllib.linalg.Vectors
-import org.apache.spark.rdd.RDD
+package models.mining.oldAlgo
 
 /**
  * Created by chetan on 12/03/15.
  */
 
 /**
- * Clustering using KMeans algorithm
+ * models.mining.oldAlgo.Clustering using KMeans algorithm
  * @param numClusters Number of clusters required
  * @param numIterations Number of iterations required (defaults to 20)
  */
@@ -18,7 +14,7 @@ abstract class Clustering(numClusters: Int, numIterations: Int = 20) {
   lazy val clusters = KMeans.train(supply, numClusters, numIterations)
   private lazy val supply = data.map(Vectors.parse(_))
 
-  def run = println("Clustering: " + clusters.toString)
+  def run = println("models.mining.oldAlgo.Clustering: " + clusters.toString)
 
   def saveToTextFile(fileLocation: String) = {
     val dataset = clusters.predict(supply) zip supply
@@ -34,7 +30,7 @@ abstract class Clustering(numClusters: Int, numIterations: Int = 20) {
 }
 
 /**
- * Clustering with a file storing vector values
+ * models.mining.oldAlgo.Clustering with a file storing vector values
  * @param file Location of the file with values
  * @param numClusters Number of clusters required
  * @param numIterations Number of iterations required (defaults to 20)
@@ -47,7 +43,7 @@ class fileVectorClustering(file: String, numClusters: Int, numIterations: Int = 
 }
 
 /**
- * Clustering with a String RDD
+ * models.mining.oldAlgo.Clustering with a String RDD
  * @param rdd
  * @param numClusters Number of clusters required
  * @param numIterations Number of iterations required (defaults to 20)
