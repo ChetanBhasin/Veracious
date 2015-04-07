@@ -9,9 +9,11 @@ package models
  * The package contains:
  *  1. The definition of the Batch class
  *  2. The sub-package job which contains the Job hierarchy
+ *  3. The Batch factory which will create the actual Batch object
  *
  * Maintained by Anish
  */
 package object batch {
-
 }
+
+// TODO: Create the batch class

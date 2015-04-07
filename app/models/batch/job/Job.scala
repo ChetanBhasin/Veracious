@@ -1,5 +1,7 @@
 package models.batch.job
 
+import models.mining.Algorithm
+
 /**
  * Created by basso on 07/04/15.
  *
@@ -27,3 +29,74 @@ trait DataSetOp extends Job     // Used by the DataSet operations manager
 trait MineOp    extends Job     // Used by the mining subsystem
 
 // TODO, implement the Job factory
+
+/** The critical Job factory,
+  * Used by the Form[List[Job]] mapping.
+  */
+object Job {
+
+  // Just a Jugaad, TODO:, write the full unapply code
+  val unapply = (j: Job) => Some((
+    "DataSetOp", "DsDelete", None, List("dsName"), List[Int]()))
+  /*
+
+
+   */
+  /**
+   * The apply function creates the correct kind of job for the user data
+   * that is passed to the application as a form
+   * @param opType : Gets in as a drop down list. Select the kind of major operation
+   * @param opName : The actual operation name
+   * @param optionalTextParam : Needed for Clustering, a single optional text parameter from the form
+   * @param textParams : Extra text parameters are generically saved in an array. Make sure to use the correct mapping in the form
+   * @param numParams : Extra numeric paramters again generically saved in an array
+   * @return : An sub-type of class Job, to be saved in a batch
+   */
+   val apply = (
+    opType: String,
+    opName: String,
+    optionalTextParam: Option[String],    // One of the algorithm needs this one
+    textParams: List[String],             // Extra text parameters, may also contain Doubles as they aren't handled properly by Form
+    numParams: List[Int]
+  ) => opType match {
+    case "DataSetOp" => opName match {      // Data set operations
+      case "DsAddDirect" =>
+        assert(textParams.length >= 3) // Important, not doing any checking here, TODO
+        DsAddDirect(
+          name = textParams(0),
+          description = textParams(1),
+          target_algo = Algorithm.withName(textParams(2)))
+      case "DsAddFromUrl" =>
+        assert(textParams.length >= 4)
+        DsAddFromUrl(
+          name = textParams(0),
+          description = textParams(1),
+          target_algo = Algorithm.withName(textParams(2)),
+          url = textParams(3))
+      case "DsDelete" =>
+        assert(textParams.length >= 1)
+        DsDelete(name = textParams(0))
+      case "DsRefresh" =>
+        assert(textParams.length >= 1)
+        DsRefresh(name = textParams(0))
+    }
+    case "MineOp" => opName match {         // Mining Operations
+      case "MnALS" =>
+        assert(textParams.length >= 1)
+        MnALS(ds_name = textParams(0))
+      case "MnClustering" =>
+        assert(textParams.length >= 1)
+        assert(numParams.length >= 2)
+        MnClustering(
+          ds_name = textParams(0),
+          pred_ds = optionalTextParam,
+          max_iter = numParams(0),
+          cluster_count = numParams(1))
+      case "MnFPgrowth" =>
+        assert(textParams.length >= 2)
+        MnFPgrowth(
+          ds_name = textParams(0),
+          min_support = textParams(1).toDouble)
+    }
+  }
+}
