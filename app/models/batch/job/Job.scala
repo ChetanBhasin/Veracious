@@ -26,9 +26,7 @@ trait Job {
 }
 
 trait DataSetOp extends Job     // Used by the DataSet operations manager
-trait MineOp    extends Job {
-  val ds_name: String
-}
+trait MineOp    extends Job
 
 // TODO, implement the Job factory
 
@@ -77,8 +75,13 @@ object Job {
     }
     case "MineOp" => opName match {         // Mining Operations
       case "MnALS" =>
-        assert(textParams.length >= 1)
-        MnALS(ds_name = textParams(0))
+        assert(textParams.length >= 2)
+        assert(numParams.length >= 2)
+        MnALS(
+          ds_train = textParams(0),
+          ds_query = textParams(1),
+          ranks = numParams(0),
+          max_iter = numParams(1))
       case "MnClustering" =>
         assert(textParams.length >= 1)
         assert(numParams.length >= 2)
@@ -93,10 +96,11 @@ object Job {
           ds_name = textParams(0),
           min_support = textParams(1).toDouble)
       case "MnSVM" =>
-        assert(textParams.length >= 1)
+        assert(textParams.length >= 2)
         assert(numParams.length >= 1)
         MnSVM(
-          ds_name = textParams(0),
+          ds_train = textParams(0),
+          ds_test = textParams(1),
           max_iter = numParams(0))
     }
   }
@@ -106,9 +110,9 @@ object Job {
     case DsAddFromUrl(ds, d, _, u, _) => Some("DataSetOp", "DsAddDirect", None, List(ds, d, u), List[Int]())
     case DsDelete(ds) => Some("DataSetOp", "DsDelete", None, List(ds), List[Int]())
     case DsRefresh(ds) => Some("DataSetOp", "DsRefresh", None, List(ds), List[Int]())
-    case MnALS(ds) => Some("MineOp", "MnALS", None, List(ds), List[Int]())
+    case MnALS(dt, dq, r, mit) => Some("MineOp", "MnALS", None, List(dt, dq), List(r, mit))
     case MnClustering(ds, pr, mit, cc) => Some("MineOp", "MnClustering", pr, List(ds), List(mit, cc))
     case MnFPgrowth(ds, ms) => Some("MineOp", "MnFPgrowth", None, List(ds, ms.toString), List[Int]())
-    case MnSVM(ds, mit) => Some("MineOp", "MnSVM", None, List(ds), List(mit))
+    case MnSVM(dt,dte, mit) => Some("MineOp", "MnSVM", None, List(dt, dte), List(mit))
   }
 }

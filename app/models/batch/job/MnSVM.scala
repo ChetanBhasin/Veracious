@@ -6,7 +6,8 @@ package models.batch.job
  * MineOp job for SVM algorithm
  */
 case class MnSVM (
-  ds_name: String,
+  ds_train: String,   // training vector file
+  ds_test: String,    // testing vector file
   max_iter: Int,      // default to 100 (impl at user end)
   id: String = " "
 ) extends MineOp {
