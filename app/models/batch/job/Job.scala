@@ -65,10 +65,10 @@ object Job {
           target_algo = Algorithm.withName(textParams(2)),
           url = textParams(3))
       case "DsDelete" =>
-        assert(textParams.length >= 1)
+        assert(textParams.nonEmpty)
         DsDelete(name = textParams(0))
       case "DsRefresh" =>
-        assert(textParams.length >= 1)
+        assert(textParams.nonEmpty)
         DsRefresh(name = textParams(0))
     }
     case "MineOp" => opName match {         // Mining Operations
@@ -81,7 +81,7 @@ object Job {
           ranks = numParams(0),
           max_iter = numParams(1))
       case "MnClustering" =>
-        assert(textParams.length >= 1)
+        assert(textParams.nonEmpty)
         assert(numParams.length >= 2)
         MnClustering(
           ds_name = textParams(0),
@@ -95,7 +95,7 @@ object Job {
           min_support = textParams(1).toDouble)
       case "MnSVM" =>
         assert(textParams.length >= 2)
-        assert(numParams.length >= 1)
+        assert(numParams.nonEmpty)
         MnSVM(
           ds_train = textParams(0),
           ds_test = textParams(1),
@@ -106,11 +106,11 @@ object Job {
   val unapply = (job: Job) => job match {
     case DsAddDirect(ds, d, _, _, _) => Some("DataSetOp", "DsAddDirect", None, List(ds, d), List[Int]())
     case DsAddFromUrl(ds, d, _, u, _) => Some("DataSetOp", "DsAddDirect", None, List(ds, d, u), List[Int]())
-    case DsDelete(ds) => Some("DataSetOp", "DsDelete", None, List(ds), List[Int]())
-    case DsRefresh(ds) => Some("DataSetOp", "DsRefresh", None, List(ds), List[Int]())
-    case MnALS(dt, dq, r, mit) => Some("MineOp", "MnALS", None, List(dt, dq), List(r, mit))
-    case MnClustering(ds, pr, mit, cc) => Some("MineOp", "MnClustering", pr, List(ds), List(mit, cc))
-    case MnFPgrowth(ds, ms) => Some("MineOp", "MnFPgrowth", None, List(ds, ms.toString), List[Int]())
-    case MnSVM(dt,dte, mit) => Some("MineOp", "MnSVM", None, List(dt, dte), List(mit))
+    case DsDelete(ds,_) => Some("DataSetOp", "DsDelete", None, List(ds), List[Int]())
+    case DsRefresh(ds,_) => Some("DataSetOp", "DsRefresh", None, List(ds), List[Int]())
+    case MnALS(dt, dq, r, mit,_) => Some("MineOp", "MnALS", None, List(dt, dq), List(r, mit))
+    case MnClustering(ds, pr, mit, cc,_) => Some("MineOp", "MnClustering", pr, List(ds), List(mit, cc))
+    case MnFPgrowth(ds, ms,_) => Some("MineOp", "MnFPgrowth", None, List(ds, ms.toString), List[Int]())
+    case MnSVM(dt,dte, mit,_) => Some("MineOp", "MnSVM", None, List(dt, dte), List(mit))
   }
 }

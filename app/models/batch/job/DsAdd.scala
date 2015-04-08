@@ -14,8 +14,8 @@ import play.api.libs.Files.TemporaryFile
  */
 
 abstract class DsAdd extends DataSetOp {
-  val name: String ,
-  val description: String ,
+  val name: String
+  val description: String
   val target_algo: Algorithm
 }
 
@@ -28,7 +28,7 @@ case class DsAddFromUrl (
   id: String = " "                  // for id to be set up later
 ) extends DsAdd {
   def setId(nid: String) = this.copy(id = nid)       // Immutable structures
-  override def toString = jobPrintFormat(id, "Add data-set file from Url", Map("name" -> name, "url" -> url))
+  def logWrite = jobPrintFormat(id, "Add data-set file from Url", Map("name" -> name, "url" -> url))
 }
 
 case class DsAddDirect (
@@ -40,6 +40,6 @@ case class DsAddDirect (
 ) extends DsAdd {
   def setId(nid: String) = this.copy(id = nid)
   def setFile(nfile: TemporaryFile) = this.copy(file = nfile)   // Set up the file later after the mapping
-  override def toString = jobPrintFormat(id, "Add data-set file", Map("name" -> name))
+  def logWrite = jobPrintFormat(id, "Add data-set file", Map("name" -> name))
 }
 
