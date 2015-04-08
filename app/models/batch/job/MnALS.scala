@@ -13,7 +13,7 @@ case class MnALS (
   id: String = " "
 ) extends MineOp {
   def setId(nid: String) = this.copy(id = nid)
-  override def toString = jobPrintFormat(id, "ALS (Alternating Least Square) mining",
+  def logWrite = jobPrintFormat(id, "ALS (Alternating Least Square) mining",
     Map("training_datSet" -> ds_train,
         "query" -> ds_query,
         "ranks" -> ranks.toString,

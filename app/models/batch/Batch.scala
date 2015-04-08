@@ -24,7 +24,10 @@ object Batch {
   // Get the current run count
   private lazy val runCount = {
     try {
-      Source.fromFile(filePath).getLines().toList.head.toInt + 1
+      val source = Source.fromFile(filePath)
+      val res = source.getLines().toList.head.toInt + 1
+      source.close()
+      res
     } catch {
       case ex: Exception => 0
     }
@@ -91,5 +94,5 @@ case class Batch (id: String, date: LocalDateTime, jobs: List[Job]) {
   import Batch._
 
   // important for it to be a val
-  override val toString = s"Batch:$id::${date.format(DateTimeFormatter.ofPattern(dateTimeFormat))}::numberOfJobs-${jobs.length}"
+  val logWrite = s"Batch:$id::${date.format(DateTimeFormatter.ofPattern(dateTimeFormat))}::numberOfJobs-${jobs.length}"
 }
