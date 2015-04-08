@@ -20,6 +20,7 @@ package object job {
           "optionalTextParam" -> optional(text),
           "textParams" -> list(text),
           "numParams" -> list(number)
+          // The last field is called "file" and will contain the file upload
         )(Job.apply)(Job.unapply)
       )
     )
