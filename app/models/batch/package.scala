@@ -27,3 +27,4 @@ package object batch {
 }
 
 // TODO: Create the batch class
+// TODO: Override the toString functions of all the classes (Batch and Job) so that logging can be easy
