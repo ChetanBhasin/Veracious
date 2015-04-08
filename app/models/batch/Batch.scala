@@ -2,6 +2,7 @@ package models.batch
 
 import java.io.{File, PrintWriter}
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicInteger
 
 import models.batch.job.{DsAddDirect, Job}
@@ -16,37 +17,43 @@ import scala.io.Source
 
 object Batch {
 
-  /**
-   * Setting up the Batch UID's.
-   */
-    // The file ./conf/runCount just keeps a simple counter for the current
-    // application run number.
-  val filePath = "./conf/runCount"
-  private lazy val runCount = {   // Get the current run count
+  /** ----------------------- Miscellaneous ----------------------------------- **/
+
+  // The file that contains the run-count of the application
+  private val filePath = "./conf/runCount"
+  // Get the current run count
+  private lazy val runCount = {
     try {
-      Source.fromFile(filePath).getLines().toList.head.toInt
+      Source.fromFile(filePath).getLines().toList.head.toInt + 1
     } catch {
       case ex: Exception => 0
     }
   }
 
-    // This is an atomic counter for concurrent access for counting the batch UID number
+  /** used in the unique id creation. This number depicts the number of batches created till now - 1 **/
   private lazy val rNum = new AtomicInteger(0)
 
-    // Get the UID for a Batch
+  /** create unique id for the batches. **/
   private def getUID = "B" + runCount + rNum.getAndIncrement
 
-    // TODO: When the application closes, one of the major actors needs to invoke this function,
-    // preferably the batch processor
+  /**
+   * Store the application run count back to the file
+   * TODO: A major actor (maybe the Batch processor) should call this function when the
+   * application is closing
+   */
   def storeRunCount() {
     val writer = new PrintWriter(new File(filePath))
-    writer.write((runCount + 1).toString)
+    writer.write((runCount).toString)
     writer.close()
   }
-  /** ------------------------------------- **/
+
+    /** formatter used to print the date (inside Batch class) in the logs **/
+  private val dateTimeFormat = "eee, dd MMM yyyy, hh:mm a"
+
+  /** ---------------------------------------------------------------------------------------- **/
 
   /**
-   * This is the factory call to create a Batch.
+   * This is the factory method to create a Batch.
    * @param jobs The Job list from the Form binding. It contains incomplete Job classes with missing ids and files
    * @param request The request receivec by the controller (the same from which the initial Form was bound).
    * @return Batch containing a unique ID and the complete job list along with the dateTime of publish
@@ -80,4 +87,9 @@ object Batch {
  * @param date The Date and Time of the batch creation
  * @param jobs List of complete jobs inside the batch
  */
-case class Batch (id: String, date: LocalDateTime, jobs: List[Job])
+case class Batch (id: String, date: LocalDateTime, jobs: List[Job]) {
+  import Batch._
+
+  // important for it to be a val
+  override val toString = s"Batch:$id::${date.format(DateTimeFormatter.ofPattern(dateTimeFormat))}::numberOfJobs-${jobs.length}"
+}

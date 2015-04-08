@@ -13,5 +13,16 @@ case class MnClustering (
   id: String = " "
 ) extends MineOp {
   def setId(nid: String) = this.copy(id = nid)
+  override def toString = jobPrintFormat(id, "Clustering", Map(
+    "dataSet" -> ds_name,
+    "prediction_DataSet" -> {
+      pred_ds match {
+        case Some(pds) => pds
+        case None => "<None>"
+      }},
+    "iterations" -> max_iter.toString,
+    "cluster_count" -> cluster_count.toString
+  ))
+
 }
 

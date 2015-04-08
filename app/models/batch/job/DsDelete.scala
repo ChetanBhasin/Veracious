@@ -7,4 +7,5 @@ package models.batch.job
 
 case class DsDelete (name: String, id: String = " ") extends DataSetOp {
   def setId(nid: String) = this.copy(id = nid)
+  override def toString = jobPrintFormat(id, "Delete Data-set", Map("name" -> name))
 }

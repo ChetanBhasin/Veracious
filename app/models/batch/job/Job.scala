@@ -28,8 +28,6 @@ trait Job {
 trait DataSetOp extends Job     // Used by the DataSet operations manager
 trait MineOp    extends Job
 
-// TODO, implement the Job factory
-
 /** The critical Job factory,
   * Used by the Form[List[Job]] mapping.
   */
