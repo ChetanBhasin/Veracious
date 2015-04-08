@@ -25,4 +25,7 @@ package object job {
       )
     )
   )
+
+  def jobPrintFormat(id: String, desc: String, params: Map[String, String]) =
+    s"Job:$id:$desc::" + params.map { case (k, v) => k + "-" + v }.mkString(",")
 }

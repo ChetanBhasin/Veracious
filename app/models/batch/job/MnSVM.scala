@@ -12,4 +12,9 @@ case class MnSVM (
   id: String = " "
 ) extends MineOp {
   def setId(nid: String) = this.copy(id = nid)
+
+  override def toString = jobPrintFormat(id, "Support Vector Machine", Map(
+    "training_dataSet" -> ds_train,
+    "testing" -> ds_test,
+    "iterations" -> max_iter.toString))
 }

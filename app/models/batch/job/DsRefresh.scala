@@ -9,4 +9,5 @@ package models.batch.job
  */
 case class DsRefresh (name: String, id: String = " ") extends DataSetOp {
   def setId(nid: String) = this.copy(id = nid)
+  override def toString = jobPrintFormat(id, "Refresh Data-set", Map("name" -> name))
 }
