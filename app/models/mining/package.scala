@@ -17,5 +17,5 @@ package object mining {
   *
   * Define each algo in it's own object.
   * Single function which takes the required parameters and gives uniform result,
-  * preferably an scala.util.Either[ErrorString, Result]
+  * preferably an scala.util.Either[ErrorString, MinerResult]
   */

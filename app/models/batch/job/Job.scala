@@ -26,7 +26,9 @@ trait Job {
 }
 
 trait DataSetOp extends Job     // Used by the DataSet operations manager
-trait MineOp    extends Job     // Used by the mining subsystem
+trait MineOp    extends Job {
+  val ds_name: String
+}
 
 // TODO, implement the Job factory
 
@@ -35,13 +37,6 @@ trait MineOp    extends Job     // Used by the mining subsystem
   */
 object Job {
 
-  // Just a Jugaad, TODO:, write the full unapply code
-  val unapply = (j: Job) => Some((
-    "DataSetOp", "DsDelete", None, List("dsName"), List[Int]()))
-  /*
-
-
-   */
   /**
    * The apply function creates the correct kind of job for the user data
    * that is passed to the application as a form
@@ -97,6 +92,23 @@ object Job {
         MnFPgrowth(
           ds_name = textParams(0),
           min_support = textParams(1).toDouble)
+      case "MnSVM" =>
+        assert(textParams.length >= 1)
+        assert(numParams.length >= 1)
+        MnSVM(
+          ds_name = textParams(0),
+          max_iter = numParams(0))
     }
+  }
+
+  val unapply = (job: Job) => job match {
+    case DsAddDirect(ds, d, _, _, _) => Some("DataSetOp", "DsAddDirect", None, List(ds, d), List[Int]())
+    case DsAddFromUrl(ds, d, _, u, _) => Some("DataSetOp", "DsAddDirect", None, List(ds, d, u), List[Int]())
+    case DsDelete(ds) => Some("DataSetOp", "DsDelete", None, List(ds), List[Int]())
+    case DsRefresh(ds) => Some("DataSetOp", "DsRefresh", None, List(ds), List[Int]())
+    case MnALS(ds) => Some("MineOp", "MnALS", None, List(ds), List[Int]())
+    case MnClustering(ds, pr, mit, cc) => Some("MineOp", "MnClustering", pr, List(ds), List(mit, cc))
+    case MnFPgrowth(ds, ms) => Some("MineOp", "MnFPgrowth", None, List(ds, ms.toString), List[Int]())
+    case MnSVM(ds, mit) => Some("MineOp", "MnSVM", None, List(ds), List(mit))
   }
 }
