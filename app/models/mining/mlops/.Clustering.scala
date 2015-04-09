@@ -1,9 +1,5 @@
 package models.mining.mlops
 
-import org.apache.spark.mllib.clustering._
-import org.apache.spark.mllib.linalg.Vectors
-import org.apache.spark.rdd.RDD
-
 /**
  * Created by chetan on 12/03/15.
  */

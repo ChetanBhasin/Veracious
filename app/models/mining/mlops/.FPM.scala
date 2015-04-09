@@ -1,8 +1,5 @@
 package models.mining.mlops
 
-import org.apache.spark.mllib.fpm.FPGrowth
-import org.apache.spark.rdd.RDD
-
 /**
  * Frequent pattern detection using FP-Growth algorithm
  * @param minSupport Minimum support for the itemsets

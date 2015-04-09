@@ -36,3 +36,9 @@ object Client {
   // The required props for the client
   def props(mediator: ActorRef)(out: ActorRef) = Props(classOf[Client], out, mediator)
 }
+
+/** Reception API for the client web-socket
+  1. Logs =>
+    { log: [ {status, message, activity} ] }
+
+*/
