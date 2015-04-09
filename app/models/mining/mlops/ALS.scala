@@ -13,9 +13,9 @@ import org.apache.spark.rdd.RDD
  * @param rank
  * @param numIterations Number of iterations to be performed for the algorithm
  */
-abstract class ALS(rank: Int = 10, numIterations: Int = 20) {
+class VALS(file: String, rank: Int = 10, numIterations: Int = 20) {
 
-  protected[mlops] def data: (RDD[String])
+  lazy val data: (RDD[String]) = sc.textFile(file)
 
   lazy val ratings = data.map(_.split(",") match {
     case Array(user, item, rate) =>
@@ -45,31 +45,5 @@ abstract class ALS(rank: Int = 10, numIterations: Int = 20) {
   def saveToTextFile(filePath: String) = predictions.saveAsTextFile(filePath)
 
   def saveToObjectFile(filePath: String) = predictions.saveAsObjectFile(filePath)
-
-}
-
-/**
- * ALS algorithm on file contents
- * @param file Path of the file on which algorithm has to be performed
- * @param rank
- * @param numIterations Number of iterations to be performed for the algorithm
- */
-class fileALS(file: String, rank: Int = 10, numIterations: Int = 20)
-  extends ALS(rank, numIterations) {
-
-  protected[mlops] def data: RDD[String] = sc.textFile(file)
-
-}
-
-/**
- * ALS algorithm on RDD contents
- * @param rdd RDD on which the operations have to be performed
- * @param rank
- * @param numIterations Number of the iterations to be performed for the algorithm
- */
-class RDDContentALS(rdd: RDD[String], rank: Int = 10, numIterations: Int = 20)
-  extends ALS(rank, numIterations) {
-
-  protected[mlops] def data = rdd
 
 }

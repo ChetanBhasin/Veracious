@@ -13,11 +13,11 @@ import org.apache.spark.rdd.RDD
  * Linear SVM algorithm for binary classification
  * @param numIterations Number of iterations to be performed for the algorithm
  */
-abstract class SVM(numIterations: Int = 100) {
+class SVM(file: String, testFile: String, numIterations: Int = 100) {
 
-  protected[mlops] def data: RDD[LabeledPoint]
+  lazy val data: RDD[LabeledPoint] = MLUtils.loadLibSVMFile(sc, file)
 
-  protected[mlops] def tests: RDD[org.apache.spark.mllib.linalg.Vector]
+  lazy val tests: RDD[org.apache.spark.mllib.linalg.Vector] = MLUtils.loadVectors(sc, testFile)
 
   lazy val model = SVMWithSGD.train(data.cache, numIterations)
 
@@ -39,32 +39,4 @@ abstract class SVM(numIterations: Int = 100) {
   def saveToTextFile(filePath: String) = predictions.saveAsTextFile(filePath)
 
   def saveToObjectFile(filePath: String) = predictions.saveAsObjectFile(filePath)
-}
-
-/**
- * Linear SVM algorithm on contents of a file
- * @param file Path of the vector file on which the algorithm has to be run
- * @param testFile Path of the file on which tests have to be performed
- * @param numIterations Number of iterations to be performed for the algorithm
- */
-class fileSVM(file: String, testFile: String, numIterations: Int = 100) extends SVM(numIterations) {
-
-  protected[mlops] def data = MLUtils.loadLibSVMFile(sc, file)
-
-  protected[mlops] def tests = MLUtils.loadVectors(sc, testFile)
-
-}
-
-/**
- * Linear SVM algorithm on an RDD vector
- * @param rdd String RDD from which the vectors have to be extracted
- * @param testRDD RDD for test data
- * @param numIterations Number of iterations to be performed for the algorithm
- */
-class RDDVectorSVM(rdd: RDD[LabeledPoint], testRDD: RDD[org.apache.spark.mllib.linalg.Vector], numIterations: Int) extends SVM(numIterations) {
-
-  protected[mlops] def data = rdd
-
-  protected[mlops] def tests = testRDD
-
 }
