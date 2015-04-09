@@ -17,13 +17,12 @@ javaOptions ++= Seq("-Xmx2G")
 
 // All the apache spark dependencies
 libraryDependencies ++= Seq(
-  "org.apache.spark" % "spark-core_2.10" % sparkVersion excludeAll(
-    ExclusionRule(organization = "org.slf4j")
-    ),
+  "org.apache.spark" % "spark-core_2.10" % sparkVersion excludeAll ExclusionRule(organization = "org.slf4j"),
   "org.apache.spark" % "spark-sql_2.10" % sparkVersion,
   "org.apache.spark" % "spark-streaming_2.10" % sparkVersion,
   "org.apache.spark" % "spark-mllib_2.10" % sparkVersion
 )
+
 
 // Scala-csv library dependency
 // Libary found at http://github.com/tototoshi/scala-csv
@@ -38,12 +37,17 @@ resolvers ++= Seq(
   "Local Repo" at Path.userHome.asFile.toURI.toURL + "/.m2/repository", // Added local repository
   Resolver.mavenLocal )
 
-
 libraryDependencies ++= Seq(
   jdbc,
   anorm,
   cache,
   ws
+)
+
+// Akka depenedencies
+libraryDependencies ++= Seq(
+  "com.typesafe.akka" %% "akka-actor" % "2.3.9",
+  "com.typesafe.akka" %% "akka-testkit" % "2.3.9"
 )
 
 //Compiler plugins
@@ -90,10 +94,6 @@ initialCommands in console :=
                                   |
                                   |""".stripMargin
 
-cleanupCommands in console :=
-  s"""
-     |sc.stop()
-   """.stripMargin
 
 /// scaladoc
 scalacOptions in (Compile,doc) ++= Seq("-groups", "-implicits",
