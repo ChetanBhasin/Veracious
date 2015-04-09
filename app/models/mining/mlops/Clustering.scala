@@ -1,4 +1,4 @@
-package models.mining.oldAlgo
+package models.mining.mlops
 
 import org.apache.spark.mllib.clustering._
 import org.apache.spark.mllib.linalg.Vectors
@@ -15,12 +15,12 @@ import org.apache.spark.rdd.RDD
  */
 abstract class Clustering(numClusters: Int, numIterations: Int = 20) {
 
-  protected[oldAlgo] def data: (RDD[String])
+  protected[mlops] def data: (RDD[String])
 
   private lazy val supply = data.map(Vectors.parse(_))
   lazy val clusters = KMeans.train(supply, numClusters, numIterations)
 
-  def run = println("models.mining.oldAlgo.Clustering:\n" + clusters.toString)
+  def run = println("models.mining.mlops.Clustering:\n" + clusters.toString)
 
   def saveToTextFile(fileLocation: String) = {
     val dataset = clusters.predict(supply) zip supply
@@ -43,7 +43,7 @@ abstract class Clustering(numClusters: Int, numIterations: Int = 20) {
 class fileVectorClustering(file: String, numClusters: Int, numIterations: Int = 20)
   extends Clustering(numClusters, numIterations) {
 
-  protected[oldAlgo] def data = sc.textFile(file)
+  protected[mlops] def data = sc.textFile(file)
 
 }
 
@@ -56,6 +56,6 @@ class fileVectorClustering(file: String, numClusters: Int, numIterations: Int = 
 class RDDVectorClustering(rdd: RDD[String], numClusters: Int, numIterations: Int = 20)
   extends Clustering(numClusters, numIterations) {
 
-  protected[oldAlgo] def data = rdd
+  protected[mlops] def data = rdd
 
 }

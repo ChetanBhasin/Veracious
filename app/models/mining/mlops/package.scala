@@ -3,7 +3,7 @@ package models.mining
 /**
  * Created by chetan on 08/04/15.
  */
-package object oldAlgo {
+package object mlops {
 
   import org.apache.spark._
 

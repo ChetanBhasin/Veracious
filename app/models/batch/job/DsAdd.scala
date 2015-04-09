@@ -14,8 +14,8 @@ import play.api.libs.Files.TemporaryFile
  */
 
 abstract class DsAdd extends DataSetOp {
-  val name: String ,
-  val description: String ,
+  val name: String;
+  val description: String;
   val target_algo: Algorithm
 }
 

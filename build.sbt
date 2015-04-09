@@ -58,7 +58,7 @@ addCompilerPlugin("com.foursquare.lint" %% "linter" % "0.1.8")
 /// console
 
 // define the statements initially evaluated when entering 'console', 'consoleQuick', or 'consoleProject'
-// but still keep the console settings in the sbt-spark-package plugin
+// but still keep the console settings in the sbt-spark-mlops plugin
 
 // If you want to use yarn-client for spark cluster mode, override the environment variable
 // SPARK_MODE=yarn-client <cmd>

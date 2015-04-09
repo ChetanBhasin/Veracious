@@ -1,6 +1,6 @@
-package models.mining.oldAlgo
+package models.mining.mlops
 
-import org.apache.spark.mllib.recommendation.{ALS, Rating}
+import org.apache.spark.mllib.recommendation.Rating
 import org.apache.spark.rdd.RDD
 
 /**
@@ -15,7 +15,7 @@ import org.apache.spark.rdd.RDD
  */
 abstract class ALS(rank: Int = 10, numIterations: Int = 20) {
 
-  protected[oldAlgo] def data: (RDD[String])
+  protected[mlops] def data: (RDD[String])
 
   lazy val ratings = data.map(_.split(",") match {
     case Array(user, item, rate) =>
@@ -26,7 +26,7 @@ abstract class ALS(rank: Int = 10, numIterations: Int = 20) {
     case Rating(user, item, rate) => (user, item)
   }
 
-  lazy val model = ALS.train(ratings, rank, numIterations)
+  lazy val model = org.apache.spark.mllib.recommendation.ALS.train(ratings, rank, numIterations)
 
   lazy val predictions = model.predict(userItems).map {
     case Rating(user, item, rate) =>
@@ -34,7 +34,7 @@ abstract class ALS(rank: Int = 10, numIterations: Int = 20) {
   }
 
   def run = {
-    println("models.mining.oldAlgo.ALS:")
+    println("models.mining.mlops.ALS:")
     predictions.map { x =>
       x match {
         case ((user, item), rate) => println("User: " + user + "; Item: " + item + "; Rating: " + rate)
@@ -57,7 +57,7 @@ abstract class ALS(rank: Int = 10, numIterations: Int = 20) {
 class fileALS(file: String, rank: Int = 10, numIterations: Int = 20)
   extends ALS(rank, numIterations) {
 
-  protected[oldAlgo] def data: RDD[String] = sc.textFile(file)
+  protected[mlops] def data: RDD[String] = sc.textFile(file)
 
 }
 
@@ -70,6 +70,6 @@ class fileALS(file: String, rank: Int = 10, numIterations: Int = 20)
 class RDDContentALS(rdd: RDD[String], rank: Int = 10, numIterations: Int = 20)
   extends ALS(rank, numIterations) {
 
-  protected[oldAlgo] def data = rdd
+  protected[mlops] def data = rdd
 
 }
