@@ -13,6 +13,6 @@ import models.batch.OperationStatus.OperationStatus
  * @param status The status of the Operation as specified in batch.OperationStatus
  * @param user The user of the job
  * @param msg A short message description
- * @param content IMPORTANT, Either a Batch or a Job.
+ * @param content A logEvent type with the logWrite val/function
  */
-case class Log (status: OperationStatus, user: String, msg: String, content: Any)
+case class Log (status: OperationStatus, user: String, msg: String, content: LogEvent)

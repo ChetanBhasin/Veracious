@@ -1,5 +1,6 @@
 package models.batch.job
 
+import models.messages.logger.LogEvent
 import models.mining.Algorithm
 
 /**
@@ -20,7 +21,7 @@ import models.mining.Algorithm
   * need to do a map on the initial job list to extract files from the request
   * (consult the desing docs)
   */
-trait Job {
+trait Job extends LogEvent {
   val id: String                // Preferably BatchId:Job#
   def setId (id: String): Job   // Have to use the copy constructor of the case class but cannot implement here
 }
