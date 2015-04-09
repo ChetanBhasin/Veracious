@@ -5,7 +5,7 @@ package models
  */
 package object mining {
 
-  /** An enumeration of all the algorithms we use **/
+  /** An enumeration of all the mlops we use **/
   object Algorithm extends Enumeration {
     type Algorithm = Value
     val Clustering, FPgrowth, SVM, ALS = Value
@@ -17,5 +17,5 @@ package object mining {
   *
   * Define each algo in it's own object.
   * Single function which takes the required parameters and gives uniform result,
-  * preferably an scala.util.Either[ErrorString, MinerResult]
+  * preferably an scala.util.Either[ErrorString, Result]
   */

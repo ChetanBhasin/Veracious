@@ -1,5 +1,7 @@
 package models.mining
 
+import models.mining.Algorithm.Algorithm
+
 /**
  * Created by basso on 08/04/15.
  *
@@ -8,4 +10,5 @@ package models.mining
  *
  * Chetan, please extend this trait to use any kind of result that is needed
  */
-trait MinerResult
+
+case class MinerResult(al: Algorithm, save: (String) => Unit)
