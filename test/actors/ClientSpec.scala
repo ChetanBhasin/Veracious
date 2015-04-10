@@ -1,7 +1,7 @@
 package actors
 
-import actors.Client.Client._
-import actors.Mediator.RegisterForNotification
+import actors.client.Client._
+import actors.mediator.RegisterForNotification
 import akka.actor.PoisonPill
 import models.messages.client._
 import play.api.libs.json._

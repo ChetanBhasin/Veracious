@@ -1,10 +1,10 @@
-package actors.Client
+package actors.client
 
 /**
  * Created by basso on 09/04/15.
  */
 
-import actors.Mediator._
+import actors.mediator._
 import akka.actor._
 import models.messages.client._
 
