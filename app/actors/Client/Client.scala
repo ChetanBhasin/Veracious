@@ -15,7 +15,7 @@ import models.messages.client._
  * @param mediator The ActorRef of the Mediator
  */
 class Client (val username: String, socket: ActorRef, mediator: ActorRef) extends Actor {
-  mediator ! RegisterForReceive(self, classOf[ClientMessage])
+  mediator ! RegisterForReceive(self, classOf[MessageToClient])
 
   mediator ! LogIn(username)
 
@@ -34,7 +34,7 @@ class Client (val username: String, socket: ActorRef, mediator: ActorRef) extend
 
 object Client {
   // The required props for the client
-  def props(mediator: ActorRef)(out: ActorRef) = Props(classOf[Client], out, mediator)
+  def props(mediator: ActorRef)(username: String, out: ActorRef) = Props(classOf[Client], username, out, mediator)
 }
 
 /** Reception API for the client web-socket

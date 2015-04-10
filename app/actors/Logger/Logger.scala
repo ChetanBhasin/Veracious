@@ -19,7 +19,7 @@ import scala.io.Source
  */
 
 import actors.Logger.Logger._
-class Logger (mediator: ActorRef) extends Actor {
+class Logger (implicit val logFile: String, mediator: ActorRef) extends Actor {
   mediator ! RegisterForReceive(self, classOf[Log])
   val userList = ListBuffer[String]()
 
@@ -63,7 +63,7 @@ class Logger (mediator: ActorRef) extends Actor {
 
 object Logger {
 
-  val logFile = "./resources/operationLog"
+  //val logFile = "./resources/operationLog"
 
   /**
    * This function will take a line of the file and return the log object if the corresponding
@@ -86,7 +86,7 @@ object Logger {
    * @param user the user we are interested in
    * @return JsArray[logs]
    */
-  def getLogs (user: String): JsArray = {
+  def getLogs (user: String) (implicit logFile: String): JsArray = {
     val stream = Source.fromFile(logFile)
     JsArray((
       for {
@@ -97,7 +97,7 @@ object Logger {
     )
   }
 
-  def createAndWriteLog (logEvent: Log): JsValue = {
+  def createAndWriteLog (logEvent: Log) (implicit logFile: String): JsValue = {
     // We first create the log object
     val logObj = Json.obj(
       "status" -> logEvent.status.toString.substring(2).toUpperCase,
@@ -105,7 +105,7 @@ object Logger {
       "activity" -> logEvent.content.logWrite
     )
     // Write the object to file immediately
-    val writer = new PrintWriter (new BufferedWriter (new FileWriter (logFile)))
+    val writer = new PrintWriter (new BufferedWriter (new FileWriter (logFile, true)))
     writer.println(
       Json.stringify(
         Json.obj(

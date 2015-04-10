@@ -1,9 +1,7 @@
+import org.junit.runner._
 import org.specs2.mutable._
 import org.specs2.runner._
-import org.junit.runner._
-
 import play.api.test._
-import play.api.test.Helpers._
 
 /**
  * Add your spec here.
@@ -16,9 +14,6 @@ class BasicSparkTest extends Specification {
   "Application" should {
 
     "be able to connect to spark and do basic comparison" in new WithApplication {
-
-      import org.apache.spark._
-      import org.apache.spark.SparkContext
 
       val conf = new SparkConf().setAppName("Test-Application-Veracious").setMaster("local")
       val sc = new SparkContext(conf)
