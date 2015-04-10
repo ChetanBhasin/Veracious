@@ -6,7 +6,7 @@ import akka.actor.ActorRef
  * Created by basso on 13/4/14.
  * Contains all the directive types for the Mediator
  */
-package object Mediator {
+package object mediator {
   sealed trait Registration
 
     // Register an actor to receive messages of types 'messageType' (& any of there subtypes)

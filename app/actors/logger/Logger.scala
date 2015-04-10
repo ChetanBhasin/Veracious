@@ -1,8 +1,8 @@
-package actors.Logger
+package actors.logger
 
 import java.io.{BufferedWriter, FileWriter, PrintWriter}
 
-import actors.Mediator._
+import actors.mediator._
 import akka.actor.{Actor, ActorRef}
 import models.messages.client.{LogIn, LogOut, MessageToClient}
 import models.messages.logger.Log
@@ -18,7 +18,7 @@ import scala.io.Source
  *
  */
 
-import actors.Logger.Logger._
+import actors.logger.Logger._
 class Logger (implicit val logFile: String, mediator: ActorRef) extends Actor {
   mediator ! RegisterForReceive(self, classOf[Log])
   val userList = ListBuffer[String]()

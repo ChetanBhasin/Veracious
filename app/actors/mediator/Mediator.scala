@@ -1,4 +1,4 @@
-package actors.Mediator
+package actors.mediator
 
 import akka.actor.{Actor, ActorRef, Terminated}
 

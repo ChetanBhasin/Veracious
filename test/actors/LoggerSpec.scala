@@ -2,11 +2,13 @@ package actors
 
 import java.io.{File, PrintWriter}
 
-import actors.Client.Client.props
-import actors.Logger._
+import actors.client.Client.props
+import actors.logger._
+import actors.mediator.RegisterForNotification
 import akka.actor.Props
 import models.batch.OperationStatus
 import models.batch.job.DsAddFromUrl
+import models.messages.client.LogIn
 import models.messages.logger._
 import models.mining.Algorithm
 import play.api.libs.json._
@@ -20,6 +22,9 @@ import scala.io.Source
 class LoggerSpec extends IntegrationTest {
   val user = "Anish"
   val logFile = "./test/resources/logFile_test"
+  mediator ! RegisterForNotification(testActor)
+
+  val logger = system.actorOf(Props(classOf[Logger], logFile, mediator))
 
   /** Setup the logFile to original form */
   val writer = new PrintWriter(new File(logFile))
@@ -28,13 +33,17 @@ class LoggerSpec extends IntegrationTest {
   writer.close()
   /** ---------------------------------- */
 
-  val logger = system.actorOf(Props(classOf[Logger], logFile, mediator))
+  /*
+    TODO: Problems were being created here because the logger wasn't initializing on time. It is imperative
+    that a feedback mechanism be made to make sure all the sub-systems are initialised and ready
+   */
 
   val client = system.actorOf(props(mediator)(user, testActor))
 
   var msg: JsValue = JsNull
   "Logger" should "send the client a log message on startup" in {
-    msg = expectMsgClass(3 seconds, classOf[JsValue])
+    expectMsg(LogIn(user))
+    msg = expectMsgClass(5 seconds, classOf[JsValue])
     msg \ "log" != JsNull
   }
 
@@ -62,6 +71,6 @@ class LoggerSpec extends IntegrationTest {
   }
 
   it should "not send the log that belongs to some other client" in {
-    logger ! sampleLog.copy(user = "Jibin")
+    logger ! sampleLog.copy(user = "OtherUser")
   }
 }

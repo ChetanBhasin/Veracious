@@ -1,6 +1,6 @@
 package actors
 
-import actors.Mediator._
+import actors.mediator._
 import akka.actor.{ActorSystem, Props}
 import akka.testkit._
 import models.messages.GlobalBroadcast
