@@ -4,6 +4,7 @@ import java.io.{BufferedWriter, FileWriter, PrintWriter}
 
 import actors.mediator._
 import akka.actor.{Actor, ActorRef}
+import models.messages.Ready
 import models.messages.client.{LogIn, LogOut, MessageToClient}
 import models.messages.logger.Log
 import play.api.libs.json._
@@ -23,8 +24,16 @@ class Logger (implicit val logFile: String, mediator: ActorRef) extends Actor {
   mediator ! RegisterForReceive(self, classOf[Log])
   val userList = ListBuffer[String]()
 
-  def receive = {
+    /** This message is called once the actor is ready */
+  override def preStart() {
+    mediator ! Ready("Logger")    // TODO: The manager will be it's parent, so a context.parent ! Read() makes more sense
+  }
 
+  override def postStop() {
+    mediator ! Unregister(self)
+  }
+
+  def receive = {
     case LogIn (username) =>
       /** The username has just logged in, let us welcome him/her with logs **/
       userList += username
