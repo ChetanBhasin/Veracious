@@ -17,7 +17,7 @@ class ClientSpec extends IntegrationTest {
   mediator ! RegisterForNotification (testActor)
 
   /** We shall become the web-socket for the client **/
-  val client = system.actorOf(props(mediator)(user, testActor))
+  val client = system.actorOf(props(mediator)(user, testActor), "testClient")
 
   "Client" should "broadcast login message" in {
     expectMsg(LogIn(user))

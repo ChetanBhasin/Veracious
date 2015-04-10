@@ -12,7 +12,7 @@ abstract class IntegrationTest(_system: ActorSystem) extends TestKit(_system)
   def this() = this(ActorSystem("test"))
 
   /** Setup the mediator */
-  val mediator = system.actorOf(Props[Mediator])
+  val mediator = system.actorOf(Props[Mediator], "mediator")
   mediator ! RegisterBroadcastMessage (classOf[GlobalBroadcast])
 
   override def afterAll() {

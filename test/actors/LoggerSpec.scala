@@ -4,10 +4,11 @@ import java.io.{File, PrintWriter}
 
 import actors.client.Client.props
 import actors.logger._
-import actors.mediator.RegisterForNotification
+import actors.mediator.RegisterForReceive
 import akka.actor.Props
 import models.batch.OperationStatus
 import models.batch.job.DsAddFromUrl
+import models.messages.Ready
 import models.messages.client.LogIn
 import models.messages.logger._
 import models.mining.Algorithm
@@ -22,9 +23,17 @@ import scala.io.Source
 class LoggerSpec extends IntegrationTest {
   val user = "Anish"
   val logFile = "./test/resources/logFile_test"
-  mediator ! RegisterForNotification(testActor)
 
-  val logger = system.actorOf(Props(classOf[Logger], logFile, mediator))
+  /** Setup the mediator */
+  //mediator ! RegisterForNotification(testActor)           // THIS was the problem!!!
+  mediator ! RegisterForReceive(testActor, classOf[Ready])
+
+
+  val logger = system.actorOf(Props(classOf[Logger], logFile, mediator), "logger")
+  "Logger" should "notify that it is ready" in {
+    expectMsg(4 seconds, Ready("Logger"))
+  }
+
 
   /** Setup the logFile to original form */
   val writer = new PrintWriter(new File(logFile))
@@ -38,11 +47,13 @@ class LoggerSpec extends IntegrationTest {
     that a feedback mechanism be made to make sure all the sub-systems are initialised and ready
    */
 
-  val client = system.actorOf(props(mediator)(user, testActor))
+  val client = system.actorOf(props(mediator)(user, testActor), "testClient2")
+  "Client" should "Notify that it has logged in" in {
+    expectMsg(4 seconds, LogIn(user))
+  }
 
   var msg: JsValue = JsNull
   "Logger" should "send the client a log message on startup" in {
-    expectMsg(LogIn(user))
     msg = expectMsgClass(5 seconds, classOf[JsValue])
     msg \ "log" != JsNull
   }

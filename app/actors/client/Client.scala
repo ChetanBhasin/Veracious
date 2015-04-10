@@ -17,7 +17,9 @@ import models.messages.client._
 class Client (val username: String, socket: ActorRef, mediator: ActorRef) extends Actor {
   mediator ! RegisterForReceive(self, classOf[MessageToClient])
 
-  mediator ! LogIn(username)
+  override def preStart() {
+    mediator ! LogIn(username)
+  }
 
   def receive = {
     // Match the message to our username
