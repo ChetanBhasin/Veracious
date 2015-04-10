@@ -69,7 +69,7 @@ class Worker (val user: String, val mediator: ActorRef)
 
     case Event(NextJob, Work(batch)) => batch.jobs match {      // Called every time to move onto the next job
       case Nil =>
-        Log(OpSuccess, user, "The batch completed successfully", batch)
+        mediator ! Log(OpSuccess, user, "The batch completed successfully", batch)
         goto(Available) using Uninitialized
       case job :: rest =>
         job match {
