@@ -16,10 +16,6 @@ class BatchWorkerSpec extends IntegrationTest {
 
   val mockParent = system.actorOf(Props(classOf[MockWorkerParent], user, mockMediator.ref, parentProbe.ref))
 
-  "Worker" should "notify the parent that it is available" in {
-    parentProbe.expectMsg(IAmFree(user))
-  }
-
   it should "accept the batch and submit the first job" in {
     mockParent ! mockBatch
     mockMediator.expectMsg(SubmitDsOpJob(user, MockDsOp("Ds1")))
