@@ -28,4 +28,7 @@ package object mocks {
   val mockBatch2 = mockBatch.copy(jobs =
     List( MockMineOp("Mn1") ))
 
+  val mockBatch3 = mockBatch.copy(jobs =
+    List( MockDsOp("Ds1") ))
+
 }

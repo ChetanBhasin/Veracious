@@ -46,27 +46,27 @@ class Worker (val user: String, val mediator: ActorRef)
 
   implicit val timeout = Timeout(3 seconds)   // Forgot what this was for
 
-  override def preStart() {
-    context.parent ! IAmFree(user)
-  }
-
   startWith(Available, Uninitialized)
 
   when (Available) {
+      /** Batch submission */
     case Event(b: Batch, Uninitialized) =>
       self ! NextJob
       goto(Busy) using Work(b)
   }
 
   when (Busy) {
+      /** The current job has succeded, move on */
     case Event(OpSuccess | OpWarning, Work(b)) =>
       self ! NextJob
       stay using Work(b.copy(jobs = b.jobs.tail))       // Here we update the jobs
 
+      /** The current job has failed. Fail the batch */
     case Event(OpFailure, Work(b)) =>
       mediator ! Log(OpFailure, user, "The job "+b.jobs.head.id+" failed", b)
       goto(Available) using Uninitialized
 
+      /** Actual algo to move to next job in batch */
     case Event(NextJob, Work(batch)) => batch.jobs match {      // Called every time to move onto the next job
       case Nil =>
         mediator ! Log(OpSuccess, user, "The batch completed successfully", batch)
@@ -81,6 +81,7 @@ class Worker (val user: String, val mediator: ActorRef)
     }
   }
 
+    /** Every time a Batch finishes, inform the controller that it is free */
   onTransition {
     case Busy -> Available => context.parent ! IAmFree(user)
   }
