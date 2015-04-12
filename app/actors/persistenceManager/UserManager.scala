@@ -1,6 +1,7 @@
 package actors.persistenceManager
 
 import java.io.FileWriter
+import java.nio.file.{Files, Paths, StandardOpenOption}
 
 import akka.actor.{ActorSystem, TypedActor, TypedProps}
 import models.batch._
@@ -23,6 +24,13 @@ object UserManager {
    * @return
    */
   def checkUsername(username: String) = {
+
+    lazy val PathStoreDir = Paths.get("./datastore/")
+    lazy val PathStoreFileUser = Paths.get("./datastore/users")
+
+    if (Files.exists(PathStoreDir)) Files.createDirectory(PathStoreDir)
+    if (files.exists(PathStoreFileUser)) Files.createDirectory(PathStoreFileUser)
+
     lazy val users = (for {
       line <- Source.fromFile("./datastore/users").getLines()
       record <- line.split("::").map(_ trim)
@@ -71,19 +79,17 @@ class UserManager {
    */
   def addUser(username: String, password: String) = Future {
 
+    lazy val PathStoreDir = Paths.get("./datastore/")
+    lazy val PathStoreFileUser = Paths.get("./datastore/users")
+
+    if (Files.exists(PathStoreDir)) Files.createDirectory(PathStoreDir)
+    if (files.exists(PathStoreFileUser)) Files.createDirectory(PathStoreFileUser)
+
     if (UserManager.checkUsername(username)) {
       OperationStatus.OpFailure
     } else {
-
       try {
-        lazy val fw = new FileWriter("./datastore/users")
-
-        // Write off existing records before overwrite
-        lazy val existing = UserManager.getRawUsersRec
-        existing.map(fw.write(_))
-
-        fw.write(s"$username::$password")
-        fw.close()
+        Files.write(PathStoreFileUser, s"$username::$password", StandardOpenOption.APPEND)
         OperationStatus.OpSuccess
       } catch {
         case _ => OperationStatus.OpWarning
@@ -105,6 +111,13 @@ class UserManager {
    * @return
    */
   def changePassword(username: String, password: String) = Future {
+
+    lazy val PathStoreDir = Paths.get("./datastore/")
+    lazy val PathStoreFileUser = Paths.get("./datastore/users")
+
+    if (Files.exists(PathStoreDir)) Files.createDirectory(PathStoreDir)
+    if (files.exists(PathStoreFileUser)) Files.createDirectory(PathStoreFileUser)
+
     lazy val existing = UserManager.getRawUsersRec
 
     lazy val newRecs = for {
