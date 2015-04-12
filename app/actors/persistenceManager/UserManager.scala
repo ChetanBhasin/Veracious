@@ -2,6 +2,7 @@ package actors.persistenceManager
 
 import java.io.FileWriter
 
+import akka.actor.{ActorSystem, TypedActor, TypedProps}
 import models.batch._
 
 import scala.concurrent.Future
@@ -14,6 +15,13 @@ import scala.io.Source
 
 object UserManager {
 
+  private var singleton = true
+
+  /**
+   * Checks for existing users in the records
+   * @param username
+   * @return
+   */
   def checkUsername(username: String) = {
     lazy val users = (for {
       line <- Source.fromFile("./datastore/users").getLines()
@@ -21,6 +29,24 @@ object UserManager {
     } yield record(0)).toStream
 
     users contains username
+  }
+
+  def getRawUsersRec = {
+    Source.fromFile("./datastore/users").getLines()
+  }
+
+  /**
+   * Returns a typed actor of type User Manager
+   * @param system The ActorSystem to be used
+   * @return
+   */
+  def apply(system: ActorSystem) = {
+    if (singleton) {
+      singleton = false
+      TypedActor(system).typedActorOf(TypedProps[UserManager]())
+    } else {
+      throw new Exception("Only one object at a time is allowed")
+    }
   }
 
 }
@@ -49,9 +75,13 @@ class UserManager {
       OperationStatus.OpFailure
     } else {
 
-      val fw = new FileWriter("./datastore/users")
-
       try {
+        lazy val fw = new FileWriter("./datastore/users")
+
+        // Write off existing records before overwrite
+        lazy val existing = UserManager.getRawUsersRec
+        existing.map(fw.write(_))
+
         fw.write(s"$username::$password")
         fw.close()
         OperationStatus.OpSuccess
@@ -74,7 +104,25 @@ class UserManager {
    * @param password
    * @return
    */
-  def changePassword(username: String, password: String) =
-    Future.successful(???)
+  def changePassword(username: String, password: String) = Future {
+    lazy val existing = UserManager.getRawUsersRec
+
+    lazy val newRecs = for {
+      oldrecs <- Source.fromFile("./datastore/users").getLines()
+      out <- if (oldrecs.split("::").map(_.trim)(0) == username)
+        s"$username::$password"
+      else oldrecs
+    } yield out
+
+    try {
+      lazy val fw = new FileWriter("./datastore/users")
+
+      newRecs.map(fw.write(_))
+      fw.close()
+      OperationStatus.OpSuccess
+    } catch {
+      case _ => OperationStatus.OpFailure
+    }
+  }
 
 }
