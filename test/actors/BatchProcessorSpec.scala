@@ -4,7 +4,6 @@ import actors.batchProcessor.BatchProcessor
 import actors.mediator.RegisterForReceive
 import actors.mocks._
 import akka.actor.Props
-import akka.testkit.TestProbe
 import models.batch.Batch
 import models.batch.OperationStatus._
 import models.messages.batchProcessing._
@@ -12,52 +11,52 @@ import models.messages.client.{LogIn, LogOut}
 import models.messages.logger.Log
 import models.messages.{Ready, SysError}
 
-class BatchProcessorSpec extends IntegrationTest {
+class BatchProcessorSpec extends UnitTest {
   val user = "Anish"
-  val mockMediator = TestProbe()
-  val testProcessor = system.actorOf(Props(classOf[BatchProcessor], mockMediator.ref), "testBatchProcessor")
+  //val parent = system.actorOf(Props(classOf[BatchProcessor], mediator.ref), "testBatchProcessor")
+  val parent = setupParent( Props(classOf[BatchProcessor], mediator.ref) )
 
-  val submit = (b: Batch) => testProcessor ! SubmitBatch(user, b)
+  val submit = (b: Batch) => parent ! SubmitBatch(user, b)
 
   "Batch Processor" should "Setup correctly" in {
-    mockMediator.expectMsg(RegisterForReceive(testProcessor, classOf[BatchProcessorMessage]))
-    mockMediator.expectMsg(Ready("BatchProcessor"))
+    mediator.expectMsgClass(classOf[RegisterForReceive])
+    parentProbe.expectMsg(Ready("BatchProcessor"))
   }
 
-  it should "send error message for orphan batch" in {         // TODO: have to work on this one
+  it should "send error message for orphan batch" in {
     submit(mockBatch2)
-    mockMediator.expectMsgClass(classOf[SysError])
+    mediator.expectMsgClass(classOf[SysError])
   }
 
   it should "send error message for orphan jobStatus" in {
-    testProcessor ! JobStatus(user, OpSuccess)
-    mockMediator.expectMsgClass(classOf[SysError])
+    parent ! JobStatus(user, OpSuccess)
+    mediator.expectMsgClass(classOf[SysError])
   }
 
   it should "correctly get a worker to start on a batch" in {
-    testProcessor ! LogIn(user)
+    parent ! LogIn(user)
     submit(mockBatch2)
-    mockMediator.expectMsg(SubmitMineJob(user, MockMineOp("Mn1")))
+    mediator.expectMsg(SubmitMineJob(user, MockMineOp("Mn1")))
   }
 
   it should "sumbmit batch into queue and make worker start immediately on it after finished" in {
     submit(mockBatch3) // Should submit to queue
-    testProcessor ! JobStatus(user, OpSuccess) // For the first batch, it will finish now
-    mockMediator.expectMsgClass(classOf[Log]) // after the first batch finishes
-    mockMediator.expectMsg(SubmitDsOpJob(user, MockDsOp("Ds1"))) // For the second batch
+    parent ! JobStatus(user, OpSuccess) // For the first batch, it will finish now
+    mediator.expectMsgClass(classOf[Log]) // after the first batch finishes
+    mediator.expectMsg(SubmitDsOpJob(user, MockDsOp("Ds1"))) // For the second batch
     // Note, the second batch is still running
   }
 
   "The Worker" should "continue working on its batch even if the user logs out" in {
-    testProcessor ! LogOut(user)
-    testProcessor ! LogIn(user)
-    testProcessor ! JobStatus(user, OpSuccess)    // The second batch that is
-    mockMediator.expectMsgClass(classOf[Log])
+    parent ! LogOut(user)
+    parent ! LogIn(user)
+    parent ! JobStatus(user, OpSuccess)    // The second batch that is
+    mediator.expectMsgClass(classOf[Log])
   }
 
   it should "die when it has no more batches to work on and the user has logged out" in {
-    testProcessor ! LogOut(user)
+    parent ! LogOut(user)
     submit(mockBatch2)
-    mockMediator.expectMsgClass(classOf[SysError])
+    mediator.expectMsgClass(classOf[SysError])
   }
 }

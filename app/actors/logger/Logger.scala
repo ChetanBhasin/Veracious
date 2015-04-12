@@ -20,13 +20,17 @@ import scala.io.Source
  */
 
 import actors.logger.Logger._
-class Logger (implicit val logFile: String, mediator: ActorRef) extends Actor {
+
+/** BIG NOTE ** implicit parameters always to the right,
+  *  Casued me Super headache
+  */
+class Logger (val mediator: ActorRef, implicit val logFile: String) extends Actor {
   mediator ! RegisterForReceive(self, classOf[Log])
   val userList = ListBuffer[String]()
 
     /** This message is called once the actor is ready */
   override def preStart() {
-    mediator ! Ready("Logger")    // TODO: The manager will be it's parent, so a context.parent ! Read() makes more sense
+    context.parent ! Ready("Logger")
   }
 
   override def postStop() {

@@ -53,7 +53,7 @@ object Job {
   ) => opType match {
     case "DataSetOp" => opName match {      // Data set operations
       case "DsAddDirect" =>
-        assert(textParams.length >= 3) // Important, not doing any checking here, TODO
+        assert(textParams.length >= 3) // TODO: do client-side validatation
         DsAddDirect(
           name = textParams(0),
           description = textParams(1),
