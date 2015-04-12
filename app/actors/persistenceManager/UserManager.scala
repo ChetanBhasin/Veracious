@@ -19,6 +19,18 @@ object UserManager {
 
   private var singleton = true
 
+  private[persistenceManager] def checkSources = {
+    lazy val PathStoreDir = Paths.get("./datastore/")
+    lazy val PathStoreMetaDir = Paths.get("./datastore/meta/")
+    lazy val PathStoreUsers = Paths.get("./datastore/meta/users.dat")
+
+    if (!Files.exists(PathStoreDir)) Files.createDirectory(PathStoreDir)
+    if (!Files.exists(PathStoreMetaDir)) Files.createDirectory(PathStoreMetaDir)
+    if (!Files.exists(PathStoreUsers)) Files.createFile(PathStoreUsers)
+
+    PathStoreUsers
+  }
+
   /**
    * Checks for existing users in the records
    * @param username
@@ -26,22 +38,25 @@ object UserManager {
    */
   def checkUsername(username: String) = {
 
-    lazy val PathStoreDir = Paths.get("./datastore/")
-    lazy val PathStoreFileUser = Paths.get("./datastore/users")
+    this.checkSources
 
-    if (Files.exists(PathStoreDir)) Files.createDirectory(PathStoreDir)
-    if (Files.exists(PathStoreFileUser)) Files.createDirectory(PathStoreFileUser)
+    lazy val stream = Source.fromFile("./datastore/meta/users.dat")
 
     lazy val users = (for {
-      line <- Source.fromFile("./datastore/users").getLines()
+      line <- stream.getLines
       record <- line.split("::").map(_ trim)
     } yield record(0)).toStream
+
+    stream.close
 
     users contains username
   }
 
   def getRawUsersRec = {
-    Source.fromFile("./datastore/users").getLines()
+    lazy val stream = Source.fromFile("./datastore/meta/users.dat")
+    lazy val lines = stream.getLines
+    stream.close
+    lines
   }
 
   /**
@@ -80,11 +95,7 @@ class UserManager {
    */
   def addUser(username: String, password: String) = Future {
 
-    lazy val PathStoreDir = Paths.get("./datastore/")
-    lazy val PathStoreFileUser = Paths.get("./datastore/users")
-
-    if (Files.exists(PathStoreDir)) Files.createDirectory(PathStoreDir)
-    if (Files.exists(PathStoreFileUser)) Files.createDirectory(PathStoreFileUser)
+    lazy val PathStoreFileUser = UserManager.checkSources
 
     if (UserManager.checkUsername(username)) {
       OperationStatus.OpFailure
@@ -113,20 +124,19 @@ class UserManager {
    */
   def changePassword(username: String, password: String) = Future {
 
-    lazy val PathStoreDir = Paths.get("./datastore/")
-    lazy val PathStoreFileUser = Paths.get("./datastore/users")
+    UserManager.checkSources
 
-    lazy val existing = UserManager.getRawUsersRec
-
+    lazy val stream = Source.fromFile("./datastore/meta/users.dat")
     lazy val newRecs = for {
-      oldrecs <- Source.fromFile("./datastore/users").getLines()
+      oldrecs <- stream.getLines
       out <- if (oldrecs contains username)
         s"$username::$password"
       else oldrecs
     } yield out
+    stream.close
 
     try {
-      lazy val fw = new FileWriter("./datastore/users")
+      lazy val fw = new FileWriter("./datastore/meta/users.dat")
 
       newRecs.map(fw.write(_))
       fw.close()
