@@ -15,7 +15,8 @@ class BatchProcessor (val mediator: ActorRef) extends Actor {
   implicit val actorFactory = context
 
   override def preStart() {
-    mediator ! Ready("BatchProcessor")      // TODO: context.parent
+    //mediator ! Ready("BatchProcessor")
+    context.parent ! Ready("BatchProcessor")
   }
 
   override def postStop() {
