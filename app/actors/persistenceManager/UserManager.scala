@@ -7,6 +7,7 @@ import akka.actor.{ActorSystem, TypedActor, TypedProps}
 import models.batch._
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 
 /**
@@ -29,7 +30,7 @@ object UserManager {
     lazy val PathStoreFileUser = Paths.get("./datastore/users")
 
     if (Files.exists(PathStoreDir)) Files.createDirectory(PathStoreDir)
-    if (files.exists(PathStoreFileUser)) Files.createDirectory(PathStoreFileUser)
+    if (Files.exists(PathStoreFileUser)) Files.createDirectory(PathStoreFileUser)
 
     lazy val users = (for {
       line <- Source.fromFile("./datastore/users").getLines()
@@ -83,16 +84,16 @@ class UserManager {
     lazy val PathStoreFileUser = Paths.get("./datastore/users")
 
     if (Files.exists(PathStoreDir)) Files.createDirectory(PathStoreDir)
-    if (files.exists(PathStoreFileUser)) Files.createDirectory(PathStoreFileUser)
+    if (Files.exists(PathStoreFileUser)) Files.createDirectory(PathStoreFileUser)
 
     if (UserManager.checkUsername(username)) {
       OperationStatus.OpFailure
     } else {
       try {
-        Files.write(PathStoreFileUser, s"$username::$password", StandardOpenOption.APPEND)
+        Files.write(PathStoreFileUser, s"$username::$password".getBytes, StandardOpenOption.APPEND)
         OperationStatus.OpSuccess
       } catch {
-        case _ => OperationStatus.OpWarning
+        case _: Throwable => OperationStatus.OpWarning
       }
     }
   }
@@ -115,14 +116,11 @@ class UserManager {
     lazy val PathStoreDir = Paths.get("./datastore/")
     lazy val PathStoreFileUser = Paths.get("./datastore/users")
 
-    if (Files.exists(PathStoreDir)) Files.createDirectory(PathStoreDir)
-    if (files.exists(PathStoreFileUser)) Files.createDirectory(PathStoreFileUser)
-
     lazy val existing = UserManager.getRawUsersRec
 
     lazy val newRecs = for {
       oldrecs <- Source.fromFile("./datastore/users").getLines()
-      out <- if (oldrecs.split("::").map(_.trim)(0) == username)
+      out <- if (oldrecs contains username)
         s"$username::$password"
       else oldrecs
     } yield out
@@ -134,7 +132,7 @@ class UserManager {
       fw.close()
       OperationStatus.OpSuccess
     } catch {
-      case _ => OperationStatus.OpFailure
+      case _: Throwable => OperationStatus.OpFailure
     }
   }
 
