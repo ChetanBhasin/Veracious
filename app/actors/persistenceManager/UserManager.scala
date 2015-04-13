@@ -15,10 +15,24 @@ import scala.io.Source
  * This modules checks for existing users and adds new user to the dataset
  */
 
-object UserManager {
+/**
+ * Companion object for class UserManager
+ *
+ * Responsibility: To act as the TypedActor which should
+ * keep track of all the user records.
+ * It should be able to add/remove/get details of/update details of all the available users
+ * on the system.
+ */
+protected[persistenceManager] object UserManager {
 
+  // Check for singleton since only one actor of such kind should exist
   private var singleton = true
 
+  /**
+   * Make sure that the environment on the disk is friendly for use.
+   * If not, create files and directories for data and meta store.
+   * @return
+   */
   private[persistenceManager] def checkSources = {
     lazy val PathStoreDir = Paths.get("./datastore/")
     lazy val PathStoreMetaDir = Paths.get("./datastore/meta/")
@@ -38,6 +52,7 @@ object UserManager {
    */
   def checkUsername(username: String) = {
 
+    // Check sources before proceeding
     this.checkSources
 
     lazy val stream = Source.fromFile("./datastore/meta/users.dat")
@@ -52,6 +67,10 @@ object UserManager {
     users contains username
   }
 
+  /**
+   * Get raw data regarding available users on the system
+   * @return
+   */
   def getRawUsersRec = {
     lazy val stream = Source.fromFile("./datastore/meta/users.dat")
     lazy val lines = stream.getLines
@@ -78,7 +97,7 @@ object UserManager {
 /**
  * Class intented to be used as TypedActor for user management
  */
-class UserManager {
+protected[persistenceManager] class UserManager {
 
   /**
    * Check if a particular user exists
