@@ -19,11 +19,10 @@ import scala.io.Source
  *
  */
 
-import actors.logger.Logger._
-
 /** BIG NOTE ** implicit parameters always to the right,
   *  Casued me Super headache
   */
+import actors.logger.Logger._
 class Logger (val mediator: ActorRef, implicit val logFile: String) extends Actor {
   mediator ! RegisterForReceive(self, classOf[Log])
   val userList = ListBuffer[String]()

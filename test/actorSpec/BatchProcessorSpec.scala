@@ -1,8 +1,8 @@
-package actors
+package actorSpec
 
+import actorSpec.mocks._
 import actors.batchProcessor.BatchProcessor
 import actors.mediator.RegisterForReceive
-import actors.mocks._
 import akka.actor.Props
 import models.batch.Batch
 import models.batch.OperationStatus._

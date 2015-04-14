@@ -1,7 +1,7 @@
-package actors
+package actorSpec
 
+import actorSpec.mocks._
 import actors.batchProcessor._
-import actors.mocks._
 import akka.actor.Props
 import models.batch.OperationStatus._
 import models.messages.batchProcessing._
@@ -10,7 +10,7 @@ import models.messages.logger.Log
 class BatchWorkerSpec extends UnitTest {
   val user = "Anish"
 
-  val parent = setupParent(Props(classOf[batchProcessor.Worker], user, mediator.ref))
+  val parent = setupParent(Props(classOf[Worker], user, mediator.ref))
 
   it should "accept the batch and submit the first job" in {
     parent ! mockBatch

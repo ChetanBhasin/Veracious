@@ -1,4 +1,4 @@
-package actors
+package actorSpec
 
 import actors.client.Client._
 import actors.mediator.RegisterForReceive
