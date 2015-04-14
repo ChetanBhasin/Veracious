@@ -23,7 +23,7 @@ import scala.io.Source
  * It should be able to add/remove/get details of/update details of all the available users
  * on the system.
  */
-protected[persistenceManager] object UserManager {
+private[persistenceManager] object UserManager {
 
   // Check for singleton since only one actor of such kind should exist
   private var singleton = true
@@ -97,7 +97,8 @@ protected[persistenceManager] object UserManager {
 /**
  * Class intented to be used as TypedActor for user management
  */
-protected[persistenceManager] class UserManager {
+private[persistenceManager] class UserManager {
+
 
   /**
    * Check if a particular user exists
@@ -112,7 +113,7 @@ protected[persistenceManager] class UserManager {
    * @param password
    * @return
    */
-  def addUser(username: String, password: String) = Future {
+  def addUser(username: String, password: String) = {
 
     lazy val PathStoreFileUser = UserManager.checkSources
 
@@ -133,7 +134,7 @@ protected[persistenceManager] class UserManager {
    * @param username
    * @return
    */
-  def removeUser(username: String) = Future.successful(???)
+  def removeUser(username: String) = ???
 
   /**
    * Change the password for a username
@@ -141,7 +142,7 @@ protected[persistenceManager] class UserManager {
    * @param password
    * @return
    */
-  def changePassword(username: String, password: String) = Future {
+  def changePassword(username: String, password: String) = {
 
     UserManager.checkSources
 
