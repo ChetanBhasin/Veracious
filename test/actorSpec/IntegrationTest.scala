@@ -1,4 +1,4 @@
-package actors
+package actorSpec
 
 /**
  * Created by basso on 12/04/15.

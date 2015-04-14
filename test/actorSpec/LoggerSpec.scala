@@ -1,4 +1,4 @@
-package actors
+package actorSpec
 
 import java.io.{File, PrintWriter}
 
@@ -43,7 +43,7 @@ class LoggerSpec extends UnitTest {
   }
 
   var msg: JsValue = JsNull
-  "Logger" should "send the client a log message on login" in {
+  it should "send the client a log message on login" in {
     parent ! LogIn(user)    // Simulating Client Login
     val fMsg = expectMsgClass(classOf[MessageToClient])
     assert (fMsg.username == user)

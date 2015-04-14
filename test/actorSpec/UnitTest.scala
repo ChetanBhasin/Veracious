@@ -1,6 +1,6 @@
-package actors
+package actorSpec
 
-import actors.mocks._
+import actorSpec.mocks._
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.testkit._
 import org.scalatest._

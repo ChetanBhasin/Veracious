@@ -1,4 +1,5 @@
-package actors.mocks
+package actorSpec.mocks
+
 import akka.actor._
 
 /**
