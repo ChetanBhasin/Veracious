@@ -1,0 +1,8 @@
+Index: test/.BasicSparkTest.scala
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- test/.BasicSparkTest.scala	(revision )
++++ test/BasicSparkTest.scala	(revision )
+@@ -1,0 +1,0 @@
