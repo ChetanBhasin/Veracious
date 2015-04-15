@@ -1,0 +1,407 @@
+Index: app/models/mining/mlops/.ALS.scala
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/models/mining/mlops/.ALS.scala	(revision )
++++ app/models/mining/mlops/.ALS.scala	(revision )
+@@ -1,49 +0,0 @@
+-package models.mining.mlops
+-
+-import org.apache.spark.mllib.recommendation.Rating
+-import org.apache.spark.rdd.RDD
+-
+-/**
+- * Created by chetan on 08/04/15.
+- */
+-
+-
+-/**
+- * ALS algorithm for collaborative filltering
+- * @param rank
+- * @param numIterations Number of iterations to be performed for the algorithm
+- */
+-class VALS(file: String, rank: Int = 10, numIterations: Int = 20) {
+-
+-  lazy val data: (RDD[String]) = sc.textFile(file)
+-
+-  lazy val ratings = data.map(_.split(",") match {
+-    case Array(user, item, rate) =>
+-      Rating(user.toInt, item.toInt, rate.toDouble)
+-  })
+-
+-  lazy val userItems = ratings.map {
+-    case Rating(user, item, rate) => (user, item)
+-  }
+-
+-  lazy val model = org.apache.spark.mllib.recommendation.ALS.train(ratings, rank, numIterations)
+-
+-  lazy val predictions = model.predict(userItems).map {
+-    case Rating(user, item, rate) =>
+-      ((user, item), rate)
+-  }
+-
+-  def run = {
+-    println("models.mining.mlops.ALS:")
+-    predictions.map { x =>
+-      x match {
+-        case ((user, item), rate) => println("User: " + user + "; Item: " + item + "; Rating: " + rate)
+-      }
+-    }
+-  }
+-
+-  def saveToTextFile(filePath: String) = predictions.saveAsTextFile(filePath)
+-
+-  def saveToObjectFile(filePath: String) = predictions.saveAsObjectFile(filePath)
+-
+-}
+Index: app/models/mining/mlops/.FPM.scala
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/models/mining/mlops/.FPM.scala	(revision )
++++ app/models/mining/mlops/.FPM.scala	(revision )
+@@ -1,32 +0,0 @@
+-package models.mining.mlops
+-
+-import org.apache.spark.mllib.fpm.FPGrowth
+-import org.apache.spark.rdd.RDD
+-
+-/**
+- * Frequent pattern detection using FP-Growth algorithm
+- * @param minSupport Minimum support for the itemsets
+- * @param numPartitions Number of partitions to make on itemsets
+- */
+-abstract class VFPM(file: String, minSupport: Double = 0.2, numPartitions: Int = 10) {
+-
+-  lazy val fpg = new FPGrowth()
+-    .setMinSupport(minSupport)
+-    .setNumPartitions(numPartitions)
+-
+-  protected lazy val model = fpg.run(transactions)
+-
+-  val transactions: RDD[Array[String]] = sc.textFile(file).map(_.split(" "))
+-
+-  def items = model.freqItemsets
+-
+-  def getItemsetData = model.freqItemsets.collect.foreach {
+-    itemset =>
+-      (itemset.items.mkString("[", ",", "]"), itemset.freq)
+-  }
+-
+-  def saveToTextFile(filePath: String) = model.freqItemsets.saveAsTextFile(filePath)
+-
+-  def saveToObjectFile(filePath: String) = model.freqItemsets.saveAsObjectFile(filePath)
+-
+-}
+Index: app/models/mining/mlops/SVM.scala
+===================================================================
+--- app/models/mining/mlops/SVM.scala	(revision )
++++ app/models/mining/mlops/SVM.scala	(revision )
+@@ -1,42 +0,0 @@
+-package models.mining.mlops
+-
+-import org.apache.spark.mllib.classification.SVMWithSGD
+-import org.apache.spark.mllib.regression.LabeledPoint
+-import org.apache.spark.mllib.util.MLUtils
+-import org.apache.spark.rdd.RDD
+-
+-/**
+- * Created by chetan on 08/04/15.
+- */
+-
+-/**
+- * Linear SVM algorithm for binary classification
+- * @param numIterations Number of iterations to be performed for the algorithm
+- */
+-class SVM(file: String, testFile: String, numIterations: Int = 100) {
+-
+-  lazy val data: RDD[LabeledPoint] = MLUtils.loadLibSVMFile(sc, file)
+-
+-  lazy val tests: RDD[org.apache.spark.mllib.linalg.Vector] = MLUtils.loadVectors(sc, testFile)
+-
+-  lazy val model = SVMWithSGD.train(data.cache, numIterations)
+-
+-  model.clearThreshold()
+-
+-  val predictions = tests.map {
+-    point =>
+-      val score = model.predict(point)
+-      (score, point)
+-  }
+-
+-  def run = {
+-    println("models.mining.oldAlgo:")
+-    predictions.map {
+-      item => println(item._1.toString + " : " + item._2.toString)
+-    }
+-  }
+-
+-  def saveToTextFile(filePath: String) = predictions.saveAsTextFile(filePath)
+-
+-  def saveToObjectFile(filePath: String) = predictions.saveAsObjectFile(filePath)
+-}
+Index: app/models/mining/mlops/.package.scala
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/models/mining/mlops/.package.scala	(revision )
++++ app/models/mining/mlops/.package.scala	(revision )
+@@ -1,13 +0,0 @@
+-package models.mining
+-
+-/**
+- * Created by chetan on 08/04/15.
+- */
+-package object mlops {
+-
+-  import org.apache.spark._
+-
+-  val conf = new SparkConf().setAppName("Veracion-Algorithms").setMaster("local")
+-  lazy val sc = new SparkContext(conf)
+-
+-}
+Index: app/models/mining/mlops/.Clustering.scala
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/models/mining/mlops/.Clustering.scala	(revision )
++++ app/models/mining/mlops/.Clustering.scala	(revision )
+@@ -1,35 +0,0 @@
+-package models.mining.mlops
+-
+-import org.apache.spark.mllib.clustering._
+-import org.apache.spark.mllib.linalg.Vectors
+-import org.apache.spark.rdd.RDD
+-
+-/**
+- * Created by chetan on 12/03/15.
+- */
+-
+-/**
+- * models.mining.oldAlgo.Clustering using KMeans algorithm
+- * @param numClusters Number of clusters required
+- * @param numIterations Number of iterations required (defaults to 20)
+- */
+-class VClustering(file: String, numClusters: Int, numIterations: Int = 20) {
+-
+-  lazy val data: (RDD[String]) = sc.textFile(file)
+-
+-  private lazy val supply = data.map(Vectors.parse(_))
+-  lazy val clusters = KMeans.train(supply, numClusters, numIterations)
+-
+-  def run = println("models.mining.mlops.Clustering:\n" + clusters.toString)
+-
+-  def saveToTextFile(fileLocation: String) = {
+-    val dataset = clusters.predict(supply) zip supply
+-    dataset.saveAsTextFile(fileLocation)
+-  }
+-
+-  def saveToObject(fileLocation: String) = {
+-    val dataset = clusters.predict(supply) zip supply
+-    dataset.saveAsObjectFile(fileLocation)
+-  }
+-
+-}
+Index: app/models/mining/mlops/ALS.scala
+===================================================================
+--- app/models/mining/mlops/ALS.scala	(revision )
++++ app/models/mining/mlops/ALS.scala	(revision )
+@@ -0,0 +1,49 @@
++package models.mining.mlops
++
++import org.apache.spark.mllib.recommendation.Rating
++import org.apache.spark.rdd.RDD
++
++/**
++ * Created by chetan on 08/04/15.
++ */
++
++
++/**
++ * ALS algorithm for collaborative filltering
++ * @param rank
++ * @param numIterations Number of iterations to be performed for the algorithm
++ */
++class VALS(file: String, rank: Int = 10, numIterations: Int = 20) {
++
++  lazy val data: (RDD[String]) = sc.textFile(file)
++
++  lazy val ratings = data.map(_.split(",") match {
++    case Array(user, item, rate) =>
++      Rating(user.toInt, item.toInt, rate.toDouble)
++  })
++
++  lazy val userItems = ratings.map {
++    case Rating(user, item, rate) => (user, item)
++  }
++
++  lazy val model = org.apache.spark.mllib.recommendation.ALS.train(ratings, rank, numIterations)
++
++  lazy val predictions = model.predict(userItems).map {
++    case Rating(user, item, rate) =>
++      ((user, item), rate)
++  }
++
++  def run = {
++    println("models.mining.mlops.ALS:")
++    predictions.map { x =>
++      x match {
++        case ((user, item), rate) => println("User: " + user + "; Item: " + item + "; Rating: " + rate)
++      }
++    }
++  }
++
++  def saveToTextFile(filePath: String) = predictions.saveAsTextFile(filePath)
++
++  def saveToObjectFile(filePath: String) = predictions.saveAsObjectFile(filePath)
++
++}
+Index: app/models/mining/mlops/FPM.scala
+===================================================================
+--- app/models/mining/mlops/FPM.scala	(revision )
++++ app/models/mining/mlops/FPM.scala	(revision )
+@@ -0,0 +1,32 @@
++package models.mining.mlops
++
++import org.apache.spark.mllib.fpm.FPGrowth
++import org.apache.spark.rdd.RDD
++
++/**
++ * Frequent pattern detection using FP-Growth algorithm
++ * @param minSupport Minimum support for the itemsets
++ * @param numPartitions Number of partitions to make on itemsets
++ */
++abstract class VFPM(file: String, minSupport: Double = 0.2, numPartitions: Int = 10) {
++
++  lazy val fpg = new FPGrowth()
++    .setMinSupport(minSupport)
++    .setNumPartitions(numPartitions)
++
++  protected lazy val model = fpg.run(transactions)
++
++  val transactions: RDD[Array[String]] = sc.textFile(file).map(_.split(" "))
++
++  def items = model.freqItemsets
++
++  def getItemsetData = model.freqItemsets.collect.foreach {
++    itemset =>
++      (itemset.items.mkString("[", ",", "]"), itemset.freq)
++  }
++
++  def saveToTextFile(filePath: String) = model.freqItemsets.saveAsTextFile(filePath)
++
++  def saveToObjectFile(filePath: String) = model.freqItemsets.saveAsObjectFile(filePath)
++
++}
+Index: app/models/mining/mlops/.SVM.scala
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/models/mining/mlops/.SVM.scala	(revision )
++++ app/models/mining/mlops/.SVM.scala	(revision )
+@@ -0,0 +1,42 @@
++package models.mining.mlops
++
++import org.apache.spark.mllib.classification.SVMWithSGD
++import org.apache.spark.mllib.regression.LabeledPoint
++import org.apache.spark.mllib.util.MLUtils
++import org.apache.spark.rdd.RDD
++
++/**
++ * Created by chetan on 08/04/15.
++ */
++
++/**
++ * Linear SVM algorithm for binary classification
++ * @param numIterations Number of iterations to be performed for the algorithm
++ */
++class SVM(file: String, testFile: String, numIterations: Int = 100) {
++
++  lazy val data: RDD[LabeledPoint] = MLUtils.loadLibSVMFile(sc, file)
++
++  lazy val tests: RDD[org.apache.spark.mllib.linalg.Vector] = MLUtils.loadVectors(sc, testFile)
++
++  lazy val model = SVMWithSGD.train(data.cache, numIterations)
++
++  model.clearThreshold()
++
++  val predictions = tests.map {
++    point =>
++      val score = model.predict(point)
++      (score, point)
++  }
++
++  def run = {
++    println("models.mining.oldAlgo:")
++    predictions.map {
++      item => println(item._1.toString + " : " + item._2.toString)
++    }
++  }
++
++  def saveToTextFile(filePath: String) = predictions.saveAsTextFile(filePath)
++
++  def saveToObjectFile(filePath: String) = predictions.saveAsObjectFile(filePath)
++}
+Index: app/models/mining/mlops/package.scala
+===================================================================
+--- app/models/mining/mlops/package.scala	(revision )
++++ app/models/mining/mlops/package.scala	(revision )
+@@ -0,0 +1,13 @@
++package models.mining
++
++/**
++ * Created by chetan on 08/04/15.
++ */
++package object mlops {
++
++  import org.apache.spark._
++
++  val conf = new SparkConf().setAppName("Veracion-Algorithms").setMaster("local")
++  lazy val sc = new SparkContext(conf)
++
++}
+Index: app/models/mining/mlops/Clustering.scala
+===================================================================
+--- app/models/mining/mlops/Clustering.scala	(revision )
++++ app/models/mining/mlops/Clustering.scala	(revision )
+@@ -0,0 +1,35 @@
++package models.mining.mlops
++
++import org.apache.spark.mllib.clustering._
++import org.apache.spark.mllib.linalg.Vectors
++import org.apache.spark.rdd.RDD
++
++/**
++ * Created by chetan on 12/03/15.
++ */
++
++/**
++ * models.mining.oldAlgo.Clustering using KMeans algorithm
++ * @param numClusters Number of clusters required
++ * @param numIterations Number of iterations required (defaults to 20)
++ */
++class VClustering(file: String, numClusters: Int, numIterations: Int = 20) {
++
++  lazy val data: (RDD[String]) = sc.textFile(file)
++
++  private lazy val supply = data.map(Vectors.parse(_))
++  lazy val clusters = KMeans.train(supply, numClusters, numIterations)
++
++  def run = println("models.mining.mlops.Clustering:\n" + clusters.toString)
++
++  def saveToTextFile(fileLocation: String) = {
++    val dataset = clusters.predict(supply) zip supply
++    dataset.saveAsTextFile(fileLocation)
++  }
++
++  def saveToObject(fileLocation: String) = {
++    val dataset = clusters.predict(supply) zip supply
++    dataset.saveAsObjectFile(fileLocation)
++  }
++
++}
