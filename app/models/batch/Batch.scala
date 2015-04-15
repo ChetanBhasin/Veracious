@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicInteger
 
 import models.batch.job.{DsAddDirect, Job}
+import models.messages.logger.LogEvent
 import play.api.mvc.{AnyContent, Request}
 
 import scala.io.Source
@@ -20,13 +21,13 @@ object Batch {
   /** ----------------------- Miscellaneous ----------------------------------- **/
 
   // The file that contains the run-count of the application
-  private val filePath = "./conf/runCount"
+  private val filePath = "./resources/runCount"
   // Get the current run count
   private lazy val runCount = {
     try {
       val source = Source.fromFile(filePath)
       val res = source.getLines().toList.head.toInt + 1
-      source.close()
+      source.close()    // safe as the iterater from getLines() has already been converted to list
       res
     } catch {
       case ex: Exception => 0
@@ -90,7 +91,7 @@ object Batch {
  * @param date The Date and Time of the batch creation
  * @param jobs List of complete jobs inside the batch
  */
-case class Batch (id: String, date: LocalDateTime, jobs: List[Job]) {
+case class Batch (id: String, date: LocalDateTime, jobs: List[Job]) extends LogEvent {
   import Batch._
 
   // important for it to be a val

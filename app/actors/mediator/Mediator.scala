@@ -1,4 +1,4 @@
-package actors.Mediator
+package actors.mediator
 
 import akka.actor.{Actor, ActorRef, Terminated}
 
@@ -17,6 +17,17 @@ class Mediator extends Actor {
   val notifySet = mSet[ActorRef]()    // For broadcast only
   val globalMsg = mSet[Class[_]]()    // Types for broadcast
 
+  /** Optimisation for Broadcast */
+  var broadcastSet = mSet[ActorRef]()
+  def updateBroadcastSet() {
+    broadcastSet = {
+      if (fTable.values.isEmpty)
+        notifySet
+      else notifySet ++ fTable.values.reduce(_ ++ _)
+    }
+  }
+  /** -------------------------- */
+
   def sendMsgFn(sender: ActorRef)(act: ActorRef, msg: Any) {
     if (act != sender) act ! msg
   }
@@ -28,11 +39,13 @@ class Mediator extends Actor {
       // Registering a colleague for broadcast messages only
     case RegisterForNotification(act) =>
       notifySet += act
+      updateBroadcastSet()
       context watch act
 
       // Register a colleague for personal and broadcast messages
     case RegisterForReceive(act, mt) =>
       fTable += ((mt, fTable.getOrElse(mt, mSet[ActorRef]())+act ))
+      updateBroadcastSet()
       context watch act
 
       // un-register a colleague from the mediator
@@ -42,6 +55,7 @@ class Mediator extends Actor {
         al -= act
       }
       notifySet -= act
+      updateBroadcastSet()
 
       // in-case actor terminates, un-register
     case Terminated(act) => self ! Unregister(act)
@@ -50,8 +64,7 @@ class Mediator extends Actor {
     case msg =>
       val sendMsg = sendMsgFn(sender)_
       if (globalMsg.exists{ _.isAssignableFrom(msg.getClass)}) {    // First check if its a broadcast
-        notifySet.foreach{sendMsg(_, msg)}
-        fTable.values.reduce(_++_).foreach{sendMsg(_, msg)}
+        broadcastSet.foreach{sendMsg(_,msg)}
       }
       else        // Its a personal message
         fTable.foreach { case(m, al) =>           // a message is sent to anyone who has registered

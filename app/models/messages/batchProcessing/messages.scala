@@ -10,14 +10,11 @@ import models.batch.job.{DataSetOp, MineOp}
 case class SubmitBatch (username: String, batch: Batch) extends BatchProcessorMessage
 
 /**
- * The next two classes will be used by the Miner and the DsOperator respectively
- * to return the status of the job they were given
- *
- * Actually, these classes will be sent back to the Batch processor directly instead of
- * being routed through the mediator
+ * Used by the Miner and DsOperator to return the status of the last operation.
+ * Given to the main controller in the Batch processor which then routes the status to
+ * the correct worker
  */
-case class MineStatus (username: String, status: OperationStatus) extends BatchProcessorMessage
-case class DsOpStatus (username: String, status: OperationStatus) extends BatchProcessorMessage
+case class JobStatus (username: String, status: OperationStatus) extends BatchProcessorMessage
 
 /**
  * Submission classes
