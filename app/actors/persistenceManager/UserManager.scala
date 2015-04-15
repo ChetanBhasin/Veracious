@@ -4,6 +4,7 @@ import java.io.FileWriter
 import java.nio.file.{Files, Paths, StandardOpenOption}
 
 import akka.actor.{ActorSystem, TypedActor, TypedProps}
+import models.batch.OperationStatus.OperationStatus
 import models.batch._
 
 import scala.concurrent.Future
@@ -86,7 +87,8 @@ private[persistenceManager] object UserManager {
   def apply(system: ActorSystem) = {
     if (singleton) {
       singleton = false
-      TypedActor(system).typedActorOf(TypedProps[UserManager]())
+      val obj: ManagerMarker = TypedActor(system).typedActorOf(TypedProps[UserManager]())
+      obj
     } else {
       throw new Exception("Only one object at a time is allowed")
     }
@@ -94,10 +96,20 @@ private[persistenceManager] object UserManager {
 
 }
 
+trait ManagerMarker {
+  def checkUsername(username: String): Future[Boolean]
+
+  def addUser(username: String, password: String): OperationStatus
+
+  def removeUser(username: String): OperationStatus
+
+  def changePassword(username: String, password: String): OperationStatus
+}
+
 /**
  * Class intented to be used as TypedActor for user management
  */
-private[persistenceManager] class UserManager {
+private[persistenceManager] class UserManager extends ManagerMarker {
 
 
   /**
