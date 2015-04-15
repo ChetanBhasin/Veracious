@@ -1,10 +1,5 @@
 package models.mining.mlops
 
-import org.apache.spark.mllib.classification.SVMWithSGD
-import org.apache.spark.mllib.regression.LabeledPoint
-import org.apache.spark.mllib.util.MLUtils
-import org.apache.spark.rdd.RDD
-
 /**
  * Created by chetan on 08/04/15.
  */
