@@ -4,7 +4,7 @@ version := "0.0.1-SNAPSHOT"
 
 scalaVersion := "2.11.1"
 
-//val sparkVersion = "1.3.0-SNAPSHOT"
+val sparkVersion = "1.3.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
@@ -16,12 +16,12 @@ fork in run := true
 javaOptions ++= Seq("-Xmx2G")
 
 // All the apache spark dependencies
-// libraryDependencies ++= Seq(
-//   "org.apache.spark" % "spark-core_2.10" % sparkVersion excludeAll ExclusionRule(organization = "org.slf4j"),
-//   "org.apache.spark" % "spark-sql_2.10" % sparkVersion,
-//   "org.apache.spark" % "spark-streaming_2.10" % sparkVersion,
-//   "org.apache.spark" % "spark-mllib_2.10" % sparkVersion
-// )
+libraryDependencies ++= Seq(
+  "org.apache.spark" % "spark-core_2.10" % sparkVersion excludeAll ExclusionRule(organization = "org.slf4j"),
+  "org.apache.spark" % "spark-sql_2.10" % sparkVersion,
+  "org.apache.spark" % "spark-streaming_2.10" % sparkVersion,
+  "org.apache.spark" % "spark-mllib_2.10" % sparkVersion
+)
 
 
 // Scala-csv library dependency
@@ -32,10 +32,10 @@ libraryDependencies += "com.github.tototoshi" %% "scala-csv" % "1.1.2"
 libraryDependencies += "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test"
 
 // All the Apache Spark resolvers
-//resolvers ++= Seq(
-//  "Apache repo" at "https://repository.apache.org/content/repositories/releases",
-//  "Local Repo" at Path.userHome.asFile.toURI.toURL + "/.m2/repository", // Added local repository
-//  Resolver.mavenLocal )
+resolvers ++= Seq(
+  "Apache repo" at "https://repository.apache.org/content/repositories/releases",
+  "Local Repo" at Path.userHome.asFile.toURI.toURL + "/.m2/repository", // Added local repository
+  Resolver.mavenLocal)
 
 libraryDependencies ++= Seq(
   jdbc,
@@ -66,7 +66,7 @@ addCompilerPlugin("com.foursquare.lint" %% "linter" % "0.1.8")
 
 // If you want to use yarn-client for spark cluster mode, override the environment variable
 // SPARK_MODE=yarn-client <cmd>
-// val sparkMode = sys.env.getOrElse("SPARK_MODE", "local[2]")
+val sparkMode = sys.env.getOrElse("SPARK_MODE", "local[2]")
 //
 //
 // initialCommands in console :=

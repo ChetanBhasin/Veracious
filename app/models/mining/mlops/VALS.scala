@@ -1,5 +1,8 @@
 package models.mining.mlops
 
+import org.apache.spark.mllib.recommendation.Rating
+import org.apache.spark.rdd.RDD
+
 /**
  * Created by chetan on 08/04/15.
  */

@@ -1,5 +1,11 @@
 package actors
 
+import java.nio.file.{Files, Paths}
+
+import play.api.libs.json.Json
+
+import scala.io.Source
+
 /**
  * The Miner sub-system. Works on the Mining jobs
  *
@@ -12,5 +18,23 @@ package actors
  *    Result (...) =>> Sent to the mediator, TODO
  */
 package object miner {
+
+  private val myConfig = {
+    lazy val confFilePath = Paths.get("./conf/minerConf.json")
+    if (!Files.exists(confFilePath)) Files.createFile(confFilePath)
+
+    val lines = Source.fromFile("./conf/psConf.json")
+    val formatted = lines.getLines.mkString("\n")
+    lines.close()
+
+    formatted
+  }
+
+  // Todo: read this from configuration
+  def getWorkerCount: Int = try {
+    (Json.parse(myConfig) \ "workerCount").toString.toInt
+  } catch {
+    case _: Throwable => 5
+  }
 
 }

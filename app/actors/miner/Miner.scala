@@ -11,11 +11,11 @@ import models.messages.batchProcessing._
  */
 class Miner(val mediator: ActorRef) extends AppModule {
 
-  mediator ! RegisterForReceive (self, classOf[MinerMessage])
+  mediator ! RegisterForReceive(self, classOf[MinerMessage])
 
   val router = Router(
-    SmallestMailboxRoutingLogic (),   // Have to decide
-    Vector.fill(Miner.getWorkerCount)(ActorRefRoutee(
+    SmallestMailboxRoutingLogic(), // Have to decide
+    Vector.fill(getWorkerCount)(ActorRefRoutee(
       context.actorOf(Props(classOf[Worker], mediator))
     ))
   )
@@ -28,6 +28,5 @@ class Miner(val mediator: ActorRef) extends AppModule {
 
 object Miner {
 
-    // Todo: read this from configuration
-  def getWorkerCount: Int = 5
+
 }
