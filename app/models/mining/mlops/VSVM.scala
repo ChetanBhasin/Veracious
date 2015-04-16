@@ -1,5 +1,10 @@
 package models.mining.mlops
 
+import org.apache.spark.mllib.classification.SVMWithSGD
+import org.apache.spark.mllib.regression.LabeledPoint
+import org.apache.spark.mllib.util.MLUtils
+import org.apache.spark.rdd.RDD
+
 /**
  * Created by chetan on 08/04/15.
  */
@@ -8,7 +13,7 @@ package models.mining.mlops
  * Linear SVM algorithm for binary classification
  * @param numIterations Number of iterations to be performed for the algorithm
  */
-class SVM(file: String, testFile: String, numIterations: Int = 100) {
+class VSVM(file: String, testFile: String, numIterations: Int = 100) {
 
   lazy val data: RDD[LabeledPoint] = MLUtils.loadLibSVMFile(sc, file)
 

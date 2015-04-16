@@ -7,9 +7,13 @@ import java.nio.file.{Files, Paths}
 import akka.actor.{Actor, ActorRef}
 import akka.pattern.ask
 import akka.util.Timeout
+import models.batch.OperationStatus
 import models.batch.job._
 import models.messages.batchProcessing._
+import models.messages.logger.Log
 import models.messages.persistenceManaging.EnterDataSet
+import models.mining
+import models.mining.MinerResult
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -23,6 +27,13 @@ class WorkerActor(mediator: ActorRef) extends Actor {
 
   private implicit val timeout = Timeout(10 seconds)
 
+  /**
+   * handles all the jobs for the actor reciever
+   * @param username username to work on
+   * @param job job to be dealt with
+   * @param dsm dataset manager actor reference
+   * @return OperationStatus
+   */
   private def handleDsJob(username: String, job: DataSetOp, dsm: ActorRef) = job match {
 
     /**
@@ -32,8 +43,9 @@ class WorkerActor(mediator: ActorRef) extends Actor {
       try {
         val downloader = new URL(url) #> new File(s"./datasets/$username/$name")
         downloader.run()
+        OperationStatus.OpSuccess
       } catch {
-        case _: Throwable => println("Got something unexpected")
+        case _: Throwable => OperationStatus.OpFailure
       }
     }
 
@@ -43,19 +55,35 @@ class WorkerActor(mediator: ActorRef) extends Actor {
     case DsAddDirect(name, desc, target_algo, file, id) => {
       try {
         val filepath = Paths.get(s"./datastore/datsets/$username/$name")
-        if (Files.exists(filepath)) throw new Exception("A file with name already exists")
-        else file.moveTo(new File(s"./datastore/datasets/$username/$name"))
+        if (Files.exists(filepath)) OperationStatus.OpWarning
+        else {
+          file.moveTo(new File(s"./datastore/datasets/$username/$name"))
+          OperationStatus.OpSuccess
+        }
       } catch {
-        case _: Throwable => println("Got something unexpected")
+        case _: Throwable => OperationStatus.OpFailure
       }
     }
+
+    /**
+     * Removes a dataset on a user's account
+     */
     case DsDelete(name, id) => {
       val filepath = Paths.get(s"./datastore/datasets/$username/$name")
-      if (!Files.exists(filepath)) {
-        dsm ! RemoveDatasetRecord(username, name)
-        Files.delete(filepath)
+      try {
+        if (!Files.exists(filepath)) {
+          dsm ! RemoveDatasetRecord(username, name)
+          Files.delete(filepath)
+          OperationStatus.OpSuccess
+        } else OperationStatus.OpWarning
+      } catch {
+        case _: Throwable => OperationStatus.OpFailure
       }
     }
+
+    /**
+     * Refreshes the file from the original download location
+     */
     case DsRefresh(name, id) => {
       try {
         val url = (dsm ? GiveUserData(username)) match {
@@ -65,16 +93,35 @@ class WorkerActor(mediator: ActorRef) extends Actor {
         }
         val downloader = new URL(url) #> new File(s"./datastore/datasetes/$username/$name")
         downloader.run()
+        OperationStatus.OpSuccess
       } catch {
-        case _: Throwable => println("Got something unexpected")
+        case _: Throwable => OperationStatus.OpFailure
       }
     }
 
-    case _ => println("Unhandled message")
+    case _ => OperationStatus.OpFailure
   }
 
   def receive = {
-    case (dsm: ActorRef, SubmitDsOpJob(username: String, job: DataSetOp)) => handleDsJob(username, job, dsm)
+
+    /**
+     * Manages all the incoming Dataset related jobs
+     */
+    case (dsm: ActorRef, SubmitDsOpJob(username: String, job: DataSetOp)) => handleDsJob(username, job, dsm) match {
+      case OperationStatus.OpSuccess => {
+        sender ! OperationStatus.OpSuccess
+        mediator ! Log(OperationStatus.OpSuccess, username, "Dataset stored on disk successfully.", job)
+      }
+      case OperationStatus.OpWarning => {
+        sender ! OperationStatus.OpWarning
+        mediator ! Log(OperationStatus.OpSuccess, username, "Warning: No fatal error, but operation could not be completed.", job)
+      }
+      case OperationStatus.OpFailure => {
+        sender ! OperationStatus.OpFailure
+        mediator ! Log(OperationStatus.OpFailure, username, "Fatal error: Operation could not be completed", job)
+      }
+    }
+
   }
 
 }

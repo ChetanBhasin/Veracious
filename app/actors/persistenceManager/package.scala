@@ -20,11 +20,13 @@ package object persistenceManager {
     val lines = Source.fromFile("./conf/psConf.json")
     val formatted = lines.getLines.mkString("\n")
     lines.close()
-
-    val out = Json.parse(formatted)
-    out
+    formatted
   }
 
-  def getChildActors: Int = (myConfig \ "DsChildOps").toString.toInt
+  def getChildActors: Int = try {
+    (Json.parse(myConfig) \ "DsChildOps").toString.toInt
+  } catch {
+    case _: Throwable => 3
+  }
 
 }

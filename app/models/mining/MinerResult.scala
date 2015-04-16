@@ -1,5 +1,6 @@
 package models.mining
 
+import models.messages.persistenceManaging.PersistenceMessage
 import models.mining.Algorithm.Algorithm
 
 /**
@@ -11,4 +12,4 @@ import models.mining.Algorithm.Algorithm
  * Chetan, please extend this trait to use any kind of result that is needed
  */
 
-case class MinerResult(al: Algorithm, save: (String) => Unit)
+case class MinerResult(al: Algorithm, save: (String) => Unit) extends PersistenceMessage
