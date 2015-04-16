@@ -2,9 +2,9 @@ package actors.logger
 
 import java.io.{BufferedWriter, FileWriter, PrintWriter}
 
+import actors.application.AppModule
 import actors.mediator._
-import akka.actor.{Actor, ActorRef}
-import models.messages.Ready
+import akka.actor.ActorRef
 import models.messages.client.{LogIn, LogOut, MessageToClient}
 import models.messages.logger.Log
 import play.api.libs.json._
@@ -23,18 +23,9 @@ import scala.io.Source
   *  Casued me Super headache
   */
 import actors.logger.Logger._
-class Logger (val mediator: ActorRef, implicit val logFile: String) extends Actor {
+class Logger (val mediator: ActorRef, implicit val logFile: String) extends AppModule {
   mediator ! RegisterForReceive(self, classOf[Log])
   val userList = ListBuffer[String]()
-
-    /** This message is called once the actor is ready */
-  override def preStart() {
-    context.parent ! Ready("Logger")
-  }
-
-  override def postStop() {
-    mediator ! Unregister(self)
-  }
 
   def receive = {
     case LogIn (username) =>

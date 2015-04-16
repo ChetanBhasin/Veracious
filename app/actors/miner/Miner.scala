@@ -1,15 +1,15 @@
 package actors.miner
 
+import actors.application.AppModule
 import actors.mediator.RegisterForReceive
 import akka.actor._
 import akka.routing._
-import models.messages.Ready
 import models.messages.batchProcessing._
 
 /**
  * Entry point for the Miner subsystem
  */
-class Miner(mediator: ActorRef) extends Actor {
+class Miner(val mediator: ActorRef) extends AppModule {
 
   mediator ! RegisterForReceive (self, classOf[MinerMessage])
 
@@ -19,10 +19,6 @@ class Miner(mediator: ActorRef) extends Actor {
       context.actorOf(Props(classOf[Worker], mediator))
     ))
   )
-
-  override def preStart() {
-    context.parent ! Ready("Miner")
-  }
 
   def receive = {
     case work: SubmitMineJob => router.route(work, sender)

@@ -1,0 +1,6 @@
+package models.messages.persistenceManaging
+
+trait PersistenceMessage
+
+object GetUserManager extends PersistenceMessage
+object GetDataStoreManager extends PersistenceMessage

@@ -38,7 +38,7 @@ class LoggerSpec extends UnitTest {
   }
 
   it should "notify that it is ready" in {
-    parentProbe.expectMsg(5 seconds, Ready("Logger"))
+    parentProbe.expectMsg(5 seconds, Ready(classOf[Logger].getSimpleName))
     //mediator.expectMsg(Ready("Logger"))
   }
 
