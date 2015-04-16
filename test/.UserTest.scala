@@ -1,11 +1,8 @@
-import org.specs2.mutable._
-import org.specs2.runner._
-import org.junit.runner._
-
 import actors.persistenceManager._
 import models.batch._
-import scala.concurrent.{Await, Future}
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.junit.runner._
+import org.specs2.mutable._
+import org.specs2.runner._
 
 /**
  * Created by chetan on 12/04/15.
@@ -15,7 +12,7 @@ class UserTest extends Specification {
 
   "UserManager" should {
 
-    val element = new UserManager
+    val element = new UserManagerImpl
 
     "be able to create new users" in {
       element.addUser("chetanbhasin", "superhacked").onSuccess {

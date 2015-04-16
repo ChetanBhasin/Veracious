@@ -1,15 +1,14 @@
-package actors
+package actorSpec
 
 import java.io.{File, PrintWriter}
 
-import actors.client.Client.props
 import actors.logger._
 import actors.mediator.RegisterForReceive
 import akka.actor.Props
 import models.batch.OperationStatus
 import models.batch.job.DsAddFromUrl
 import models.messages.Ready
-import models.messages.client.LogIn
+import models.messages.client.{LogIn, MessageToClient}
 import models.messages.logger._
 import models.mining.Algorithm
 import play.api.libs.json._
@@ -20,20 +19,9 @@ import scala.io.Source
 /**
  * Created by basso on 10/04/15.
  */
-class LoggerSpec extends IntegrationTest {
+class LoggerSpec extends UnitTest {
   val user = "Anish"
-  val logFile = "./test/resources/logFile_test"
-
-  /** Setup the mediator */
-  //mediator ! RegisterForNotification(testActor)           // THIS was the problem!!!
-  mediator ! RegisterForReceive(testActor, classOf[Ready])
-
-
-  val logger = system.actorOf(Props(classOf[Logger], logFile, mediator), "logger")
-  "Logger" should "notify that it is ready" in {
-    expectMsg(4 seconds, Ready("Logger"))
-  }
-
+  implicit val logFile = "./test/resources/logFile_test"
 
   /** Setup the logFile to original form */
   val writer = new PrintWriter(new File(logFile))
@@ -42,19 +30,24 @@ class LoggerSpec extends IntegrationTest {
   writer.close()
   /** ---------------------------------- */
 
-  /*
-    TODO: Problems were being created here because the logger wasn't initializing on time. It is imperative
-    that a feedback mechanism be made to make sure all the sub-systems are initialised and ready
-   */
+  val parent = setupParent (Props(classOf[Logger], mediator.ref, logFile))
+  // The parentProbe will receive messages
 
-  val client = system.actorOf(props(mediator)(user, testActor), "testClient2")
-  "Client" should "Notify that it has logged in" in {
-    expectMsg(4 seconds, LogIn(user))
+  "Logger" should "register itself at the mediator" in {
+    mediator.expectMsgClass(classOf[RegisterForReceive])
+  }
+
+  it should "notify that it is ready" in {
+    parentProbe.expectMsg(5 seconds, Ready(classOf[Logger].getSimpleName))
+    //mediator.expectMsg(Ready("Logger"))
   }
 
   var msg: JsValue = JsNull
-  "Logger" should "send the client a log message on startup" in {
-    msg = expectMsgClass(5 seconds, classOf[JsValue])
+  it should "send the client a log message on login" in {
+    parent ! LogIn(user)    // Simulating Client Login
+    val fMsg = expectMsgClass(classOf[MessageToClient])
+    assert (fMsg.username == user)
+    msg = fMsg.msg
     msg \ "log" != JsNull
   }
 
@@ -73,8 +66,9 @@ class LoggerSpec extends IntegrationTest {
     DsAddFromUrl("data-setName","desc", Algorithm.Clustering ,"https://blah.com/ds"))
 
   it should "send the log that belongs to the client" in {
-    logger ! sampleLog
-    expectMsgClass(classOf[JsValue])
+    parent ! sampleLog
+    val msg = mediator.expectMsgClass(classOf[MessageToClient])
+    assert (msg.username == user)
   }
 
   it should "write the log to file" in {
@@ -82,6 +76,7 @@ class LoggerSpec extends IntegrationTest {
   }
 
   it should "not send the log that belongs to some other client" in {
-    logger ! sampleLog.copy(user = "OtherUser")
+    parent ! sampleLog.copy(user = "OtherUser")
+    expectNoMsg()
   }
 }
