@@ -8,7 +8,6 @@ import models.batch.OperationStatus.OperationStatus
 import models.batch._
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 
 /**
@@ -24,7 +23,7 @@ import scala.io.Source
  * It should be able to add/remove/get details of/update details of all the available users
  * on the system.
  */
-private[persistenceManager] object UserManager {
+private[persistenceManager] object UserManagerImpl {
 
   // Check for singleton since only one actor of such kind should exist
   private var singleton = true
@@ -87,7 +86,7 @@ private[persistenceManager] object UserManager {
   def apply(system: ActorSystem) = {
     if (singleton) {
       singleton = false
-      val obj: ManagerMarker = TypedActor(system).typedActorOf(TypedProps[UserManager]())
+      val obj: UserManager = TypedActor(system).typedActorOf(TypedProps[UserManagerImpl]())
       obj
     } else {
       throw new Exception("Only one object at a time is allowed")
@@ -96,7 +95,7 @@ private[persistenceManager] object UserManager {
 
 }
 
-trait ManagerMarker {
+trait UserManager {
   def checkUsername(username: String): Future[Boolean]
 
   def addUser(username: String, password: String): OperationStatus
@@ -109,7 +108,7 @@ trait ManagerMarker {
 /**
  * Class intented to be used as TypedActor for user management
  */
-private[persistenceManager] class UserManager extends ManagerMarker {
+private[persistenceManager] class UserManagerImpl extends UserManager {
 
 
   /**
@@ -117,7 +116,7 @@ private[persistenceManager] class UserManager extends ManagerMarker {
    * @param username
    * @return
    */
-  def checkUsername(username: String) = Future.successful(UserManager.checkUsername(username))
+  def checkUsername(username: String) = Future.successful(UserManagerImpl.checkUsername(username))
 
   /**
    * Add a user if it doesn't already exists
@@ -127,9 +126,9 @@ private[persistenceManager] class UserManager extends ManagerMarker {
    */
   def addUser(username: String, password: String) = {
 
-    lazy val PathStoreFileUser = UserManager.checkSources
+    lazy val PathStoreFileUser = UserManagerImpl.checkSources
 
-    if (UserManager.checkUsername(username)) {
+    if (UserManagerImpl.checkUsername(username)) {
       OperationStatus.OpFailure
     } else {
       try {
@@ -156,7 +155,7 @@ private[persistenceManager] class UserManager extends ManagerMarker {
    */
   def changePassword(username: String, password: String) = {
 
-    UserManager.checkSources
+    UserManagerImpl.checkSources
 
     lazy val stream = Source.fromFile("./datastore/meta/users.dat")
     lazy val newRecs = for {

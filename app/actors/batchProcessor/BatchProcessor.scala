@@ -1,26 +1,19 @@
 package actors.batchProcessor
 
+import actors.application.AppModule
 import actors.mediator._
-import akka.actor.{Actor, ActorRef, PoisonPill}
+import akka.actor.{ActorRef, PoisonPill}
 import models.messages._
 import models.messages.batchProcessing._
 import models.messages.client.{LogIn, LogOut}
 
 import scala.collection.mutable.{Map => mMap}
 
-class BatchProcessor (val mediator: ActorRef) extends Actor {
+class BatchProcessor (val mediator: ActorRef) extends AppModule {
 
   mediator ! RegisterForReceive (self, classOf[BatchProcessorMessage])
   val workerTable = mMap[String, WorkerRecord]()
   implicit val actorFactory = context
-
-  override def preStart() {
-    mediator ! Ready("BatchProcessor")      // TODO: context.parent
-  }
-
-  override def postStop() {
-    mediator ! Unregister(self)
-  }
 
   /**
    * Exceptions are going to stop the BatchProcessor,. Need to find some other

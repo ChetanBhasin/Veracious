@@ -1,9 +1,10 @@
 package actors.persistenceManager
 
-import akka.actor.{Actor, ActorRef, Props, Terminated}
+import actors.application.AppModule
+import actors.mediator.RegisterForReceive
+import akka.actor.{ActorRef, Props, Terminated}
 import akka.routing.{ActorRefRoutee, Router, SmallestMailboxRoutingLogic}
-import models.messages.Ready
-import models.messages.batchProcessing.SubmitDsOpJob
+import models.messages.batchProcessing.{DsOperatorMessage, SubmitDsOpJob}
 import models.messages.persistenceManaging._
 
 /**
@@ -15,16 +16,16 @@ import models.messages.persistenceManaging._
  * Persistence actor
  * Role: Communicate directly with the disk and perform read/write operations.
  */
-class Persistence(mediator: ActorRef) extends Actor {
+//TODO:: All messed up this one is
+class Persistence(val mediator: ActorRef) extends AppModule {
+
+  mediator ! RegisterForReceive (self, classOf[PersistenceMessage])
+  mediator ! RegisterForReceive (self, classOf[DsOperatorMessage])
 
   // UserManager TypedActor for user related meta operations
-  lazy val userManager = UserManager(context system)
+  lazy val userManager = UserManagerImpl(context system)
   // DatastoreManager TypedActor for datastore related meta operations
   lazy val datastoreManager = DatastoreManager(context system)
-
-  override def preStart(): Unit = {
-    context.parent ! Ready("Persistence")
-  }
 
   // Router to route jobs to Worker actors
   var router = {
@@ -39,8 +40,8 @@ class Persistence(mediator: ActorRef) extends Actor {
 
   def receive = {
     // Request for UserManager actor
-    case getUserManager => sender ! userManager
-    case getDatastoreManager => sender ! datastoreManager
+    case GetUserManager => sender ! userManager
+    case GetDataStoreManager => sender ! datastoreManager
 
     case ListUserData(username: String) => datastoreManager !(GiveUserData(username), sender)
 
