@@ -3,7 +3,7 @@ package actors.persistenceManager
 import java.nio.file.{Files, Paths, StandardOpenOption}
 
 import akka.actor.{Actor, ActorSystem, Props}
-import models.messages.persistenceManaging.datasetEntry
+import models.messages.persistenceManaging.EnterDataSet
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -11,11 +11,11 @@ import scala.io.Source
 
 case class GiveUserData(username: String)
 
-case class AddDatasetRecord(username: String, dataset: datasetEntry)
+case class AddDatasetRecord(username: String, dataset: EnterDataSet)
 
 case class RemoveDatasetRecord(username: String, dataset: String)
 
-case class ModifyDatasetStatus(username: String, dataset: datasetEntry, newStatus: String)
+case class ModifyDatasetStatus(username: String, dataset: EnterDataSet, newStatus: String)
 
 case class RemoveUserEntirely(username: String)
 
@@ -37,7 +37,7 @@ object DatastoreManager {
   def makeDsEntry(line: String) = {
     line split ("::") match {
       case Array(name: String, dtype: String, targetAlgo: String, status: String, source: String) =>
-        datasetEntry(name, dtype, targetAlgo, status, source)
+        EnterDataSet(name, dtype, targetAlgo, status, source)
       case _ => throw new Error("Got something of which I have no idea.")
     }
   }
@@ -48,8 +48,8 @@ object DatastoreManager {
    * @param incoming Entry data
    * @return
    */
-  def makeEntryText(incoming: datasetEntry): String = incoming match {
-    case datasetEntry(name, dtype, targetAlgo, status, source) => s"$name::$dtype::$targetAlgo::$status::$source"
+  def makeEntryText(incoming: EnterDataSet): String = incoming match {
+    case EnterDataSet(name, dtype, targetAlgo, status, source) => s"$name::$dtype::$targetAlgo::$status::$source"
   }
 
   // Check on weather a single value exists or not
@@ -99,7 +99,7 @@ class DatastoreManager extends Actor {
    * @param dataset dataset to add
    * @return unit
    */
-  private def addUserDataset(uname: String, dataset: datasetEntry) = {
+  private def addUserDataset(uname: String, dataset: EnterDataSet) = {
     val filePath = Paths.get(s"./datastore/meta/usersets/$uname.dat")
     if (!Files.exists(filePath)) Files.createFile(filePath)
     try {
@@ -137,7 +137,7 @@ class DatastoreManager extends Actor {
    * @param newStatus new status of the dataset
    * @return unit
    */
-  private def modifyStatus(username: String, data: datasetEntry, newStatus: String) = {
+  private def modifyStatus(username: String, data: EnterDataSet, newStatus: String) = {
     val filePath = Paths.get(s"./datastore/meta/usersets/$username.dat")
     if (Files.exists(filePath)) {
       val stream = Source.fromFile(s"./datastore/meta/usersets/$username.dat")
@@ -147,7 +147,7 @@ class DatastoreManager extends Actor {
       val newset = items.map { item =>
         if (item == myEntry) {
           data match {
-            case datasetEntry(name, datatype, targetAlgo, status, source) => s"$name::$datatype::$targetAlgo::$newStatus::$source"
+            case EnterDataSet(name, datatype, targetAlgo, status, source) => s"$name::$datatype::$targetAlgo::$newStatus::$source"
           }
         } else item
       }
@@ -166,9 +166,9 @@ class DatastoreManager extends Actor {
 
   def receive = {
     case GiveUserData(username: String) => sender ! getUserDatasets(username)
-    case AddDatasetRecord(username: String, data: datasetEntry) => addUserDataset(username, data)
+    case AddDatasetRecord(username: String, data: EnterDataSet) => addUserDataset(username, data)
     case RemoveDatasetRecord(username: String, dsName: String) => removeUserDataset(username, dsName)
-    case ModifyDatasetStatus(username: String, data: datasetEntry, newStatus: String) => modifyStatus(username, data, newStatus)
+    case ModifyDatasetStatus(username: String, data: EnterDataSet, newStatus: String) => modifyStatus(username, data, newStatus)
     case RemoveUserEntirely(username: String) => removeUserEntirely(username)
   }
 

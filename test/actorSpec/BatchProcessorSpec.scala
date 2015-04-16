@@ -20,7 +20,7 @@ class BatchProcessorSpec extends UnitTest {
 
   "Batch Processor" should "Setup correctly" in {
     mediator.expectMsgClass(classOf[RegisterForReceive])
-    parentProbe.expectMsg(Ready("BatchProcessor"))
+    parentProbe.expectMsg(Ready(classOf[BatchProcessor].getSimpleName))
   }
 
   it should "send error message for orphan batch" in {

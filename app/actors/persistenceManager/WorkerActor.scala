@@ -7,13 +7,12 @@ import java.nio.file.{Files, Paths}
 import akka.actor.{Actor, ActorRef}
 import akka.pattern.ask
 import akka.util.Timeout
-import scala.concurrent.duration._
-import scala.concurrent.Future
-import scala.concurrent.Await
 import models.batch.job._
 import models.messages.batchProcessing._
-import models.messages.persistenceManaging.datasetEntry
+import models.messages.persistenceManaging.EnterDataSet
 
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 import scala.sys.process._
 
 
@@ -61,7 +60,7 @@ class WorkerActor(mediator: ActorRef) extends Actor {
       try {
         val url = (dsm ? GiveUserData(username)) match {
           case x: Future[Any] => Await.result(x, 30 seconds) match {
-            case datasetEntry(_, _, _, _, url: String) => url
+            case EnterDataSet(_, _, _, _, url: String) => url
           }
         }
         val downloader = new URL(url) #> new File(s"./datastore/datasetes/$username/$name")

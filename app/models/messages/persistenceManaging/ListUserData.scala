@@ -8,4 +8,4 @@ package models.messages.persistenceManaging
  * Message to ask the list of available datasets of a user
  * @param username
  */
-case class ListUserData(username: String)
+case class ListUserData(username: String) extends PersistenceMessage
