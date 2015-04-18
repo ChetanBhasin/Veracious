@@ -7,4 +7,4 @@ package models.messages
  * sub-systems after they are initielised. After all the Ready messages are received,
  * the application will be open to client connections
  */
-case class Ready (subsys: String)
+case class Ready (subsys: Class[_])
