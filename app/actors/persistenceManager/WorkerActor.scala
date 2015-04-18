@@ -12,8 +12,7 @@ import models.batch.job._
 import models.messages.batchProcessing._
 import models.messages.logger.Log
 import models.messages.persistenceManaging.EnterDataSet
-import models.mining
-import models.mining.MinerResult
+import models.mining.{Algorithm, MinerResult}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -119,6 +118,18 @@ class WorkerActor(mediator: ActorRef) extends Actor {
       case OperationStatus.OpFailure => {
         sender ! OperationStatus.OpFailure
         mediator ! Log(OperationStatus.OpFailure, username, "Fatal error: Operation could not be completed", job)
+      }
+    }
+
+    /**
+     * Save the incoming miner result to the disk
+     */
+    case MinerResult(al: Algorithm.Algorithm, user: String, name: String, save: (String => Unit)) => {
+      try {
+        save(s"./datastore/datasets/$user/$name.dat")
+        // Log here
+      } catch {
+        case _: Throwable => ??? //Log here
       }
     }
 
