@@ -6,7 +6,7 @@ package actors.application
 
 import actors.mediator.Unregister
 import akka.actor.{Actor, ActorRef}
-import models.messages.Ready
+import models.messages.{Ready, SysError}
 
 /**
  * This is the template for the major sub-systems of the application
@@ -15,10 +15,14 @@ abstract class AppModule extends Actor {
 
   val mediator: ActorRef
   override def preStart() {
-    context.parent ! Ready(this.getClass.getSimpleName)
+    context.parent ! Ready(this.getClass)
   }
 
   override def postStop() {
     mediator ! Unregister(self)
+  }
+
+  def moduleError (msg: String) = {
+    context.parent ! SysError(this.getClass.getSimpleName, msg)
   }
 }

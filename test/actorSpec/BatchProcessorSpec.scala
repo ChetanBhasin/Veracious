@@ -20,17 +20,17 @@ class BatchProcessorSpec extends UnitTest {
 
   "Batch Processor" should "Setup correctly" in {
     mediator.expectMsgClass(classOf[RegisterForReceive])
-    parentProbe.expectMsg(Ready(classOf[BatchProcessor].getSimpleName))
+    parentProbe.expectMsg(Ready(classOf[BatchProcessor]))
   }
 
   it should "send error message for orphan batch" in {
     submit(mockBatch2)
-    mediator.expectMsgClass(classOf[SysError])
+    parentProbe.expectMsgClass(classOf[SysError])
   }
 
   it should "send error message for orphan jobStatus" in {
     parent ! JobStatus(user, OpSuccess)
-    mediator.expectMsgClass(classOf[SysError])
+    parentProbe.expectMsgClass(classOf[SysError])
   }
 
   it should "correctly get a worker to start on a batch" in {
@@ -57,6 +57,6 @@ class BatchProcessorSpec extends UnitTest {
   it should "die when it has no more batches to work on and the user has logged out" in {
     parent ! LogOut(user)
     submit(mockBatch2)
-    mediator.expectMsgClass(classOf[SysError])
+    parentProbe.expectMsgClass(classOf[SysError])
   }
 }

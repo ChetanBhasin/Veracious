@@ -1,7 +1,7 @@
 package actors.miner
 
 import akka.actor._
-import models.batch.job.{MnClustering, MnFPgrowth, MnSVM, MnALS}
+import models.batch.job.{MnALS, MnClustering, MnFPgrowth, MnSVM}
 import models.mining.mlops._
 
 /**
@@ -12,7 +12,7 @@ class Worker (mediator: ActorRef) extends Actor {
 
   private def handleALS(als: MnALS) = {
     val sparkWorker = als match {
-      case MnALS(train: String, query: String, ranks: Int, maxIter: Int) => new VALS(train, ranks, maxIter)
+      case MnALS(train: String, query: String, ranks: Int, maxIter: Int, id: String) => new VALS(train, ranks, maxIter)
     }
   }
 

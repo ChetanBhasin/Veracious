@@ -4,7 +4,7 @@ version := "0.0.1-SNAPSHOT"
 
 scalaVersion := "2.11.1"
 
-val sparkVersion = "1.3.0-SNAPSHOT"
+val sparkVersion = "1.3.0"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
@@ -17,10 +17,10 @@ javaOptions ++= Seq("-Xmx2G")
 
 // All the apache spark dependencies
 libraryDependencies ++= Seq(
-  "org.apache.spark" % "spark-core_2.10" % sparkVersion excludeAll ExclusionRule(organization = "org.slf4j"),
-  "org.apache.spark" % "spark-sql_2.10" % sparkVersion,
-  "org.apache.spark" % "spark-streaming_2.10" % sparkVersion,
-  "org.apache.spark" % "spark-mllib_2.10" % sparkVersion
+  "org.apache.spark" % "spark-core_2.11" % sparkVersion excludeAll ExclusionRule(organization = "org.slf4j"),
+  "org.apache.spark" % "spark-sql_2.11" % sparkVersion,
+  "org.apache.spark" % "spark-streaming_2.11" % sparkVersion,
+  "org.apache.spark" % "spark-mllib_2.11" % sparkVersion
 )
 
 
@@ -44,10 +44,10 @@ libraryDependencies ++= Seq(
   ws
 )
 
-// Akka depenedencies
+//  depenedencies
 libraryDependencies ++= Seq(
-  "com.typesafe.akka" %% "akka-actor" % "2.3.9",
-  "com.typesafe.akka" %% "akka-testkit" % "2.3.9"
+  "com.typesafe." %% "akka-actor" % "2.3.9",
+  "com.typesafe." %% "akka-testkit" % "2.3.9"
 )
 
 //Compiler plugins
