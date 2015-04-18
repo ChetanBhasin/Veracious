@@ -13,6 +13,7 @@ import models.messages.batchProcessing._
 import models.messages.logger.Log
 import models.messages.persistenceManaging.EnterDataSet
 import models.mining.{Algorithm, MinerResult}
+import play.api.libs.json.{JsObject, JsString}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -131,6 +132,32 @@ class WorkerActor(mediator: ActorRef) extends Actor {
       } catch {
         case _: Throwable => ??? //Log here
       }
+    }
+
+    /**
+     * Get the details of a user's datasets in Json Format
+     */
+    case (dsm: ActorRef, GetUserDatasetsJson(username: String)) => {
+
+      val userdata: Seq[EnterDataSet] = Await.result((dsm ? GiveUserData(username)), 60 seconds) match {
+        case obj: Seq[EnterDataSet] => obj
+        case _: Throwable => Seq()
+      }
+
+      val objects = userdata.map { entry =>
+        entry match {
+          case EnterDataSet(name: String, dtype: String, algo: String, status: String, source: String) =>
+            JsObject(Seq("name" -> JsString(name),
+              "type" -> JsString(dtype),
+              "algo" -> JsString(algo),
+              "status" -> JsString(status),
+              "source" -> JsString(source)))
+        }
+      }.zipWithIndex
+
+      val out = JsObject(objects.map(x => x._2.toString -> x._1))
+
+      sender ! out
     }
 
   }

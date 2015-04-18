@@ -83,13 +83,13 @@ class DatastoreManager extends Actor {
    * @param uname username to check for
    * @return unit
    */
-  private def getUserDatasets(uname: String) = Future {
+  private def getUserDatasets(uname: String): Future[Seq[EnterDataSet]] = Future[Seq[EnterDataSet]] {
     val stream = Source.fromFile(s"./datastore/meta/usersets/$uname.dat")
     val vals = stream.getLines.map {
       line => DatastoreManager.makeDsEntry(line)
     }
     stream.close()
-    vals
+    vals.toSeq
   }
 
   /**
