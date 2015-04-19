@@ -15,6 +15,14 @@ fork in run := true
 // add a JVM option to use when forking a JVM for 'run'
 javaOptions ++= Seq("-Xmx2G")
 
+resolvers += "Typesafe Repository" at "https://repo.typesafe.com/typesafe/releases/"
+
+//  depenedencies
+libraryDependencies ++= Seq(
+  "com.typesafe.akka" %% "akka-actor" % "2.3.9",
+  "com.typesafe.akka" %% "akka-testkit" % "2.3.9"
+)
+
 // All the apache spark dependencies
 libraryDependencies ++= Seq(
   "org.apache.spark" % "spark-core_2.11" % sparkVersion excludeAll ExclusionRule(organization = "org.slf4j"),
@@ -44,11 +52,6 @@ libraryDependencies ++= Seq(
   ws
 )
 
-//  depenedencies
-libraryDependencies ++= Seq(
-  "com.typesafe." %% "akka-actor" % "2.3.9",
-  "com.typesafe." %% "akka-testkit" % "2.3.9"
-)
 
 //Compiler plugins
 

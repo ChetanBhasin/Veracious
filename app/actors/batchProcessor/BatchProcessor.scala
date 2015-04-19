@@ -47,7 +47,7 @@ class BatchProcessor (val mediator: ActorRef) extends AppModule {
         }
 
       case None =>
-        mediator ! moduleError("Batch came for unknown user")
+        moduleError("Batch came for unknown user")
     }
 
     case JobStatus(user, status) => workerTable.get(user) match {
