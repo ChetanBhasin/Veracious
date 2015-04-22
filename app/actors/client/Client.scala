@@ -16,12 +16,12 @@ import models.messages.client._
 class Client (val username: String, socket: ActorRef, mediator: ActorRef) extends Actor {
 
   override def preStart() {
-    mediator ! new LogIn(username) with ClientMgrMessage
+    mediator ! new LogIn(username) with ClientManagerMessage
   }
 
   def receive = {
     // Match the message to our username
-    case MessageToClient(`username`, msg) => socket ! msg   // TODO: get rid of this
+    //case MessageToClient(`username`, msg) => socket ! msg
     case Push(msg) => socket ! msg
     case _ => Unit    // Ignore all others
 
@@ -29,7 +29,7 @@ class Client (val username: String, socket: ActorRef, mediator: ActorRef) extend
   }
 
   override def postStop() {   // Will run when this actor is killed. (The client logged out)
-    mediator ! new LogOut(username) with ClientMgrMessage
+    mediator ! new LogOut(username) with ClientManagerMessage
   }
 }
 
