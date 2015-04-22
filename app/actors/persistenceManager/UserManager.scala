@@ -8,6 +8,7 @@ import models.batch.OperationStatus.OperationStatus
 import models.batch._
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.io.Source
 
 /**
@@ -71,9 +72,9 @@ private[persistenceManager] object UserManagerImpl {
    * Get raw data regarding available users on the system
    * @return
    */
-  def getRawUsersRec = {
+  def getRawUsersRec: Array[String] = {
     lazy val stream = Source.fromFile("./datastore/meta/users.dat")
-    lazy val lines = stream.getLines
+    lazy val lines = stream.getLines.toArray
     stream.close
     lines
   }
@@ -110,6 +111,21 @@ trait UserManager {
  */
 private[persistenceManager] class UserManagerImpl extends UserManager {
 
+  /**
+   * Authenticate a user
+   * @param username username of the user
+   * @param password expected password of the user
+   * @return Future[Boolean]
+   */
+  def authenticate(username: String, password: String) = Future[Boolean] {
+    try {
+      val user = UserManagerImpl.getRawUsersRec.filter(_ contains username)(0).split("::")
+      user(1) == password
+    } catch {
+      case _: Throwable => false
+    }
+
+  }
 
   /**
    * Check if a particular user exists
