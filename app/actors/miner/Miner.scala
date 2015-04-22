@@ -2,6 +2,7 @@ package actors.miner
 
 import actors.application.AppModule
 import actors.mediator.RegisterForReceive
+import actors.persistenceManager.Persistence
 import akka.actor._
 import akka.routing._
 import models.messages.batchProcessing._

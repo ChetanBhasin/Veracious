@@ -6,11 +6,13 @@ import akka.actor.{ActorRef, Props, Terminated}
 import akka.routing.{ActorRefRoutee, Router, SmallestMailboxRoutingLogic}
 import models.messages.batchProcessing.{DsOperatorMessage, SubmitDsOpJob}
 import models.messages.persistenceManaging._
+import models.mining.MinerResult
 
 /**
  * Created by chetan on 12/04/15.
  */
 
+case class GetUserDatasetsJson(username: String)
 
 /**
  * Persistence actor
@@ -39,14 +41,40 @@ class Persistence(val mediator: ActorRef) extends AppModule {
 
 
   def receive = {
-    // Request for UserManager actor
+
+    /**
+     * Get userManager ActorRef
+     */
     case GetUserManager => sender ! userManager
+
+    /**
+     * Get datastoreManager ActorRef
+     */
     case GetDataStoreManager => sender ! datastoreManager
 
+    /**
+     * Get a user owned datasets' meta records in private message formate
+     */
     case ListUserData(username: String) => datastoreManager !(GiveUserData(username), sender)
 
-    case operation: SubmitDsOpJob => router.route((operation, datastoreManager), sender())
+    /**
+     * Submit a DsOpJob
+     */
+    case operation: SubmitDsOpJob => router.route((operation, datastoreManager), sender)
 
+    /**
+     * get a user owned datasets' meta records in Json format
+     */
+    case GetUserDatasetsJson(username: String) => router.route((GetUserDatasetsJson(username), datastoreManager), sender)
+
+    /**
+     * Perform a miner result operation
+     */
+    case operation: MinerResult => router.route((operation, datastoreManager), sender)
+
+    /**
+     * Renew and reroute expired children actor
+     */
     case Terminated(routee) => {
       router = router.removeRoutee(routee)
       val r = context actorOf (Props[WorkerActor])

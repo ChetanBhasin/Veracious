@@ -1,6 +1,6 @@
 package spark
 
-import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark.{SparkContext, SparkConf}
 import org.junit.runner._
 import org.specs2.mutable._
 import org.specs2.runner._
@@ -22,7 +22,7 @@ class BasicSparkTest extends Specification {
       val sc = new SparkContext(conf)
 
       val textFile = sc.textFile("test/resources/testText.txt")
-      textFile.first must equalTo("This is a text file.")
+      textFile.collect.head must equalTo("This is a text file.")
     }
   }
 
