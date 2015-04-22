@@ -9,4 +9,5 @@ import play.api.libs.json._
  * @param username : The unique username of the client
  * @param msg : The final Json msg data that will be sent to the client as it is
  */
-case class MessageToClient (username: String, msg: JsValue)
+case class MessageToClient (username: String, msg: PushData) extends ClientMgrMessage
+case class Push (msg: JsValue)

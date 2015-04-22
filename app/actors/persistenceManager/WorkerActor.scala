@@ -11,7 +11,7 @@ import models.batch.OperationStatus
 import models.batch.job._
 import models.messages.batchProcessing._
 import models.messages.logger.Log
-import models.messages.persistenceManaging.EnterDataSet
+import models.messages.persistenceManaging.DataSetEntry
 import models.mining.{Algorithm, MinerResult}
 import play.api.libs.json.{JsObject, JsString}
 
@@ -39,7 +39,7 @@ class WorkerActor(mediator: ActorRef) extends Actor {
     /**
      * Download a file from a source
      */
-    case DsAddFromUrl(name, desc, target_algo, url, id) => {
+    case DsAddFromUrl(name, desc, target_algo, url, id) =>
       try {
         val downloader = new URL(url) #> new File(s"./datasets/$username/$name")
         downloader.run()
@@ -47,12 +47,11 @@ class WorkerActor(mediator: ActorRef) extends Actor {
       } catch {
         case _: Throwable => OperationStatus.OpFailure
       }
-    }
 
     /**
      * Add a file directly from the supplied resource
      */
-    case DsAddDirect(name, desc, target_algo, file, id) => {
+    case DsAddDirect(name, desc, target_algo, file, id) =>
       try {
         val filepath = Paths.get(s"./datastore/datsets/$username/$name")
         if (Files.exists(filepath)) OperationStatus.OpWarning
@@ -63,12 +62,11 @@ class WorkerActor(mediator: ActorRef) extends Actor {
       } catch {
         case _: Throwable => OperationStatus.OpFailure
       }
-    }
 
     /**
      * Removes a dataset on a user's account
      */
-    case DsDelete(name, id) => {
+    case DsDelete(name, id) =>
       val filepath = Paths.get(s"./datastore/datasets/$username/$name")
       try {
         if (!Files.exists(filepath)) {
@@ -79,16 +77,15 @@ class WorkerActor(mediator: ActorRef) extends Actor {
       } catch {
         case _: Throwable => OperationStatus.OpFailure
       }
-    }
 
     /**
      * Refreshes the file from the original download location
      */
-    case DsRefresh(name, id) => {
+    case DsRefresh(name, id) =>
       try {
-        val url = (dsm ? GiveUserData(username)) match {
+        val url = dsm ? GiveUserData(username) match {
           case x: Future[Any] => Await.result(x, 30 seconds) match {
-            case EnterDataSet(_, _, _, _, url: String) => url
+            case DataSetEntry(_, _, _, _, url: String) => url
           }
         }
         val downloader = new URL(url) #> new File(s"./datastore/datasetes/$username/$name")
@@ -97,7 +94,6 @@ class WorkerActor(mediator: ActorRef) extends Actor {
       } catch {
         case _: Throwable => OperationStatus.OpFailure
       }
-    }
 
     case _ => OperationStatus.OpFailure
   }
@@ -134,25 +130,24 @@ class WorkerActor(mediator: ActorRef) extends Actor {
       }
     }
 
+      // TODO: Get rid of all this
     /**
      * Get the details of a user's datasets in Json Format
      */
     case (dsm: ActorRef, GetUserDatasetsJson(username: String)) => {
 
-      val userdata: Seq[EnterDataSet] = Await.result((dsm ? GiveUserData(username)), 60 seconds) match {
-        case obj: Seq[EnterDataSet] => obj
+      val userdata: Seq[DataSetEntry] = Await.result(dsm ? GiveUserData(username), 60 seconds) match {
+        case obj: Seq[DataSetEntry] => obj
         case _: Throwable => Seq()
       }
 
-      val objects = userdata.map { entry =>
-        entry match {
-          case EnterDataSet(name: String, dtype: String, algo: String, status: String, source: String) =>
-            JsObject(Seq("name" -> JsString(name),
-              "type" -> JsString(dtype),
-              "algo" -> JsString(algo),
-              "status" -> JsString(status),
-              "source" -> JsString(source)))
-        }
+      val objects = userdata.map {
+        case DataSetEntry(name: String, dtype: String, algo: String, status: String, source: String) =>
+          JsObject(Seq("name" -> JsString(name),
+            "type" -> JsString(dtype),
+            "algo" -> JsString(algo),
+            "status" -> JsString(status),
+            "source" -> JsString(source)))
       }.zipWithIndex
 
       val out = JsObject(objects.map(x => x._2.toString -> x._1))
