@@ -6,7 +6,8 @@ import actors.mediator.{Mediator, RegisterForNotification}
 import actors.miner.Miner
 import actors.persistenceManager.Persistence
 import akka.actor._
-import models.messages.Ready
+import models.messages.client.{LogIn, LogOut}
+import models.messages.{Ready, SysError}
 
 import scala.collection.mutable.{Map => mMap}
 
@@ -21,15 +22,14 @@ object ApplicationManager {
     classOf[Miner],
     classOf[Persistence]
   )
-  case class ModSetupRecord (module: ActorRef, ready: Boolean)
 
   trait AppData
-  //object Uninitialised extends AppData
-  case class ModuleSetup (modules: Map[Class[_], ModSetupRecord]) extends AppData
-  case class Modules (modules: Map[Class[_], ActorRef]) extends AppData
+  case class ModuleSetup (modules: Set[(Class[_], ActorRef)]) extends AppData
+  case class RunData (modules: Map[String, ActorRef], clients: Map[String, ActorRef]) extends AppData
 
-  /*trait AppControl
-  object StartSetup extends AppControl        // TODO: We can possibly send in the configuration using this */
+  trait AppControl
+  /*object StartSetup extends AppControl        // TODO: We can possibly send in the configuration using this */
+  object Shutdown extends AppControl
 }
 
 import actors.application.ApplicationManager._
@@ -39,29 +39,41 @@ with FSM[AppState, AppData] with ActorLogging {
 
   val mediator = context.actorOf(Props[Mediator])
   mediator ! RegisterForNotification (self)
-  // Do something about receiving SysErrors
 
-  startWith (AppSetup, ModuleSetup( modules =
-    moduleList zip ( moduleList map { cls =>
-      ModSetupRecord (
-        context.actorOf (Props(cls, mediator), cls.getSimpleName),
-        ready = false
-      )
-    }) toMap
-  ))
-
-  when (AppSetup) {
-    case Event (Ready(cls), ms @ ModuleSetup(modules)) =>
-      if (!modules.contains(cls)) throw new Exception("Ghost sub-system")
-      else {
-        val newMod = modules.updated (cls, modules(cls).copy(ready = true))
-        if ( newMod.forall { case (k, ModSetupRecord(_, rdy)) => rdy } )
-          goto (AppRunning) using Modules (
-            modules mapValues { case ModSetupRecord(act,_) => act }
-          )
-        else stay using ms.copy(modules = newMod)
-      }
+  moduleList foreach { cls =>
+    context.actorOf ( Props(cls, mediator), cls.getSimpleName )
+    // context watch
+    // TODO: have to manage the supervisor strategy
   }
 
-  // TODO: handle SysError
+  startWith (AppSetup, ModuleSetup (Set()))
+
+  when (AppSetup) {
+    case Event ( Ready(cls), ModuleSetup(set) ) =>
+      val nSet = set + ((cls, sender))
+      if ( nSet.size == moduleList.length )
+        goto (AppRunning) using RunData (
+          modules = nSet map { case (k,v) => (k.getSimpleName, v) } toMap,
+          clients = Map()
+        )
+      else stay using ModuleSetup (nSet)
+  }
+
+  when (AppRunning) {
+    case Event (LogIn(user), RunData(mods, clients)) =>
+      stay using RunData (mods, clients + ((user, sender)))
+    case Event (LogOut(user), RunData(mods, clients)) =>
+      stay using RunData (mods, clients - user)
+
+    // TODO: handle AppShutdown by creating a safe shutdown procedure
+  }
+
+  // TODO: External actor needs to subscribe to state change notification
+
+  whenUnhandled {
+    case Event (SysError(susys, msg), _) =>
+      log.error("Subsystem: "+susys+" Send error message: "+msg)
+      stay()
+  }
+
 }
