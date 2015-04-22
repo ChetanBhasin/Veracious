@@ -7,8 +7,8 @@ import akka.actor.{ActorSystem, TypedActor, TypedProps}
 import models.batch.OperationStatus.OperationStatus
 import models.batch._
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.io.Source
 
 /**
