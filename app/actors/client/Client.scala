@@ -4,7 +4,6 @@ package actors.client
  * Created by basso on 09/04/15.
  */
 
-import actors.mediator._
 import akka.actor._
 import models.messages.client._
 
@@ -15,22 +14,22 @@ import models.messages.client._
  * @param mediator The ActorRef of the Mediator
  */
 class Client (val username: String, socket: ActorRef, mediator: ActorRef) extends Actor {
-  mediator ! RegisterForReceive(self, classOf[MessageToClient])
 
   override def preStart() {
-    mediator ! LogIn(username)
+    mediator ! new LogIn(username) with ClientManagerMessage
   }
 
   def receive = {
     // Match the message to our username
-    case MessageToClient(`username`, msg) => socket ! msg
+    //case MessageToClient(`username`, msg) => socket ! msg
+    case Push(msg) => socket ! msg
     case _ => Unit    // Ignore all others
 
     /** As of now, no messages to come from the browser using the socket. */
   }
 
   override def postStop() {   // Will run when this actor is killed. (The client logged out)
-    mediator ! LogOut(username)
+    mediator ! new LogOut(username) with ClientManagerMessage
   }
 }
 

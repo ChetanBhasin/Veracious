@@ -5,12 +5,14 @@ import java.io.{BufferedWriter, FileWriter, PrintWriter}
 import actors.application.AppModule
 import actors.mediator._
 import akka.actor.ActorRef
-import models.messages.client.{LogIn, LogOut, MessageToClient}
-import models.messages.logger.Log
+import models.messages.client.MessageToClient
+import models.messages.logger.{GetLogs, Log, LoggerMessage}
 import play.api.libs.json._
 
-import scala.collection.mutable.{ListBuffer, Map => mMap}
+import scala.collection.mutable.{Map => mMap}
 import scala.io.Source
+import scala.util.{Failure, Success, Try}
+
 /**
  * Created by basso on 09/04/15.
  *
@@ -24,45 +26,19 @@ import scala.io.Source
   */
 import actors.logger.Logger._
 class Logger (val mediator: ActorRef, implicit val logFile: String) extends AppModule {
-  mediator ! RegisterForReceive(self, classOf[Log])
-  val userList = ListBuffer[String]()
+  mediator ! RegisterForReceive(self, classOf[LoggerMessage])
 
   def receive = {
-    case LogIn (username) =>
-      /** The username has just logged in, let us welcome him/her with logs **/
-      userList += username
-      sender ! MessageToClient (
-        username,   // Bit redundant?
-        Json.obj("log" -> getLogs(username))
-      )
-
-      /** The user has logged out, delete him/her from records */
-    case LogOut (username) => userList -= username
-
       /** Got a log event, write the log to file and then notify the user if he/she is logged in */
     case lg @ Log(status, username, msg, event) =>
-      val logObj = createAndWriteLog(lg)    // Create the log object and write to file as well
-      if (userList.contains(username)) // If the user is logged in
-        mediator ! MessageToClient (username, Json.obj("log" -> logObj))
+      writeLog(lg) match {
+        case Success(_) => mediator ! MessageToClient(username, lg)
+        case Failure(ex) => moduleError("Could'nt write log to disk: Exception => "+ex)
+      }
 
+    case GetLogs (username) => sender ! getLogs(username)   // Send back the array as it is
   }
 }
-
-
-/**
- * Design decision: We will use Json file for logs
- *
- * A typical log will be:
- * {
- *   user: String,
- *   log: {
- *     status: String,
- *     message: String,
- *     activity: String
- *   }
- * }
- *
- */
 
 object Logger {
 
@@ -100,25 +76,17 @@ object Logger {
     )
   }
 
-  def createAndWriteLog (logEvent: Log) (implicit logFile: String): JsValue = {
-    // We first create the log object
-    val logObj = Json.obj(
-      "status" -> logEvent.status.toString.substring(2).toUpperCase,
-      "message" -> logEvent.msg,
-      "activity" -> logEvent.content.logWrite
-    )
-    // Write the object to file immediately
+  import models.jsonWrites._
+  def writeLog (logObject: Log) (implicit logFile: String): Try[Unit] = Try {
     val writer = new PrintWriter (new BufferedWriter (new FileWriter (logFile, true)))
     writer.println(
       Json.stringify(
         Json.obj(
-          "user" -> logEvent.user,
-          "log" -> logObj
+          "user" -> logObject.user,
+          "log" -> Json.toJson(logObject)
         )
       )
     )
     writer.close()
-    // return the log object
-    logObj
   }
 }

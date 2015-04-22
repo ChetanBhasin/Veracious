@@ -55,17 +55,12 @@ class Persistence(val mediator: ActorRef) extends AppModule {
     /**
      * Get a user owned datasets' meta records in private message formate
      */
-    case ListUserData(username: String) => datastoreManager !(GiveUserData(username), sender)
+    case GetUserDataSets(username: String) => datastoreManager ! (GiveUserData(username), sender)
 
     /**
      * Submit a DsOpJob
      */
     case operation: SubmitDsOpJob => router.route((operation, datastoreManager), sender)
-
-    /**
-     * get a user owned datasets' meta records in Json format
-     */
-    case GetUserDatasetsJson(username: String) => router.route((GetUserDatasetsJson(username), datastoreManager), sender)
 
     /**
      * Perform a miner result operation

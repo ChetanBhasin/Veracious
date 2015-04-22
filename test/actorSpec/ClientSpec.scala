@@ -1,7 +1,6 @@
 package actorSpec
 
 import actors.client.Client._
-import actors.mediator.RegisterForReceive
 import akka.actor.PoisonPill
 import models.messages.client._
 import play.api.libs.json._
@@ -19,23 +18,14 @@ class ClientSpec extends UnitTest {
   /** We shall become the web-socket for the client **/
   val client = system.actorOf(props(mediator.ref)(user, testActor), "testClient")
 
-  "Client" should "register itself at mediator" in {
-    mediator.expectMsgClass(classOf[RegisterForReceive])
-  }
-
-  "Client" should "broadcast login message" in {
-    mediator.expectMsg(LogIn(user))
+  "Client" should "send login message to its manager" in {
+    mediator.expectMsg(new LogIn(user) with ClientManagerMessage)
   }
 
   val sampleJson = Json.obj ("user" -> "you", "name" -> "jibin")
   it should "forward json message to socket" in {
-    client ! MessageToClient(user, sampleJson)
+    client ! Push(sampleJson)
     expectMsg(sampleJson)
-  }
-
-  it should "ignore messages not meant for it" in {
-    client ! MessageToClient("someOtherUser", sampleJson)
-    expectNoMsg()
   }
 
   it should "ignore any other messages" in {
@@ -43,8 +33,8 @@ class ClientSpec extends UnitTest {
     expectNoMsg(1 second)
   }
 
-  it should "broadcast logout message when killed" in {
+  it should "Send logout message to its manager when killed" in {
     client ! PoisonPill
-    mediator.expectMsg(LogOut(user))
+    mediator.expectMsg(new LogOut(user) with ClientManagerMessage)
   }
 }
