@@ -2,8 +2,10 @@ package actorSpec
 
 import java.time.LocalDateTime
 
-import models.batch.Batch
-import models.batch.job.{DataSetOp, MineOp}
+import models.batch.job.{DataSetOp, DsAddFromUrl, MineOp}
+import models.batch.{Batch, OperationStatus}
+import models.messages.logger.Log
+import models.mining.Algorithm
 
 /**
  * Created by basso on 11/04/15.
@@ -31,4 +33,9 @@ package object mocks {
   val mockBatch3 = mockBatch.copy(jobs =
     List( MockDsOp("Ds1") ))
 
+  def sampleLog(user: String) = Log(
+    OperationStatus.OpSuccess,
+    user,
+    "The operation was a success",
+    DsAddFromUrl("data-setName","desc", Algorithm.Clustering ,"https://blah.com/ds"))
 }

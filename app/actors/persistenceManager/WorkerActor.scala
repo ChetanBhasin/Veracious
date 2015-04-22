@@ -13,7 +13,6 @@ import models.messages.batchProcessing._
 import models.messages.logger.Log
 import models.messages.persistenceManaging.DataSetEntry
 import models.mining.{Algorithm, MinerResult}
-import play.api.libs.json.{JsObject, JsString}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -102,20 +101,22 @@ class WorkerActor(mediator: ActorRef) extends Actor {
 
     /**
      * Manages all the incoming Dataset related jobs
+     *
+     * Modified by Anish,
+     * The reply should be a JobStatus message
      */
     case (dsm: ActorRef, SubmitDsOpJob(username: String, job: DataSetOp)) => handleDsJob(username, job, dsm) match {
-      case OperationStatus.OpSuccess => {
-        sender ! OperationStatus.OpSuccess
-        mediator ! Log(OperationStatus.OpSuccess, username, "Dataset stored on disk successfully.", job)
-      }
-      case OperationStatus.OpWarning => {
-        sender ! OperationStatus.OpWarning
-        mediator ! Log(OperationStatus.OpSuccess, username, "Warning: No fatal error, but operation could not be completed.", job)
-      }
-      case OperationStatus.OpFailure => {
-        sender ! OperationStatus.OpFailure
-        mediator ! Log(OperationStatus.OpFailure, username, "Fatal error: Operation could not be completed", job)
-      }
+      case s @ OperationStatus.OpSuccess =>
+        sender ! JobStatus(username,s)
+        mediator ! Log(s, username, "Dataset stored on disk successfully.", job)
+
+      case s @ OperationStatus.OpWarning =>
+        sender ! JobStatus(username,s)
+        mediator ! Log(s, username, "Warning: No fatal error, but operation could not be completed.", job)
+
+      case s @ OperationStatus.OpFailure =>
+        sender ! JobStatus(username,s)
+        mediator ! Log(s, username, "Fatal error: Operation could not be completed", job)
     }
 
     /**
@@ -128,31 +129,6 @@ class WorkerActor(mediator: ActorRef) extends Actor {
       } catch {
         case _: Throwable => ??? //Log here
       }
-    }
-
-      // TODO: Get rid of all this
-    /**
-     * Get the details of a user's datasets in Json Format
-     */
-    case (dsm: ActorRef, GetUserDatasetsJson(username: String)) => {
-
-      val userdata: Seq[DataSetEntry] = Await.result(dsm ? GiveUserData(username), 60 seconds) match {
-        case obj: Seq[DataSetEntry] => obj
-        case _: Throwable => Seq()
-      }
-
-      val objects = userdata.map {
-        case DataSetEntry(name: String, dtype: String, algo: String, status: String, source: String) =>
-          JsObject(Seq("name" -> JsString(name),
-            "type" -> JsString(dtype),
-            "algo" -> JsString(algo),
-            "status" -> JsString(status),
-            "source" -> JsString(source)))
-      }.zipWithIndex
-
-      val out = JsObject(objects.map(x => x._2.toString -> x._1))
-
-      sender ! out
     }
 
   }

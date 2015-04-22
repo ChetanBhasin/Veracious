@@ -5,8 +5,6 @@ import java.nio.file.{Files, Paths, StandardOpenOption}
 import akka.actor.{Actor, ActorSystem, Props}
 import models.messages.persistenceManaging.DataSetEntry
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.io.Source
 
 case class GiveUserData(username: String)
@@ -71,25 +69,30 @@ object DatastoreManager {
   }
 }
 
+import models.jsonWrites._
+import play.api.libs.json._
 /**
  * Class meant to br produced as a typed actor
  */
 class DatastoreManager extends Actor {
 
   /**
-   * Get an Iterable of all the available datasets a user holds
-   * along with other related information about those datasets
+   * Modified by Anish
+   * Get a JsArray of All the data-sets belonging to the user
    *
-   * @param uname username to check for
-   * @return unit
    */
-  private def getUserDatasets(uname: String): Future[Seq[DataSetEntry]] = Future[Seq[DataSetEntry]] {
+  private def getUserDatasets(uname: String): JsValue = try {
     val stream = Source.fromFile(s"./datastore/meta/usersets/$uname.dat")
-    val vals = stream.getLines.map {
-      line => DatastoreManager.makeDsEntry(line)
+    if (stream isEmpty) JsNull
+    else {
+      val vals = stream.getLines.map {
+        line => DatastoreManager.makeDsEntry(line)
+      }
+      stream.close()
+      Json.toJson(vals.toSeq)   // Should work automagically with the JsonWrites available for DataSetEntry
     }
-    stream.close()
-    vals.toSeq
+  } catch {
+    case ex: Throwable => JsNull
   }
 
   /**
