@@ -2,15 +2,13 @@ package actorSpec
 
 import java.io.{File, PrintWriter}
 
+import actorSpec.mocks._
 import actors.logger._
 import actors.mediator.RegisterForReceive
 import akka.actor.Props
-import models.batch.OperationStatus
-import models.batch.job.DsAddFromUrl
 import models.messages.Ready
-import models.messages.client.{LogIn, MessageToClient}
+import models.messages.client.MessageToClient
 import models.messages.logger._
-import models.mining.Algorithm
 import play.api.libs.json._
 
 import scala.concurrent.duration._
@@ -43,40 +41,32 @@ class LoggerSpec extends UnitTest {
   }
 
   var msg: JsValue = JsNull
-  it should "send the client a log message on login" in {
-    parent ! LogIn(user)    // Simulating Client Login
+  it should "send the clientManager the list of logs when asked" in {
+    parent ! GetLogs(user)
+    msg = expectMsgClass(classOf[JsValue])
+    assert (msg != JsNull)
+    /*parent ! LogIn(user)    // Simulating Client Login
     val fMsg = expectMsgClass(classOf[MessageToClient])
     assert (fMsg.username == user)
     msg = fMsg.msg
-    msg \ "log" != JsNull
+    msg \ "log" != JsNull*/
   }
 
   it should "send correct number of logs" in {
-    (msg \ "log").asOpt[List[JsObject]] match {
+    (msg).asOpt[List[JsObject]] match {
       case None => fail("Log object failure")
       case Some(lst) =>
         if (lst.length != 5) fail("Some logs from other users have been supplied")
     }
   }
 
-  val sampleLog = Log(
-    OperationStatus.OpSuccess,
-    user,
-    "The operation was a success",
-    DsAddFromUrl("data-setName","desc", Algorithm.Clustering ,"https://blah.com/ds"))
-
   it should "send the log that belongs to the client" in {
-    parent ! sampleLog
+    parent ! sampleLog(user)
     val msg = mediator.expectMsgClass(classOf[MessageToClient])
     assert (msg.username == user)
   }
 
   it should "write the log to file" in {
     if (Source.fromFile(logFile).getLines().length != orig.length + 1) fail()
-  }
-
-  it should "not send the log that belongs to some other client" in {
-    parent ! sampleLog.copy(user = "OtherUser")
-    expectNoMsg()
   }
 }

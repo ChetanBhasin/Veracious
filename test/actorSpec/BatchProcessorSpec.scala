@@ -19,7 +19,8 @@ class BatchProcessorSpec extends UnitTest {
   val submit = (b: Batch) => parent ! SubmitBatch(user, b)
 
   "Batch Processor" should "Setup correctly" in {
-    mediator.expectMsgClass(classOf[RegisterForReceive])
+    val msg = mediator.expectMsgClass(classOf[RegisterForReceive])
+    assert (msg.messageType == classOf[BatchProcessorMessage])
     parentProbe.expectMsg(Ready(classOf[BatchProcessor]))
   }
 
@@ -34,7 +35,7 @@ class BatchProcessorSpec extends UnitTest {
   }
 
   it should "correctly get a worker to start on a batch" in {
-    parent ! LogIn(user)
+    parent ! new LogIn(user) with BatchProcessorMessage
     submit(mockBatch2)
     mediator.expectMsg(SubmitMineJob(user, MockMineOp("Mn1")))
   }
