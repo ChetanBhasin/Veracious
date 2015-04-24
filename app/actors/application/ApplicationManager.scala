@@ -9,6 +9,7 @@ import actors.persistenceManager.Persistence
 import akka.actor.SupervisorStrategy.Resume
 import akka.actor._
 import models.messages.application._
+import models.messages.persistenceManaging.GetUserManager
 
 import scala.collection.mutable.{Map => mMap}
 
@@ -66,7 +67,10 @@ with FSM[AppState, AppData] with ActorLogging {
     case Event (AppShutDown, Modules(mods)) =>
       mediator ! FinishWork
       goto (AppFinish) using Finishing(mods, 0)
-    // TODO: Get the User manager and all that
+
+    case Event (GetUserManager, _) =>
+      mediator ! ((GetUserManager, sender))
+      stay
   }
 
   when (AppFinish) {

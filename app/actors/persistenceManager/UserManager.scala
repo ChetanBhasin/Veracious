@@ -7,8 +7,6 @@ import akka.actor.{ActorSystem, TypedActor, TypedProps}
 import models.batch.OperationStatus.OperationStatus
 import models.batch._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.io.Source
 
 /**
@@ -97,13 +95,15 @@ private[persistenceManager] object UserManagerImpl {
 }
 
 trait UserManager {
-  def checkUsername(username: String): Future[Boolean]
+  def checkUsername(username: String): Boolean
 
   def addUser(username: String, password: String): OperationStatus
 
   def removeUser(username: String): OperationStatus
 
   def changePassword(username: String, password: String): OperationStatus
+
+  def authenticate(username: String, password: String): Boolean
 }
 
 /**
@@ -115,24 +115,22 @@ private[persistenceManager] class UserManagerImpl extends UserManager {
    * Authenticate a user
    * @param username username of the user
    * @param password expected password of the user
-   * @return Future[Boolean]
+   * @return Boolean
    */
-  def authenticate(username: String, password: String) = Future[Boolean] {
-    try {
+  def authenticate(username: String, password: String) = try {
       val user = UserManagerImpl.getRawUsersRec.filter(_ contains username)(0).split("::")
       user(1) == password
     } catch {
       case _: Throwable => false
     }
 
-  }
 
   /**
    * Check if a particular user exists
    * @param username
    * @return
    */
-  def checkUsername(username: String) = Future.successful(UserManagerImpl.checkUsername(username))
+  def checkUsername(username: String) = UserManagerImpl.checkUsername(username)
 
   /**
    * Add a user if it doesn't already exists
