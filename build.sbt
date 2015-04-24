@@ -17,7 +17,7 @@ javaOptions ++= Seq("-Xmx2G")
 
 resolvers += "Typesafe Repository" at "https://repo.typesafe.com/typesafe/releases/"
 
-//  depenedencies
+//  depenedencies for Akka
 libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % "2.3.9",
   "com.typesafe.akka" %% "akka-testkit" % "2.3.9"
@@ -29,6 +29,13 @@ libraryDependencies ++= Seq(
   "org.apache.spark" % "spark-sql_2.11" % sparkVersion,
   "org.apache.spark" % "spark-streaming_2.11" % sparkVersion,
   "org.apache.spark" % "spark-mllib_2.11" % sparkVersion
+)
+
+// Webjar dependencies
+libraryDependencies ++= Seq(
+  "org.webjars" %% "webjars-play" % "2.3.0-2",
+  "org.webjars" % "angularjs" % "1.3.15",
+  "org.webjars" % "bootstrap" % "3.3.4"
 )
 
 
