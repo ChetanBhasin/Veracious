@@ -1,4 +1,4 @@
-package models.messages
+package models.messages.application
 
 /**
  * This is the error class which will be sent to the mediator. Preferably, the application

@@ -27,10 +27,10 @@ package object mocks {
       MockDsOp("Ds2"), MockMineOp("Mn2")
     ))
 
-  val mockBatch2 = mockBatch.copy(jobs =
+  val mockBatch1 = mockBatch.copy(jobs =
     List( MockMineOp("Mn1") ))
 
-  val mockBatch3 = mockBatch.copy(jobs =
+  val mockBatch2 = mockBatch.copy(jobs =
     List( MockDsOp("Ds1") ))
 
   def sampleLog(user: String) = Log(

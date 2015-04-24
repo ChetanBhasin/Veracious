@@ -3,11 +3,13 @@ package actors.application
 import actors.batchProcessor.BatchProcessor
 import actors.client.ClientManager
 import actors.logger.Logger
-import actors.mediator.{Mediator, RegisterForNotification}
+import actors.mediator.RegisterForReceive
 import actors.miner.Miner
 import actors.persistenceManager.Persistence
+import akka.actor.SupervisorStrategy.Resume
 import akka.actor._
-import models.messages.{Ready, SysError}
+import models.messages.application._
+import models.messages.persistenceManaging.GetUserManager
 
 import scala.collection.mutable.{Map => mMap}
 
@@ -24,27 +26,28 @@ object ApplicationManager {
     classOf[ClientManager]
   )
 
-  trait AppData
-  case class ModuleSetup (modules: Set[(Class[_], ActorRef)]) extends AppData
-  case class Modules (modules: Map[String, ActorRef]) extends AppData
+  sealed trait AppData
+  private case class ModuleSetup (modules: Set[(Class[_], ActorRef)]) extends AppData
+  private case class Modules (modules: Map[String, ActorRef]) extends AppData
+  private case class Finishing(modules: Map[String, ActorRef], num: Int) extends AppData
 
-  trait AppControl
-  /*object StartSetup extends AppControl        // TODO: We can possibly send in the configuration using this */
-  object Shutdown extends AppControl
 }
 
 import actors.application.ApplicationManager._
 
-class ApplicationManager extends Actor
+class ApplicationManager (val mediator: ActorRef) extends Actor
 with FSM[AppState, AppData] with ActorLogging {
 
-  val mediator = context.actorOf(Props[Mediator])
-  mediator ! RegisterForNotification (self)
+  mediator ! RegisterForReceive (self, classOf[AppControl])
 
   moduleList foreach { cls =>
     context.actorOf ( Props(cls, mediator), cls.getSimpleName )
     // context watch
-    // TODO: have to manage the supervisor strategy
+  }
+
+  override val supervisorStrategy = OneForOneStrategy() {
+    case _: Throwable => Resume
+    //case _: Exception => Resume
   }
 
   startWith (AppSetup, ModuleSetup (Set()))
@@ -59,10 +62,34 @@ with FSM[AppState, AppData] with ActorLogging {
       else stay using ModuleSetup (nSet)
   }
 
-  /*
   when (AppRunning) {
-    // TODO: handle AppShutdown by creating a safe shutdown procedure
-  }*/
+    case Event (AppShutDown, Modules(mods)) =>
+      mediator ! FinishWork
+      goto (AppFinish) using Finishing(mods, 0)
+
+    case Event (GetUserManager, _) =>
+      mediator ! ((GetUserManager, sender))
+      stay
+  }
+
+  when (AppFinish) {
+    case Event (FinishedWork, Finishing(m, 0)) =>
+      stay using Finishing(m, 1)
+    case Event (FinishedWork, Finishing(mods, 1)) =>
+      mods.values.foreach { _ ! PoisonPill }
+      context stop self
+      stay
+  }
+
+
+  /**
+   * Safe shutdown procedure:
+   *  1. Send messages to Batch Processor and ClientManager to finish up their work
+   *    1.1 The Batch processor will wait for any worker still doing it's job
+   *    1.2 The Client Manager will disconnect all the clients
+   *  2. Go to AppFinish
+   *  3. Once these two reply with confirmations, then do graceful stop of all the modules
+   */
 
   // TODO: External actor needs to subscribe to state change notification
 
