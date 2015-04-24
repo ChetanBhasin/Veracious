@@ -24,6 +24,7 @@ object Auth extends Controller {
   def check(username: String, password: String) =
     username == "admin" && password == "admin"
 
+  /** Here we need to check whether the application is ready or not */
   def login = ???   //Ok(views.html.login(loginForm))
 
   def authenticate = Action { implicit request =>
@@ -45,7 +46,7 @@ trait Secured {
     /** Get username from the headers */
   def username(request: RequestHeader):Option[String] = request.session.get(Security.username)
 
-    /** Redirection when unauthorised */
+  /** Redirection when unauthorised */
   def onUnauthorized(request: RequestHeader) = Results.Redirect(routes.Auth.login)
 
   def isAuthenticated(f: => String => Request[AnyContent] => Result) = {
