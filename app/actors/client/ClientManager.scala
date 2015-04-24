@@ -2,9 +2,10 @@ package actors.client
 
 import actors.application.AppModule
 import actors.mediator.RegisterForReceive
-import akka.actor.ActorRef
+import akka.actor.{ActorRef, PoisonPill}
 import akka.pattern.ask
 import akka.util.Timeout
+import models.messages.application.{FinishWork, FinishedWork}
 import models.messages.batchProcessing.BatchProcessorMessage
 import models.messages.client._
 import models.messages.logger.{GetLogs, Log}
@@ -40,11 +41,11 @@ class ClientManager (val mediator: ActorRef) extends AppModule {
         case Success(logs) => clientTable(username) ! Push(Json.obj("logs" -> logs))
         case Failure(ex) => moduleError("Couldn't get logs: exception =>"+ex)
       }
-      (mediator ? GetUserDataSets(username)).asInstanceOf[Future[JsValue]].onComplete {
+      (mediator ? GetUserDataSets(username)).asInstanceOf[Future[JsValue]].onComplete {       // TODO: Have to work on this
         case Success(ds) => clientTable(username) ! Push(Json.obj("data-sets" -> ds))
         case Failure(ex) => moduleError("Couldn't get Data-sets: exception =>"+ex)
       }
-      (mediator ? GetUserResults(username)).asInstanceOf[Future[JsValue]].onComplete {
+      (mediator ? GetUserResults(username)).asInstanceOf[Future[JsValue]].onComplete {    // Don't think we need this
         case Success(ds) => clientTable(username) ! Push(Json.obj("results" -> ds))
         case Failure(ex) => moduleError("Couldn't get results: exception =>"+ex)
       }
@@ -61,6 +62,10 @@ class ClientManager (val mediator: ActorRef) extends AppModule {
         }
         case None => Unit   // The client is unavailable, so no push
       }
+
+    case FinishWork =>
+      clientTable.values.foreach { _ ! PoisonPill }
+      sender ! FinishedWork
 
   }
 }

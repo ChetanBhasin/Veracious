@@ -3,9 +3,9 @@ package actorSpec
 import actorSpec.mocks.sampleLog
 import actors.client.ClientManager
 import actors.mediator.RegisterForReceive
-import akka.actor.Props
+import akka.actor.{Props, Terminated}
 import akka.testkit.TestProbe
-import models.messages.Ready
+import models.messages.application.{FinishWork, FinishedWork, Ready}
 import models.messages.batchProcessing.BatchProcessorMessage
 import models.messages.client._
 import models.messages.logger.GetLogs
@@ -26,7 +26,7 @@ class ClientManagerSpec extends UnitTest {
   }
 
   val fakeClient = TestProbe()
-  it should "Do the initial honors of notifying LogIn, asking for Logs, Data-sets and Results" in {
+  def repBlock = {      // This block will be repeated you see
     parent.tell(new LogIn(user) with ClientManagerMessage, fakeClient.ref)
     mediator.expectMsg(new LogIn(user) with BatchProcessorMessage)
     mediator.expectMsg(GetLogs(user))
@@ -40,6 +40,9 @@ class ClientManagerSpec extends UnitTest {
     mediator.reply(JsNull)
     fakeClient.expectMsg(Push(Json.obj("results" -> JsNull)))
   }
+
+  it should "Do the initial honors of notifying LogIn, " +
+    "asking for Logs, Data-sets and Results" in repBlock
 
   import models.jsonWrites._
   val sLog = sampleLog(user)
@@ -57,5 +60,15 @@ class ClientManagerSpec extends UnitTest {
     parent.tell(new LogOut(user) with ClientManagerMessage, fakeClient.ref)
     parent ! MessageToClient(user, sLog)
     fakeClient.expectNoMsg()
+    mediator.expectMsg(new LogOut(user) with BatchProcessorMessage)
   }
+
+  it should "again do the initial work" in repBlock
+
+  watch(fakeClient.ref)
+  it should "kill / disconnect the clients when given a FinishWork directive" in {
+    parent ! FinishWork
+    expectMsgClass(classOf[Terminated])   // First the fakeClient terminates
+    expectMsg(FinishedWork)               // Then we receive the FinishedWork meant
+  }                                       // meant for the application manager
 }

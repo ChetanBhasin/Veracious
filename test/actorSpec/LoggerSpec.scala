@@ -6,7 +6,7 @@ import actorSpec.mocks._
 import actors.logger._
 import actors.mediator.RegisterForReceive
 import akka.actor.Props
-import models.messages.Ready
+import models.messages.application.Ready
 import models.messages.client.MessageToClient
 import models.messages.logger._
 import play.api.libs.json._

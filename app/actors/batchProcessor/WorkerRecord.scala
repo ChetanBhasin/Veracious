@@ -19,7 +19,7 @@ object WorkerRecord {
   /* Overloaded */
   def apply(user: String, mediator: ActorRef)(implicit actorFactory: ActorRefFactory): WorkerRecord = {
     WorkerRecord(
-      actorFactory.actorOf(Props(classOf[Worker], user, mediator), "batchWorker:" + user),
+      actorFactory.actorOf(Props(classOf[Worker], user, mediator)),   // Bad Idea to use username
       mQueue[Batch](),
       workerFree = true, userLoggedIn = true
     )
