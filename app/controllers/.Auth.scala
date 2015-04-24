@@ -7,6 +7,7 @@ import play.api.mvc._
  * Authorisation controller
  */
 
+import models.Application.appAccess
 import play.api.data.Forms._
 import play.api.data._
 
@@ -20,9 +21,8 @@ object Auth extends Controller {
     ) verifying ("Invalid email or password",  { case (email, password) => check(email, password)})
   )
 
-  /** TODO: implement the actual user checking **/
   def check(username: String, password: String) =
-    username == "admin" && password == "admin"
+    appAccess.authenticate(username, password)
 
   /** Here we need to check whether the application is ready or not */
   def login = ???   //Ok(views.html.login(loginForm))

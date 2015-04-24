@@ -3,7 +3,7 @@ package actors.application
 import actors.batchProcessor.BatchProcessor
 import actors.client.ClientManager
 import actors.logger.Logger
-import actors.mediator.{Mediator, RegisterForReceive}
+import actors.mediator.RegisterForReceive
 import actors.miner.Miner
 import actors.persistenceManager.Persistence
 import akka.actor.SupervisorStrategy.Resume
@@ -35,10 +35,9 @@ object ApplicationManager {
 
 import actors.application.ApplicationManager._
 
-class ApplicationManager extends Actor
+class ApplicationManager (val mediator: ActorRef) extends Actor
 with FSM[AppState, AppData] with ActorLogging {
 
-  val mediator = context.actorOf(Props[Mediator])
   mediator ! RegisterForReceive (self, classOf[AppControl])
 
   moduleList foreach { cls =>
@@ -81,6 +80,7 @@ with FSM[AppState, AppData] with ActorLogging {
       context stop self
       stay
   }
+
 
   /**
    * Safe shutdown procedure:
