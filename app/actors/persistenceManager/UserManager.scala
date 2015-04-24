@@ -1,7 +1,7 @@
 package actors.persistenceManager
 
-import java.io.FileWriter
-import java.nio.file.{Files, Paths, StandardOpenOption}
+import java.io.{BufferedWriter, FileWriter, PrintWriter}
+import java.nio.file.{Files, Paths}
 
 import akka.actor.{ActorSystem, TypedActor, TypedProps}
 import models.batch.OperationStatus.OperationStatus
@@ -33,9 +33,9 @@ object UserManagerImpl {
    * @return
    */
   private[persistenceManager] def checkSources = {
-    lazy val PathStoreDir = Paths.get("./datastore/")
-    lazy val PathStoreMetaDir = Paths.get("./datastore/meta/")
-    lazy val PathStoreUsers = Paths.get("./datastore/meta/users.dat")
+    lazy val PathStoreDir = Paths.get("./.datastore/")
+    lazy val PathStoreMetaDir = Paths.get("./.datastore/meta/")
+    lazy val PathStoreUsers = Paths.get("./.datastore/meta/users.dat")
 
     if (!Files.exists(PathStoreDir)) Files.createDirectory(PathStoreDir)
     if (!Files.exists(PathStoreMetaDir)) Files.createDirectory(PathStoreMetaDir)
@@ -54,20 +54,9 @@ object UserManagerImpl {
     // Check sources before proceeding
     this.checkSources
 
-    lazy val stream = Source.fromFile("./datastore/meta/users.dat")
+    lazy val stream = Source.fromFile("./.datastore/meta/users.dat")
 
-    lazy val users = try {
-      (for {
-        line <- stream.getLines
-        record <- line.split("::").map(_ trim)
-      } yield record(0)).toStream
-    } finally {
-      stream.close
-    }
-
-    stream.close
-
-    users contains username
+    stream.getLines.map(_.split("::")(0)) contains username
   }
 
   /**
@@ -75,8 +64,8 @@ object UserManagerImpl {
    * @return
    */
   def getRawUsersRec: Array[String] = {
-    lazy val stream = Source.fromFile("./datastore/meta/users.dat")
-    lazy val lines = try (stream.getLines.toArray) finally (stream.close)
+    lazy val stream = Source.fromFile("./.datastore/meta/users.dat")
+    lazy val lines = stream.getLines.toArray //finally (stream.close)
     lines
   }
 
@@ -149,7 +138,9 @@ private[persistenceManager] class UserManagerImpl extends UserManager {
       OperationStatus.OpFailure
     } else {
       try {
-        Files.write(PathStoreFileUser, s"$username::$password".getBytes, StandardOpenOption.APPEND)
+        val writer = new PrintWriter(new BufferedWriter(new FileWriter("./.datastore/meta/users.dat", true)))
+        writer.println(s"$username::$password")
+        writer.close
         OperationStatus.OpSuccess
       } catch {
         case _: Throwable => OperationStatus.OpWarning
@@ -162,7 +153,26 @@ private[persistenceManager] class UserManagerImpl extends UserManager {
    * @param username
    * @return
    */
-  def removeUser(username: String) = ???
+  def removeUser(username: String) = {
+    UserManagerImpl.checkSources
+
+    val stream = Source.fromFile("./.datastore/meta/users.dat")
+
+    val newRecs = try {
+      stream.getLines.filter(_ contains username)
+    } finally {
+      stream.close
+    }
+
+    try {
+      val writer = new PrintWriter(new BufferedWriter(new FileWriter("./.datastore/meta/users.dat", false)))
+      newRecs.map(writer.println(_))
+      writer.close()
+      OperationStatus.OpSuccess
+    } catch {
+      case _: Throwable => OperationStatus.OpFailure
+    }
+  }
 
   /**
    * Change the password for a username
@@ -174,21 +184,19 @@ private[persistenceManager] class UserManagerImpl extends UserManager {
 
     UserManagerImpl.checkSources
 
-    lazy val stream = Source.fromFile("./datastore/meta/users.dat")
+    val stream = Source.fromFile("./.datastore/meta/users.dat")
 
     val newRecs = try {
-      stream.getLines.map {
-        element => if (element == username) s"username::password" else element
-      }
+      stream.getLines.filter(_ contains username)
     } finally {
-      stream.close()
+      stream.close
     }
 
     try {
-      lazy val fw = new FileWriter("./datastore/meta/users.dat")
-
-      newRecs.map(fw.write(_))
-      fw.close()
+      val writer = new PrintWriter(new BufferedWriter(new FileWriter("./.datastore/meta/users.dat", false)))
+      newRecs.map(writer.println(_))
+      writer.println(s"$username::$password")
+      writer.close()
       OperationStatus.OpSuccess
     } catch {
       case _: Throwable => OperationStatus.OpFailure
