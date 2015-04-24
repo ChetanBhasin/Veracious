@@ -1,4 +1,4 @@
-package models.messages
+package models.messages.application
 
 /**
  * Created by basso on 10/04/15.
@@ -8,3 +8,4 @@ package models.messages
  * the application will be open to client connections
  */
 case class Ready (subsys: Class[_])
+object FinishedWork extends AppControl

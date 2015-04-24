@@ -25,7 +25,7 @@ class BatchWorkerSpec extends UnitTest {
   }
 
   it should "accept batch & submit mine job" in {
-    parent ! mockBatch2
+    parent ! mockBatch1
     mediator.expectMsg(SubmitMineJob(user, MockMineOp("Mn1")))
   }
 
