@@ -56,10 +56,14 @@ private[persistenceManager] object UserManagerImpl {
 
     lazy val stream = Source.fromFile("./datastore/meta/users.dat")
 
-    lazy val users = (for {
-      line <- stream.getLines
-      record <- line.split("::").map(_ trim)
-    } yield record(0)).toStream
+    lazy val users = try {
+      (for {
+        line <- stream.getLines
+        record <- line.split("::").map(_ trim)
+      } yield record(0)).toStream
+    } finally {
+      stream.close
+    }
 
     stream.close
 
@@ -72,8 +76,7 @@ private[persistenceManager] object UserManagerImpl {
    */
   def getRawUsersRec: Array[String] = {
     lazy val stream = Source.fromFile("./datastore/meta/users.dat")
-    lazy val lines = stream.getLines.toArray
-    stream.close
+    lazy val lines = try (stream.getLines.toArray) finally (stream.close)
     lines
   }
 
@@ -118,11 +121,11 @@ private[persistenceManager] class UserManagerImpl extends UserManager {
    * @return Boolean
    */
   def authenticate(username: String, password: String) = try {
-      val user = UserManagerImpl.getRawUsersRec.filter(_ contains username)(0).split("::")
-      user(1) == password
-    } catch {
-      case _: Throwable => false
-    }
+    val user = UserManagerImpl.getRawUsersRec.filter(_ contains username)(0).split("::")
+    user(1) == password
+  } catch {
+    case _: Throwable => false
+  }
 
 
   /**
@@ -172,13 +175,16 @@ private[persistenceManager] class UserManagerImpl extends UserManager {
     UserManagerImpl.checkSources
 
     lazy val stream = Source.fromFile("./datastore/meta/users.dat")
-    lazy val newRecs = for {
-      oldrecs <- stream.getLines
-      out <- if (oldrecs contains username)
-        s"$username::$password"
-      else oldrecs
-    } yield out
-    stream.close
+    lazy val newRecs: Iterable[String] = try {
+      val newRecs = for {
+        oldrecs <- stream.getLines
+        out <- if (oldrecs contains username)
+          s"$username::$password"
+        else oldrecs
+      } yield out
+    } finally {
+      stream.close
+    }
 
     try {
       lazy val fw = new FileWriter("./datastore/meta/users.dat")
