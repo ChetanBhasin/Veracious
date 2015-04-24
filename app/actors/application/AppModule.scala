@@ -6,7 +6,7 @@ package actors.application
 
 import actors.mediator.Unregister
 import akka.actor.{Actor, ActorRef}
-import models.messages.{Ready, SysError}
+import models.messages.application.{Ready, SysError}
 
 /**
  * This is the template for the major sub-systems of the application
