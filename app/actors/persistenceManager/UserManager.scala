@@ -175,15 +175,13 @@ private[persistenceManager] class UserManagerImpl extends UserManager {
     UserManagerImpl.checkSources
 
     lazy val stream = Source.fromFile("./datastore/meta/users.dat")
-    lazy val newRecs: Iterable[String] = try {
-      val newRecs = for {
-        oldrecs <- stream.getLines
-        out <- if (oldrecs contains username)
-          s"$username::$password"
-        else oldrecs
-      } yield out
+
+    val newRecs = try {
+      stream.getLines.map {
+        element => if (element == username) s"username::password" else element
+      }
     } finally {
-      stream.close
+      stream.close()
     }
 
     try {
