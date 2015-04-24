@@ -22,7 +22,7 @@ import scala.io.Source
  * It should be able to add/remove/get details of/update details of all the available users
  * on the system.
  */
-private[persistenceManager] object UserManagerImpl {
+object UserManagerImpl {
 
   // Check for singleton since only one actor of such kind should exist
   private var singleton = true
