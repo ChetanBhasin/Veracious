@@ -28,9 +28,7 @@ object AppAccessSpec {
         case _: Exception => Resume
       }
 
-    val appAccess: AppAccess = TypedActor(context).typedActorOf(
-      TypedProps(classOf[AppProxy], new AppProxy(appManager)), "TestAppAccess"
-    )
+    val appAccess: AppAccess = AppAccess(context, appManager, "testAccess")
 
     def receive = {
       case msg => sender ! appAccess
