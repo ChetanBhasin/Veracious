@@ -20,7 +20,7 @@ import scala.concurrent.duration._
  *
  * TODO: !! Important, this actor needs to have a Resume Strategy
  */
-class AppProxy (val appManager: ActorRef) extends AppAccess with Receiver {
+private[application] class AppProxy (val appManager: ActorRef) extends AppAccess with Receiver {
   var _appStatus: AppState = AppSetup
   appManager ! SubscribeTransitionCallBack(TypedActor.context.self)
   implicit val timeout = Timeout(5 seconds)

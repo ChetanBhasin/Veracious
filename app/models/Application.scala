@@ -4,7 +4,7 @@ package models
  * Main object for the application
  */
 
-import actors.application.{AppAccess, AppProxy, ApplicationManager}
+import actors.application.{AppAccess, ApplicationManager}
 import actors.mediator.Mediator
 import akka.actor._
 import play.api.Play.current
@@ -15,7 +15,5 @@ object Application {
   private val appManager = system.actorOf(Props(classOf[ApplicationManager], mediator), "AppManager")
 
   /** We use this to access the application **/
-  val appAccess: AppAccess = TypedActor(system).typedActorOf(
-    TypedProps(classOf[AppProxy], new AppProxy(appManager)), "AppAccess"
-  )
+  val appAccess: AppAccess = AppAccess(system, appManager, "AppAccess")
 }
