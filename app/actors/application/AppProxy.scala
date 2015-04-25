@@ -17,6 +17,8 @@ import scala.concurrent.duration._
  * Created by basso on 24/04/15.
  *
  * Typed actor to use on the system
+ *
+ * TODO: !! Important, this actor needs to have a Resume Strategy
  */
 class AppProxy (val appManager: ActorRef) extends AppAccess with Receiver {
   var _appStatus: AppState = AppSetup
