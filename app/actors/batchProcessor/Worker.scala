@@ -52,6 +52,7 @@ class Worker (val user: String, val mediator: ActorRef)
       /** Batch submission */
     case Event(b: Batch, Uninitialized) =>
       self ! NextJob
+      mediator ! Log(OpInfo, user, "Started working on the Batch", b)
       goto(Busy) using Work(b)
   }
 
