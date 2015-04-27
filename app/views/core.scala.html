@@ -1,4 +1,4 @@
-@(title: String)(headers: Option[Html] = None)(content: Html)
+@(title: String)(headers: Html = Html("<!-- -->"))(content: Html)
 
 <!DOCTYPE html>
 <html>
@@ -9,7 +9,7 @@
 
   <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))'></script>
   <script type="text/javascript" src='@routes.WebJarAssets.at(WebJarAssets.locate("angular.js"))'></script>
-  @if(!headers.isEmpty) {headers.get}
+  @headers
 
 </head>
 <body>

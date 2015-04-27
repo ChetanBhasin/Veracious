@@ -1,6 +1,8 @@
 @()
 
-@core("Index")() {
+@core("Index"){
+  <script type="text/javascript" src='@routes.Application.connectJs()'></script>
+  <script type="text/javascript" src='@routes.Assets.at("javascripts/app.js")'></script> }{
 
   <h1>Temporary Index file</h1>
 }

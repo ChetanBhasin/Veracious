@@ -1,0 +1,22 @@
+@(controller: String)
+<!-- Partial file for the user's batch logging on screen -->
+
+@****************************
+* Todo: Fixed height window *
+* with scroll bars          *
+****************************@
+
+<div ng-controller="@controller as lgCtrl">
+  <div class="row well well-lg">
+    <div ng-repeat="cLog in lgCtrl.logs" class="row" ng-class='{
+   "text-success": lgCtrl.isStatus("SUCCESS", cLog),
+   "text-warning": lgCtrl.isStatus("WARNING", cLog),
+   "text-danger": lgCtrl.isStatus("FAILURE", cLog),
+   "text-info": lgCtrl.isStatus("INFO", cLog)
+   }'>
+      <div class="col-md-1"><strong>{{ cLog.status }}</strong></div>
+      <div class="col-md-6">: {{ cLog.activity }}</div>
+      <div class="col-md-5">&gt&gt{{ cLog.message }}</div>
+    </div>
+  </div>
+</div>
