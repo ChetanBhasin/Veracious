@@ -1,5 +1,6 @@
 package controllers
 
+import actors.application.AppRunning
 import play.api.mvc._
 
 /**
@@ -8,29 +9,34 @@ import play.api.mvc._
  */
 
 import models.Application.appAccess
-import play.api.data.Forms._
-import play.api.data._
+import models.security.loginForm
 
 // TODO: create routes for the Auth
 
 object Auth extends Controller {
-  val loginForm = Form(
-    tuple(
-      "email" -> text,
-      "password" -> text
-    ) verifying ("Invalid email or password",  { case (email, password) => check(email, password)})
-  )
 
   def check(username: String, password: String) =
     appAccess.authenticate(username, password)
 
   /** Here we need to check whether the application is ready or not */
-  def login = ???   //Ok(views.html.login(loginForm))
+  def login = Action {
+    if (appAccess.appStatus == AppRunning)
+      Ok(views.html.login())
+    else Ok("Application is not running")
+  }
 
   def authenticate = Action { implicit request =>
     loginForm.bindFromRequest.fold(
-      formWithErrors => BadRequest, //BadRequest(html.login(formWithErrors)),
-      user => Redirect(routes.Application.index).withSession(Security.username -> user._1)
+      formWithErrors => BadRequest(views.html.login()),
+      lgForm =>
+        if (lgForm.signUp.toBoolean)
+          appAccess.signUp(lgForm.username, lgForm.password) match {
+            case Left(str) => Redirect(routes.Auth.login).flashing("failure" -> str )
+            case _ => Redirect(routes.Auth.login).flashing("success" -> "SignUp was successfull, now please login")
+          }
+        else if (check(lgForm.username, lgForm.password))
+            Redirect(routes.Application.index).withSession(Security.username -> lgForm.username)  // If we have a Security.username, we are authenticated
+        else Redirect(routes.Auth.login).flashing("failure" -> "Authentication Failure")
     )
   }
 
