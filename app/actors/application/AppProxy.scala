@@ -8,6 +8,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import models.batch.OperationStatus
 import models.messages.application.AppShutDown
+import models.messages.client.UserAlreadyLoggedIn
 import models.messages.persistenceManaging.GetUserManager
 
 import scala.concurrent.Await
@@ -71,4 +72,6 @@ private[application] class AppProxy (val appManager: ActorRef) extends AppAccess
         case _ => Left("Operation Failed")
       }
 
+  def alreadyLoggedIn (username: String) =
+    Await.result(appManager ? UserAlreadyLoggedIn(username), 4 seconds).asInstanceOf[Boolean]
 }

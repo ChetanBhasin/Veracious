@@ -9,6 +9,7 @@ import actors.persistenceManager.Persistence
 import akka.actor.SupervisorStrategy.Resume
 import akka.actor._
 import models.messages.application._
+import models.messages.client.UserAlreadyLoggedIn
 import models.messages.persistenceManaging.GetUserManager
 
 import scala.collection.mutable.{Map => mMap}
@@ -45,8 +46,9 @@ with FSM[AppState, AppData] with ActorLogging {
   mediator ! RegisterForReceive (self, classOf[AppControl])
 
   /** Create all the main modules */
-  moduleList foreach { cls =>
-    context.actorOf ( Props(cls, mediator), cls.getSimpleName )
+  moduleList foreach {
+    case cls if cls == classOf[Logger]  => context.actorOf ( Props(cls, mediator, Logger.productionLogFile), cls.getSimpleName)
+    case cls => context.actorOf ( Props(cls, mediator), cls.getSimpleName )
     // context watch
   }
 
@@ -92,6 +94,14 @@ with FSM[AppState, AppData] with ActorLogging {
      */
     case Event (GetUserManager, _) =>
       mediator ! ((GetUserManager, sender))
+      stay
+
+    /**
+     * Check if the user has already logged in, will be accepted by the client manager and
+     * will eventually return Boolean
+     */
+    case Event (u @ UserAlreadyLoggedIn(user), _) =>
+      mediator ! ((u, sender))
       stay
   }
 

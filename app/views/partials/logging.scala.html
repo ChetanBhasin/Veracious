@@ -1,0 +1,24 @@
+@(lgCtrl: String)
+<!-- Partial file for the user's batch logging on screen -->
+
+@**********************************************
+* Controller vals and methods needed          *
+* 1. var logs   -> An array of logs           *
+* 2. function isStatus(String, log)           *
+*         -> A function to check whether the  *
+*            status of the given log matches  *
+*            the String                       *
+**********************************************@
+
+<div class="row well well-lg" id="loggingWell">
+  <div ng-repeat="cLog in lgCtrl.logs" class="row" ng-class='{
+ "text-success": lgCtrl.isStatus("SUCCESS", cLog),
+ "text-warning": lgCtrl.isStatus("WARNING", cLog),
+ "text-danger": lgCtrl.isStatus("FAILURE", cLog),
+ "text-info": lgCtrl.isStatus("INFO", cLog)
+ }'>
+    <div class="col-md-1"><strong>{{ cLog.status }}</strong></div>
+    <div class="col-md-6">: {{ cLog.activity }}</div>
+    <div class="col-md-5">&gt&gt {{ cLog.message }}</div>
+  </div>
+</div>
