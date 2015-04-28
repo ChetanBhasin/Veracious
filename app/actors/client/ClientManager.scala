@@ -9,7 +9,7 @@ import models.messages.application.{FinishWork, FinishedWork}
 import models.messages.batchProcessing.BatchProcessorMessage
 import models.messages.client._
 import models.messages.logger.{GetLogs, Log}
-import models.messages.persistenceManaging.{DataSetEntry, GetUserDataSets, GetUserResults}
+import models.messages.persistenceManaging.{DataSetEntry, GetUserDataSets}
 import play.api.libs.json._
 
 import scala.collection.mutable.{Map => mMap}
@@ -34,6 +34,9 @@ class ClientManager (val mediator: ActorRef) extends AppModule {
   implicit val timeout = Timeout(30 seconds)
 
   def receive = {
+    case UserAlreadyLoggedIn(username) =>
+      sender ! clientTable.contains(username)
+
     case LogIn(username) =>
       clientTable += ((username, sender))   // Invariant, the user is unique
       mediator ! new LogIn(username) with BatchProcessorMessage     // Notifiy the batch processor that a new user has logged in
@@ -44,10 +47,6 @@ class ClientManager (val mediator: ActorRef) extends AppModule {
       (mediator ? GetUserDataSets(username)).asInstanceOf[Future[JsValue]].onComplete {       // TODO: Have to work on this
         case Success(ds) => clientTable(username) ! Push(Json.obj("data-sets" -> ds))
         case Failure(ex) => moduleError("Couldn't get Data-sets: exception =>"+ex)
-      }
-      (mediator ? GetUserResults(username)).asInstanceOf[Future[JsValue]].onComplete {    // Don't think we need this
-        case Success(ds) => clientTable(username) ! Push(Json.obj("results" -> ds))
-        case Failure(ex) => moduleError("Couldn't get results: exception =>"+ex)
       }
 
     case LogOut(username) =>
