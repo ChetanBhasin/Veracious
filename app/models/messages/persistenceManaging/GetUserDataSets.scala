@@ -10,7 +10,3 @@ package models.messages.persistenceManaging
  */
 case class GetUserDataSets(username: String) extends PersistenceMessage
 
-/**
- * Not sure if this is needed, TODO:
- */
-case class GetUserResults(username: String) extends PersistenceMessage

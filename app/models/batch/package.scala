@@ -22,6 +22,6 @@ package object batch {
     */
   object OperationStatus extends Enumeration {
     type OperationStatus = Value
-    val OpSuccess, OpFailure, OpWarning = Value
+    val OpSuccess, OpFailure, OpWarning, OpInfo = Value       // Added the Info for logging sakes
   }
 }

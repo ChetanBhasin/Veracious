@@ -63,5 +63,12 @@ trait AppAccess {
    */
   def signUp(username: String, password: String): Either[String, Unit]
 
+  /**
+   * Check if the given user is already logged in
+   * @param username the user trying to log in
+   * @return true if its already logged in, else false
+   */
+  def alreadyLoggedIn(username: String): Boolean
+
   def shutdown: Unit
 }
