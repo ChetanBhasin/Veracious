@@ -1,6 +1,7 @@
 package models.mining.mlops
 
 import org.apache.spark.mllib.fpm.FPGrowth
+import org.apache.spark.mllib.fpm.FPGrowth.FreqItemset
 import org.apache.spark.rdd.RDD
 
 /**
@@ -16,9 +17,9 @@ class VFPM(file: String, minSupport: Double = 0.2, numPartitions: Int = 10) {
 
   protected lazy val model = fpg.run(transactions)
 
-  val transactions: RDD[Array[String]] = sc.textFile(file).map(_.split(" "))
+  val transactions: RDD[Array[String]] = sc.textFile(file).map(_.split(" ")).cache()
 
-  def items = model.freqItemsets
+  def items: RDD[FreqItemset[String]] = model.freqItemsets
 
   def getItemsetData = model.freqItemsets.collect.foreach {
     itemset =>

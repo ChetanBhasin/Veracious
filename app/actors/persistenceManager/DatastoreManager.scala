@@ -34,8 +34,8 @@ object DatastoreManager {
    */
   def makeDsEntry(line: String) = {
     line split ("::") match {
-      case Array(name: String, dtype: String, targetAlgo: String, status: String, source: String) =>
-        DataSetEntry(name, dtype, targetAlgo, status, source)
+      case Array(name: String, desc: String, dtype: String, targetAlgo: String, status: String, source: String) =>
+        DataSetEntry(name, desc, dtype, targetAlgo, status, source)
       case _ => throw new Error("Got something of which I have no idea.")
     }
   }
@@ -47,7 +47,7 @@ object DatastoreManager {
    * @return
    */
   def makeEntryText(incoming: DataSetEntry): String = incoming match {
-    case DataSetEntry(name, dtype, targetAlgo, status, source) => s"$name::$dtype::$targetAlgo::$status::$source"
+    case DataSetEntry(name, desc, dtype, targetAlgo, status, source) => s"$name::$desc::$dtype::$targetAlgo::$status::$source"
   }
 
   // Check on weather a single value exists or not

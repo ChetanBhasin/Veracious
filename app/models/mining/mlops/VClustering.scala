@@ -1,7 +1,7 @@
 package models.mining.mlops
 
 import org.apache.spark.mllib.clustering._
-import org.apache.spark.mllib.linalg.Vectors
+import org.apache.spark.mllib.linalg.{Vector, Vectors}
 import org.apache.spark.rdd.RDD
 
 /**
@@ -17,7 +17,7 @@ class VClustering(file: String, test: Option[String], numClusters: Int, numItera
 
   lazy val data: (RDD[String]) = sc.textFile(file)
 
-  private lazy val supply = data.map(Vectors.parse(_))
+  private lazy val supply = data.map(Vectors.parse(_)).cache()
   private lazy val preds = {
     test match {
       case Some(element: String) => sc.textFile(element).map(Vectors.parse(_))
@@ -35,7 +35,7 @@ class VClustering(file: String, test: Option[String], numClusters: Int, numItera
   }
 
   def saveToObject(fileLocation: String) = {
-    val dataset = clusters.predict(supply) zip preds
+    val dataset: RDD[(Int, Vector)] = clusters.predict(supply) zip preds
     dataset.saveAsObjectFile(fileLocation)
   }
 

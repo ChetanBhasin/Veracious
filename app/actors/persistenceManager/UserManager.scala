@@ -3,10 +3,14 @@ package actors.persistenceManager
 import java.io.{BufferedWriter, FileWriter, PrintWriter}
 import java.nio.file.{Files, Paths}
 
-import akka.actor.{ActorSystem, TypedActor, TypedProps}
+import akka.actor.{ActorRef, ActorSystem, TypedActor, TypedProps}
+import akka.pattern.ask
 import models.batch.OperationStatus.OperationStatus
 import models.batch._
+import models.messages.persistenceManaging.GetDataStoreManager
 
+import scala.concurrent.Await
+import scala.concurrent.duration._
 import scala.io.Source
 
 /**
@@ -74,11 +78,10 @@ object UserManagerImpl {
    * @param system The ActorSystem to be used
    * @return
    */
-  def apply(system: ActorSystem) = {
+  def apply(system: ActorSystem, pers: ActorRef) = {
     if (singleton) {
       singleton = false
-      val obj: UserManager = TypedActor(system).typedActorOf(TypedProps[UserManagerImpl]())
-      obj
+      val obj: UserManager = TypedActor(system).typedActorOf(TypedProps(classOf[UserManagerImpl], new UserManagerImpl(pers)))
     } else {
       throw new Exception("Only one object at a time is allowed")
     }
@@ -101,7 +104,7 @@ trait UserManager {
 /**
  * Class intented to be used as TypedActor for user management
  */
-private[persistenceManager] class UserManagerImpl extends UserManager {
+private[persistenceManager] class UserManagerImpl(pers: ActorRef) extends UserManager {
 
   /**
    * Authenticate a user
@@ -156,7 +159,11 @@ private[persistenceManager] class UserManagerImpl extends UserManager {
   def removeUser(username: String) = {
     UserManagerImpl.checkSources
 
+    val dsm: ActorRef = Await.result(pers ? GetDataStoreManager, 10 seconds).asInstanceOf[ActorRef]
+
     val stream = Source.fromFile("./.datastore/meta/users.dat")
+
+    dsm ! RemoveUserEntirely(username)
 
     val newRecs = try {
       stream.getLines.filter(_ contains username)

@@ -84,7 +84,7 @@ class WorkerActor(mediator: ActorRef) extends Actor {
       try {
         val url = dsm ? GiveUserData(username) match {
           case x: Future[Any] => Await.result(x, 30 seconds) match {
-            case DataSetEntry(_, _, _, _, url: String) => url
+            case DataSetEntry(_, _, _, _, _, url: String) => url
           }
         }
         val downloader = new URL(url) #> new File(s"./datastore/datasetes/$username/$name")
@@ -122,14 +122,19 @@ class WorkerActor(mediator: ActorRef) extends Actor {
     /**
      * Save the incoming miner result to the disk
      */
-    case MinerResult(al: Algorithm.Algorithm, user: String, name: String, save: (String => Unit)) => {
+    case MinerResult(al: Algorithm.Algorithm, user: String, name: String, save: (String => Unit), job: MineOp) => {
       try {
         save(s"./datastore/datasets/$user/$name.dat")
         // Log here
       } catch {
-        case _: Throwable => ??? //Log here
+        case _: Throwable => Log(OperationStatus.OpFailure, user, "Dataset canot be saved to the disk", job)
       }
     }
+
+    /**
+     * Manage the request for mine operation results
+     */
+    case (operation: GetDsData, dsm: ActorRef) => ???
 
   }
 

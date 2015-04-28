@@ -14,6 +14,8 @@ import models.mining.MinerResult
 
 case class GetUserDatasetsJson(username: String)
 
+case class GetDsData(username: String, Ds: String)
+
 /**
  * Persistence actor
  * Role: Communicate directly with the disk and perform read/write operations.
@@ -25,7 +27,7 @@ class Persistence(val mediator: ActorRef) extends AppModule {
   mediator ! RegisterForReceive (self, classOf[DsOperatorMessage])
 
   // UserManager TypedActor for user related meta operations
-  lazy val userManager = UserManagerImpl(context system)
+  lazy val userManager = UserManagerImpl(context system, context self)
   // DatastoreManager TypedActor for datastore related meta operations
   lazy val datastoreManager = DatastoreManager(context system)
 
@@ -66,6 +68,11 @@ class Persistence(val mediator: ActorRef) extends AppModule {
      * Perform a miner result operation
      */
     case operation: MinerResult => router.route((operation, datastoreManager), sender)
+
+    /**
+     * Return a dataset's data to the user
+     */
+    case operation: GetDsData => router.route((operation, datastoreManager), sender)
 
     /**
      * Renew and reroute expired children actor

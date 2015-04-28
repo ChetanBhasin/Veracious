@@ -20,7 +20,7 @@ class VALS(file: String, rank: Int = 10, numIterations: Int = 20) {
   lazy val ratings = data.map(_.split(",") match {
     case Array(user, item, rate) =>
       Rating(user.toInt, item.toInt, rate.toDouble)
-  })
+  }).cache()
 
   lazy val userItems = ratings.map {
     case Rating(user, item, rate) => (user, item)
@@ -28,7 +28,7 @@ class VALS(file: String, rank: Int = 10, numIterations: Int = 20) {
 
   lazy val model = org.apache.spark.mllib.recommendation.ALS.train(ratings, rank, numIterations)
 
-  lazy val predictions = model.predict(userItems).map {
+  lazy val predictions: RDD[((Int, Int), Double)] = model.predict(userItems).map {
     case Rating(user, item, rate) =>
       ((user, item), rate)
   }

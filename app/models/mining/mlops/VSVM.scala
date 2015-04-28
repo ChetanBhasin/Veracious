@@ -1,6 +1,7 @@
 package models.mining.mlops
 
 import org.apache.spark.mllib.classification.SVMWithSGD
+import org.apache.spark.mllib.linalg
 import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.util.MLUtils
 import org.apache.spark.rdd.RDD
@@ -17,13 +18,13 @@ class VSVM(file: String, testFile: String, numIterations: Int = 100) {
 
   lazy val data: RDD[LabeledPoint] = MLUtils.loadLibSVMFile(sc, file)
 
-  lazy val tests: RDD[org.apache.spark.mllib.linalg.Vector] = MLUtils.loadVectors(sc, testFile)
+  lazy val tests: RDD[org.apache.spark.mllib.linalg.Vector] = MLUtils.loadVectors(sc, testFile).cache()
 
   lazy val model = SVMWithSGD.train(data.cache, numIterations)
 
   model.clearThreshold()
 
-  val predictions = tests.map {
+  lazy val predictions: RDD[(Double, linalg.Vector)] = tests.map {
     point =>
       val score = model.predict(point)
       (score, point)
