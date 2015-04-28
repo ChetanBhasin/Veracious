@@ -46,8 +46,9 @@ with FSM[AppState, AppData] with ActorLogging {
   mediator ! RegisterForReceive (self, classOf[AppControl])
 
   /** Create all the main modules */
-  moduleList foreach { cls =>
-    context.actorOf ( Props(cls, mediator), cls.getSimpleName )
+  moduleList foreach {
+    case cls if cls == classOf[Logger]  => context.actorOf ( Props(cls, mediator, Logger.productionLogFile), cls.getSimpleName)
+    case cls => context.actorOf ( Props(cls, mediator), cls.getSimpleName )
     // context watch
   }
 
