@@ -1,0 +1,4 @@
+#loggingWell {
+  overflow-y: scroll;
+  max-height: 500px;    /* have to decide between max-height and height */
+}
