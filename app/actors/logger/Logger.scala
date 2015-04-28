@@ -42,7 +42,7 @@ class Logger (val mediator: ActorRef, implicit val logFile: String) extends AppM
 
 object Logger {
 
-  //val logFile = "./resources/operationLog"
+  val productionLogFile = "./resources/operationLog"
 
   /**
    * This function will take a line of the file and return the log object if the corresponding
