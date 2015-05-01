@@ -12,6 +12,12 @@ object TestController extends Controller {
     Ok(views.html.testPage())
   }
 
+  def connectJs = Action { implicit request =>
+    Ok(javascripts.js.testConnect(request))
+  }
+
+  def connect = TODO      // web socket actor
+
   def testLoginForm = Action { implicit request =>
     loginForm.bindFromRequest.fold(
       formWithErrors => BadRequest(views.html.testPage()),
