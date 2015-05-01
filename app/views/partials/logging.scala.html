@@ -11,11 +11,11 @@
 **********************************************@
 
 <div class="row well well-lg" id="loggingWell">
-  <div ng-repeat="cLog in lgCtrl.logs" class="row" ng-class='{
- "text-success": lgCtrl.isStatus("SUCCESS", cLog),
- "text-warning": lgCtrl.isStatus("WARNING", cLog),
- "text-danger": lgCtrl.isStatus("FAILURE", cLog),
- "text-info": lgCtrl.isStatus("INFO", cLog)
+  <div ng-repeat="cLog in @(lgCtrl).logs" class="row" ng-class='{
+ "text-success": @(lgCtrl).isStatus("SUCCESS", cLog),
+ "text-warning": @(lgCtrl).isStatus("WARNING", cLog),
+ "text-danger": @(lgCtrl).isStatus("FAILURE", cLog),
+ "text-info": @(lgCtrl).isStatus("INFO", cLog)
  }'>
     <div class="col-md-1"><strong>{{ cLog.status }}</strong></div>
     <div class="col-md-6">: {{ cLog.activity }}</div>
