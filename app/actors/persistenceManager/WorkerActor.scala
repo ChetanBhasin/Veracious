@@ -12,6 +12,7 @@ import models.batch.job._
 import models.messages.batchProcessing._
 import models.messages.logger.Log
 import models.messages.persistenceManaging.DataSetEntry
+import models.mining.mlret._
 import models.mining.{Algorithm, MinerResult}
 
 import scala.concurrent.duration._
@@ -27,6 +28,28 @@ class WorkerActor(mediator: ActorRef) extends Actor {
   private implicit val timeout = Timeout(10 seconds)
 
   /**
+   * Handles output operations of the mining results
+   * @param operation Details of user and dataset wrapped in GetDsData case object Details of user and dataset wrapped in GetDsData case object Details of user and dataset wrapped in GetDsData case object Details of user and dataset wrapped in GetDsData case object
+   * @param dsm Actor reference to datastore manager
+   * @return Option[JSON-Output]
+   */
+  private def handleDsOutput(operation: GetDsData, dsm: ActorRef) = {
+    val (uname, name) = (operation.username, operation.Ds)
+    val result = Await.result(dsm ? CheckUserDataset(uname, name), 10 seconds).asInstanceOf[Option[DataSetEntry]]
+    val filepath = s"./datastore/datasets/$uname/$name"
+    result match {
+      case Some(x: DataSetEntry) => x.targetAlgorithm match {
+        case "als" => new RALS(filepath)
+        case "clustering" => new RClustering(filepath)
+        case "fpm" => new RFPM(filepath)
+        case "svm" => new RSVM(filepath)
+        case _ => None
+      }
+      case None => None
+    }
+  }
+
+  /**
    * handles all the jobs for the actor reciever
    * @param username username to work on
    * @param job job to be dealt with
@@ -40,7 +63,7 @@ class WorkerActor(mediator: ActorRef) extends Actor {
      */
     case DsAddFromUrl(name, desc, target_algo, url, id) =>
       try {
-        val downloader = new URL(url) #> new File(s"./datasets/$username/$name")
+        val downloader = new URL(url) #> new File(s"./datastore/datasets/$username/$name")
         downloader.run()
         OperationStatus.OpSuccess
       } catch {
@@ -95,6 +118,11 @@ class WorkerActor(mediator: ActorRef) extends Actor {
       }
 
     case _ => OperationStatus.OpFailure
+  }
+
+  def handleDsReq(operation: GetDsData, dsm: ActorRef) = {
+    val usersets = Await.result(dsm ? GiveRawUserData(operation.username), 10 seconds)
+
   }
 
   def receive = {

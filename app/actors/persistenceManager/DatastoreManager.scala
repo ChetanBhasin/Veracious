@@ -9,6 +9,8 @@ import scala.io.Source
 
 case class GiveUserData(username: String)
 
+case class GiveRawUserData(username: String)
+
 case class AddDatasetRecord(username: String, dataset: DataSetEntry)
 
 case class RemoveDatasetRecord(username: String, dataset: String)
@@ -16,6 +18,8 @@ case class RemoveDatasetRecord(username: String, dataset: String)
 case class ModifyDatasetStatus(username: String, dataset: DataSetEntry, newStatus: String)
 
 case class RemoveUserEntirely(username: String)
+
+case class CheckUserDataset(username: String, ds: String)
 
 /**
  * Created by chetan on 14/04/15.
@@ -96,6 +100,18 @@ class DatastoreManager extends Actor {
   }
 
   /**
+   * Get Raw records of datasets owned by a user
+   * @param uname
+   * @return
+   */
+  private def getRawUserDatasets(uname: String): Iterator[DataSetEntry] = try {
+    val stream = Source.fromFile(s"./datastore/meta/usersets/$uname.dat")
+    val vals = stream.getLines().map(DatastoreManager.makeDsEntry(_))
+    stream.close()
+    vals
+  }
+
+  /**
    * Add a dataset to a user's profile in the meta-store
    *
    * @param uname username to check for
@@ -167,12 +183,30 @@ class DatastoreManager extends Actor {
     if (Files.exists(filepath)) Files.delete(filepath)
   }
 
+  /**
+   * Check if a dataset is owned by a user
+   * @param username
+   * @param ds
+   * @return
+   */
+  private def checkUserDataset(username: String, ds: String) = {
+    val stream = Source.fromFile(s"./datastore/meta/usersets/$username.dat")
+    val vals = stream.getLines().find(_ == ds)
+    stream.close()
+    vals match {
+      case Some(x: String) => Some(DatastoreManager.makeDsEntry(x))
+      case None => None
+    }
+  }
+
   def receive = {
     case GiveUserData(username: String) => sender ! getUserDatasets(username)
+    case GiveRawUserData(username: String) => sender ! getRawUserDatasets(username)
     case AddDatasetRecord(username: String, data: DataSetEntry) => addUserDataset(username, data)
     case RemoveDatasetRecord(username: String, dsName: String) => removeUserDataset(username, dsName)
     case ModifyDatasetStatus(username: String, data: DataSetEntry, newStatus: String) => modifyStatus(username, data, newStatus)
     case RemoveUserEntirely(username: String) => removeUserEntirely(username)
+    case CheckUserDataset(username: String, ds: String) => checkUserDataset(username, ds)
   }
 
 }
