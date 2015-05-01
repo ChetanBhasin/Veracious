@@ -18,24 +18,15 @@ app.controller('LogController', ($scope) ->
     ###
     # Parts: #loggingWell -> The area of the log
     loggingWell = $("#loggingWell")[0];
-    this.logs = []
-
-    ## Set initial logs or add consectutive logs. Needes the event.data from socket
-    # this.AddSetLogs = (serverData) ->
-    #     if serverData.logs
-    #         this.logs = serverData.logs
-    #     else
-    #         this.logs.push(serverData.log)
-    #     loggingWell.scrollTop = loggingWell.scrollHeight
-    #     return
+    $scope.logs = []
 
     # simple match for status
-    this.isStatus = (status, log) ->
+    $scope.isStatus = (status, log) ->
         log.status == status
 
-    this.test = () ->
-        this.logs.push status: "SUCCESS", message: "Helloooo", activity: "Yohoooo"
-        console.log "DEBUG: running test, this.logs: "+JSON.stringify(this.logs)
+    #$scope.test = () ->
+    #    $scope.logs.push status: "SUCCESS", message: "Helloooo", activity: "Yohoooo"
+    #    console.log "DEBUG: running test, this.logs: "+JSON.stringify($scope.logs)
 
     # Okay, trying out an IDEA
     # Let us see, If we want to separate everything into different controllers, we need a common receiver for the
@@ -45,22 +36,22 @@ app.controller('LogController', ($scope) ->
     # If we add such receiver functions into an array and then make a master receiver that goes through the array with
     # the received server data and stopping till it gets a true, then it might just work right??
 
-    this.receiveFunction = (data) ->    # TODO:check if the model update reflects correctly on the view
+    # UPDATE, got it to work, FINALLLY!!
+    $scope.receiveFunction = (data) -> $scope.$apply () ->  # TODO:check if the model update reflects correctly on the view
         console.log "Debug: received data: "+JSON.stringify(data)
         if data.logs or data.log
             if data.log
-                this.logs.push(data.log)
-            else this.logs = data.logs
+                $scope.logs.push(data.log)
+            else $scope.logs = data.logs
             loggingWell.scrollTop = loggingWell.scrollHeight
-            this.AddSetLogs(data)
             console.log "Debug: apparently saved logs/log data"
-            console.log "Debug: this.logs: "+JSON.stringify(this.logs)
+            console.log "Debug: this.logs: "+JSON.stringify($scope.logs)
             true
         else
             console.log "Debug: didn't save logs/log data"
             false
 
-    receivers.push(this.receiveFunction)     # Add this receiver to the
+    receivers.push($scope.receiveFunction)     # Add this receiver to the
 
     return
 )
@@ -84,10 +75,10 @@ masterReceive = (data) ->
     return
 
 onWSclose = () ->       # TODO, implement
-    alert "Closing application"
+    console.log "Closing application"
 
 onWSerror = (d) ->
-    alert "Some error occured"+ JSON.stringify d
+    console.log "Some error occured"+ JSON.stringify d
 
 webSocket = {}
 
