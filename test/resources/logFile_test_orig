@@ -3,8 +3,8 @@
 { "user" : "Jibin", "log" : { "status" : "SUCCESS", "message" : "the operation was successfull", "activity" : "JOB abc" }}
 { "user" : "Jibin", "log" : { "status" : "FAILURE", "message" : "the operation was a failure", "activity" : "JOB abc" }}
 { "user" : "Anish", "log" : { "status" : "FAILURE", "message" : "the operation was a failure", "activity" : "JOB abc" }}
-{ "user" : "Jibin", "log" : { "status" : "WARNINNG", "message" : "the operation was successfull", "activity" : "JOB abc" }}
+{ "user" : "Jibin", "log" : { "status" : "WARNING", "message" : "the operation was successfull", "activity" : "JOB abc" }}
 { "user" : "Anish", "log" : { "status" : "SUCCESS", "message" : "the operation was successfull", "activity" : "JOB abc" }}
-{ "user" : "Anish", "log" : { "status" : "WARNINNG", "message" : "the operation was successfull", "activity" : "JOB abc" }}
-{ "user" : "Jibin", "log" : { "status" : "WARNINNG", "message" : "the operation was successfull", "activity" : "JOB abc" }}
+{ "user" : "Anish", "log" : { "status" : "WARNING", "message" : "the operation was successfull", "activity" : "JOB abc" }}
+{ "user" : "Jibin", "log" : { "status" : "WARNING", "message" : "the operation was successfull", "activity" : "JOB abc" }}
 { "user" : "Jibin", "log" : { "status" : "SUCCESS", "message" : "the operation was successfull", "activity" : "JOB abc" }}
