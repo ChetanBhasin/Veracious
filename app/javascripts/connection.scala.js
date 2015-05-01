@@ -16,7 +16,7 @@ the username to connect to will be given by the session
    *                 {  send: function( json ) => {},
    *                    close: function() => {}  }
    */
-  var connect = function ( config, callback ) {
+  window.connectToApp = function ( config, callback ) {
 
     /* ------- Initialise the socket -------- */
     var WS = window['MozWebSocket'] ? MozWebSocket : WebSocket;
