@@ -39,6 +39,7 @@ class BatchProcessorSpec extends UnitTest {
   it should "correctly get a worker to start on a batch" in {
     parent ! new LogIn(user) with BatchProcessorMessage
     submit(mockBatch1)
+    mediator.expectMsgClass(classOf[Log])
     mediator.expectMsg(SubmitMineJob(user, MockMineOp("Mn1")))
   }
 
@@ -46,6 +47,7 @@ class BatchProcessorSpec extends UnitTest {
     submit(mockBatch2) // Should submit to queue
     parent ! JobStatus(user, OpSuccess) // For the first batch, it will finish now
     mediator.expectMsgClass(classOf[Log]) // after the first batch finishes
+    mediator.expectMsgClass(classOf[Log])   // For the start of second batch
     mediator.expectMsg(SubmitDsOpJob(user, MockDsOp("Ds1"))) // For the second batch
     // Note, the second batch is still running
   }
@@ -66,6 +68,7 @@ class BatchProcessorSpec extends UnitTest {
   "Batch Processor" should "correctly handle the FinishWork directive" in {
     parent ! LogIn(user)
     submit(mockBatch1)      // Just one job
+    mediator.expectMsgClass(classOf[Log])
     mediator.expectMsg(SubmitMineJob(user, MockMineOp("Mn1")))
     parent ! FinishWork     // Now it must wait for the batches to finish
     mediator.expectNoMsg(1 second)    // No msg just yet
