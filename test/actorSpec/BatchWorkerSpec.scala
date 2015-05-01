@@ -14,6 +14,7 @@ class BatchWorkerSpec extends UnitTest {
 
   it should "accept the batch and submit the first job" in {
     parent ! mockBatch
+    mediator.expectMsgClass(classOf[Log])
     mediator.expectMsg(SubmitDsOpJob(user, MockDsOp("Ds1")))
   }
 
@@ -26,6 +27,7 @@ class BatchWorkerSpec extends UnitTest {
 
   it should "accept batch & submit mine job" in {
     parent ! mockBatch1
+    mediator.expectMsgClass(classOf[Log])
     mediator.expectMsg(SubmitMineJob(user, MockMineOp("Mn1")))
   }
 
