@@ -6,7 +6,7 @@ receivers = []      # Set of receiving functions
 
 app = angular.module('Veracious', [])
 
-app.controller('LogController', () ->
+app.controller('LogController', ($scope) ->
     ###
     format: { status: String E { SUCCESS, FAILURE, WARNING, INFO },
                  activity: String E {
@@ -33,6 +33,10 @@ app.controller('LogController', () ->
     this.isStatus = (status, log) ->
         log.status == status
 
+    this.test = () ->
+        this.logs.push status: "SUCCESS", message: "Helloooo", activity: "Yohoooo"
+        console.log "DEBUG: running test, this.logs: "+JSON.stringify(this.logs)
+
     # Okay, trying out an IDEA
     # Let us see, If we want to separate everything into different controllers, we need a common receiver for the
     # web-socket...
@@ -41,16 +45,22 @@ app.controller('LogController', () ->
     # If we add such receiver functions into an array and then make a master receiver that goes through the array with
     # the received server data and stopping till it gets a true, then it might just work right??
 
-    receiveFunction = (data) ->     # TODO:check if the model update reflects correctly on the view
+    this.receiveFunction = (data) ->    # TODO:check if the model update reflects correctly on the view
+        console.log "Debug: received data: "+JSON.stringify(data)
         if data.logs or data.log
             if data.log
                 this.logs.push(data.log)
             else this.logs = data.logs
-            loggingWell.scrollTop = logginWell.scrollHeight
+            loggingWell.scrollTop = loggingWell.scrollHeight
+            this.AddSetLogs(data)
+            console.log "Debug: apparently saved logs/log data"
+            console.log "Debug: this.logs: "+JSON.stringify(this.logs)
             true
-        else false
+        else
+            console.log "Debug: didn't save logs/log data"
+            false
 
-    receivers.push(receiveFunction)     # Add this receiver to the
+    receivers.push(this.receiveFunction)     # Add this receiver to the
 
     return
 )
@@ -59,6 +69,14 @@ app.controller('BatchController', () -> )       # TODO, implement
 app.controller('DataController', () -> )
 
 # Now for setting up the websocket connection
+testReceiver = (data) ->
+    if (data.test)
+        console.log "Testing message : "+JSON.stringify(data.test)
+        true
+    else false
+
+receivers.push(testReceiver)
+
 masterReceive = (data) ->
     for receiver in receivers
         if receiver data
@@ -71,7 +89,7 @@ onWSclose = () ->       # TODO, implement
 onWSerror = (d) ->
     alert "Some error occured"+ JSON.stringify d
 
-webSocket {}
+webSocket = {}
 
 wsCallBack = (ws) -> webSocket = ws
 window.connectToApp {
