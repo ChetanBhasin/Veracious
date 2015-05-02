@@ -21,6 +21,7 @@ package object jsonWrites {
   implicit val dataSetEntryWrites = new Writes[DataSetEntry] {
     def writes(dsEntry: DataSetEntry) = Json.obj(
       "name" -> dsEntry.name,
+      "desc" -> dsEntry.desc,
       "type" -> dsEntry.datatype,
       "algo" -> dsEntry.targetAlgorithm,
       "status" -> dsEntry.status,
