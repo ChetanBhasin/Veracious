@@ -9,7 +9,7 @@ import models.messages.application.{FinishWork, FinishedWork, Ready}
 import models.messages.batchProcessing.BatchProcessorMessage
 import models.messages.client._
 import models.messages.logger.GetLogs
-import models.messages.persistenceManaging.{GetUserDataSets, GetUserResults}
+import models.messages.persistenceManaging.GetUserDataSets
 import play.api.libs.json._
 
 /**
@@ -35,10 +35,6 @@ class ClientManagerSpec extends UnitTest {
     mediator.expectMsg(GetUserDataSets(user))
     mediator.reply(JsNull)
     fakeClient.expectMsg(Push(Json.obj("data-sets" -> JsNull)))
-    mediator.expectMsg(GetUserResults(user))
-    //parentProbe.expectMsgClass(35 seconds, classOf[SysError])   // Too long to test, but works
-    mediator.reply(JsNull)
-    fakeClient.expectMsg(Push(Json.obj("results" -> JsNull)))
   }
 
   it should "Do the initial honors of notifying LogIn, " +

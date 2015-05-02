@@ -1,4 +1,4 @@
-@(lgCtrl: String)
+@()
 <!-- Partial file for the user's batch logging on screen -->
 
 @**********************************************
@@ -11,14 +11,14 @@
 **********************************************@
 
 <div class="row well well-lg" id="loggingWell">
-  <div ng-repeat="cLog in lgCtrl.logs" class="row" ng-class='{
- "text-success": lgCtrl.isStatus("SUCCESS", cLog),
- "text-warning": lgCtrl.isStatus("WARNING", cLog),
- "text-danger": lgCtrl.isStatus("FAILURE", cLog),
- "text-info": lgCtrl.isStatus("INFO", cLog)
+  <div ng-repeat="cLog in logs" class="row" ng-class='{
+ "text-success": isStatus("SUCCESS", cLog),
+ "text-warning": isStatus("WARNING", cLog),
+ "text-danger": isStatus("FAILURE", cLog),
+ "text-info": isStatus("INFO", cLog)
  }'>
-    <div class="col-md-1"><strong>{{ cLog.status }}</strong></div>
-    <div class="col-md-6">: {{ cLog.activity }}</div>
+    <div class="col-md-2"><strong>{{ cLog.status }}</strong></div>
+    <div class="col-md-5">: {{ cLog.activity }}</div>
     <div class="col-md-5">&gt&gt {{ cLog.message }}</div>
   </div>
 </div>
