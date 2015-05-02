@@ -11,10 +11,7 @@ import play.api.mvc._
 import models.Application.appAccess
 import models.security.loginForm
 
-// TODO: create routes for the Auth
-
 object Auth extends Controller {
-
   def check(username: String, password: String) =
     appAccess.authenticate(username, password)
 

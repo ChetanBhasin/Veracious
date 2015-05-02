@@ -28,6 +28,9 @@ import actors.logger.Logger._
 class Logger (val mediator: ActorRef, implicit val logFile: String) extends AppModule {
   mediator ! RegisterForReceive(self, classOf[LoggerMessage])
 
+  def this(mediator: ActorRef) =
+    this(mediator, Logger.productionLogFile)
+
   def receive = {
       /** Got a log event, write the log to file and then notify the user if he/she is logged in */
     case lg @ Log(status, username, msg, event) =>
@@ -42,7 +45,7 @@ class Logger (val mediator: ActorRef, implicit val logFile: String) extends AppM
 
 object Logger {
 
-  val productionLogFile = "./resources/operationLog"
+  private val productionLogFile = "./resources/operationLog"
 
   /**
    * This function will take a line of the file and return the log object if the corresponding

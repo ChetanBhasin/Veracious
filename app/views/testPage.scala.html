@@ -1,0 +1,28 @@
+@()
+<!-- Testing the components -->
+
+@core("Testing components"){
+  <script type='text/javascript' src="@routes.TestController.connectJs()"></script>
+  <script type="text/javascript" src='@routes.Assets.at("javascripts/app.js")'></script> }{
+
+  <div ng-app="Veracious" ng-controller="NavigationController as nCtrl" class="main-app" >
+    @partials.header()
+    <div class="container">
+      <div class="page-header">
+        <h1>Test Page for Veracious</h1><small>Specially for the bootstrap and Angular components</small>
+      </div>
+      <div class="row">
+        <div class="col-xs-offset-3 col-xs-6">
+          <h2>Login Form Test</h2>
+          @partials.loginForm(routes.TestController.testLoginForm.toString)
+        </div>
+      </div>
+      <div ng-show='nCtrl.isLogging()' class="row" ng-controller="LogController as logCtrl">
+        <div class="col-xs-8">
+          <h2>This should'nt work</h2>
+          @partials.logging()
+        </div>
+      </div>
+    </div>
+  </div>
+}
