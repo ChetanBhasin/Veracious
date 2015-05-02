@@ -23,6 +23,7 @@ GET     /webjars/*file              controllers.WebJarAssets.at(file)
 
 # Test pages
 GET     /test                       controllers.TestController.test
+GET     /test/main                  controllers.TestController.testActual
 POST    /test/login                 controllers.TestController.testLoginForm
 GET     /test/connect.js            controllers.TestController.connectJs
 GET     /test/connect               controllers.TestController.connect

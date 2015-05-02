@@ -3,10 +3,24 @@
 
 receivers = []      # Set of receiving functions
 
-
 app = angular.module('Veracious', [])
 
-app.controller('LogController', ($scope) ->
+app.controller 'NavigationController', () ->
+    this.visible = "data"
+
+    this.setLogging = () -> this.visible = "logging"
+    this.setData = () -> this.visible = "data"
+    #this.setVisible = (str) ->
+    #    console.log "Setting visible to : " + str
+    #    this.visible = str
+    # this.isVisible = (str) ->
+    #     console.log "checking is visible for : "+str
+    #     this.visible == str
+    this.isLogging = () -> this.visible == "logging"
+    this.isData = () -> this.visible == "data"
+
+
+app.controller 'LogController', ($scope) ->
     ###
     format: { status: String E { SUCCESS, FAILURE, WARNING, INFO },
                  activity: String E {
@@ -16,6 +30,7 @@ app.controller('LogController', ($scope) ->
                  message: String
                }
     ###
+    #$scope.showCtrl = true          # Show this controller by default
     # Parts: #loggingWell -> The area of the log
     loggingWell = $("#loggingWell")[0];
     $scope.logs = []
@@ -38,23 +53,26 @@ app.controller('LogController', ($scope) ->
 
     # UPDATE, got it to work, FINALLLY!!
     $scope.receiveFunction = (data) -> $scope.$apply () ->  # TODO:check if the model update reflects correctly on the view
-        console.log "Debug: received data: "+JSON.stringify(data)
+        #console.log "Debug: received data: "+JSON.stringify(data)
         if data.logs or data.log
             if data.log
                 $scope.logs.push(data.log)
             else $scope.logs = data.logs
             loggingWell.scrollTop = loggingWell.scrollHeight
-            console.log "Debug: apparently saved logs/log data"
-            console.log "Debug: this.logs: "+JSON.stringify($scope.logs)
+            #console.log "Debug: apparently saved logs/log data"
+            #console.log "Debug: this.logs: "+JSON.stringify($scope.logs)
             true
         else
-            console.log "Debug: didn't save logs/log data"
+            #console.log "Debug: didn't save logs/log data"
             false
 
+    #$scope.toggle = (b) -> $scope.$apply () -> $scope.showCtrl = b
+
     receivers.push($scope.receiveFunction)     # Add this receiver to the
+    #toggleFunc.logging = $scope.toggle
 
     return
-)
+
 
 app.controller('BatchController', () -> )       # TODO, implement
 app.controller('DataController', () -> )
@@ -62,7 +80,7 @@ app.controller('DataController', () -> )
 # Now for setting up the websocket connection
 testReceiver = (data) ->
     if (data.test)
-        console.log "Testing message : "+JSON.stringify(data.test)
+        #console.log "Testing message : "+JSON.stringify(data.test)
         true
     else false
 
