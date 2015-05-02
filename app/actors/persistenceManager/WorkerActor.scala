@@ -84,7 +84,7 @@ class WorkerActor(mediator: ActorRef) extends Actor {
       try {
         val url = dsm ? GiveUserData(username) match {
           case x: Future[Any] => Await.result(x, 30 seconds) match {
-            case DataSetEntry(_, _, _, _, url: String) => url
+            case DataSetEntry(_, _, _, _, _, url: String) => url
           }
         }
         val downloader = new URL(url) #> new File(s"./datastore/datasetes/$username/$name")
