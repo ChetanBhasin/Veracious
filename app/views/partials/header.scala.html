@@ -1,0 +1,25 @@
+@()
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- grouping brand and collapse button -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navigationLinks">
+        <span class="sr-only">Toggle Navigation</span>
+        <span class="icon-bar"></span>    <!-- This gives those horizontal lines on the toggle button -->
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">Veracious</a>
+    </div>
+
+    <!-- Main items -->
+    <div class="collapse navbar-collapse" id="navigationLinks">
+      <ul class="nav navbar-nav">
+        <li ng-class='{"active" : nCtrl.isLogging()}'><a href="#"
+               ng-click="nCtrl.setLogging()">Log</a></li>
+        <li ng-class='{"active" : nCtrl.isData()}'><a href="#"
+               ng-click="nCtrl.setData()" >Data</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>

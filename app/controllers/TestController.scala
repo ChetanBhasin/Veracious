@@ -16,6 +16,10 @@ object TestController extends Controller {
     Ok(views.html.testPage())
   }
 
+  def testActual = Action {
+    Ok(views.html.index())
+  }
+
   def connectJs = Action { implicit request =>
     Ok(javascripts.js.testConnect(request))
   }

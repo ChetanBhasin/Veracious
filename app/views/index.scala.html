@@ -1,8 +1,19 @@
 @()
 
 @core("Index"){
-  <script type="text/javascript" src='@routes.Application.connectJs()'></script>
+  <!--<script type="text/javascript" src='@routes.Application.connectJs()'></script> -->
+  <script type="text/javascript" src='@routes.TestController.connectJs()'></script>
   <script type="text/javascript" src='@routes.Assets.at("javascripts/app.js")'></script> }{
 
-  <h1>Temporary Index file</h1>
+  <div class="main-app" ng-app="Veracious" ng-controller="NavigationController as nCtrl">
+    @partials.header()
+    <div class="container">
+      <div ng-show="nCtrl.isLogging()" ng-controller="LogController as logCtrl">
+        <div class="page-header">
+          <h1>Operational Log</h1>
+        </div>
+        @partials.logging()
+      </div>
+    </div>
+  </div>
 }
