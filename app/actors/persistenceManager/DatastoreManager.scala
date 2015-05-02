@@ -106,9 +106,11 @@ class DatastoreManager extends Actor {
    */
   private def getRawUserDatasets(uname: String): Iterator[DataSetEntry] = try {
     val stream = Source.fromFile(s"./datastore/meta/usersets/$uname.dat")
-    val vals = stream.getLines().map(DatastoreManager.makeDsEntry(_))
+    val vals: Iterator[DataSetEntry] = stream.getLines().map(DatastoreManager.makeDsEntry(_))
     stream.close()
     vals
+  } catch {
+    case _: Throwable => Iterator(Nil.asInstanceOf[DataSetEntry])
   }
 
   /**
@@ -166,7 +168,7 @@ class DatastoreManager extends Actor {
       val newset = items.map { item =>
         if (item == myEntry) {
           data match {
-            case DataSetEntry(name, datatype, targetAlgo, status, source) => s"$name::$datatype::$targetAlgo::$newStatus::$source"
+            case DataSetEntry(name, desc, datatype, targetAlgo, status, source) => s"$name::$datatype::$targetAlgo::$newStatus::$source"
           }
         } else item
       }
