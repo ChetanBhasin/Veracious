@@ -17,5 +17,5 @@ object Application {
 
   val clientProps = Client.props(mediator)_
   /** We use this to access the application **/
-  val appAccess: AppAccess = AppAccess(system, appManager, "AppAccess")
+  val appAccess: AppAccess = AppAccess(system, appManager, mediator, "AppAccess")
 }

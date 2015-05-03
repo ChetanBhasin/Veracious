@@ -8,14 +8,14 @@ import akka.actor._
  * security
  */
 object AppAccess {
-  private def createAct (tsys: TypedActorFactory, appManager: ActorRef, name: String): AppAccess =
+  private def createAct (tsys: TypedActorFactory, appManager: ActorRef, mediator: ActorRef, name: String): AppAccess =
     tsys.typedActorOf(
-      TypedProps (classOf[AppProxy], new AppProxy(appManager)), name
+      TypedProps (classOf[AppProxy], new AppProxy(appManager, mediator)), name
     )
-  def apply (system: ActorSystem, appManager: ActorRef, name: String): AppAccess =
-    createAct(TypedActor(system), appManager, name)
-  def apply (system: ActorContext, appManager: ActorRef, name: String): AppAccess =
-    createAct(TypedActor(system), appManager, name)
+  def apply (system: ActorSystem, appManager: ActorRef, mediator: ActorRef, name: String): AppAccess =
+    createAct(TypedActor(system), appManager, mediator, name)
+  def apply (system: ActorContext, appManager: ActorRef, mediator: ActorRef, name: String): AppAccess =
+    createAct(TypedActor(system), appManager, mediator, name)
 }
 
 trait AppAccess {

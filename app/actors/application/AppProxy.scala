@@ -21,7 +21,7 @@ import scala.concurrent.duration._
  *
  * TODO: !! Important, this actor needs to have a Resume Strategy
  */
-private[application] class AppProxy (val appManager: ActorRef) extends AppAccess with Receiver {
+private[application] class AppProxy (val appManager: ActorRef, mediator: ActorRef) extends AppAccess with Receiver {
   var _appStatus: AppState = AppSetup
   appManager ! SubscribeTransitionCallBack(TypedActor.context.self)
   implicit val timeout = Timeout(5 seconds)
@@ -34,7 +34,7 @@ private[application] class AppProxy (val appManager: ActorRef) extends AppAccess
   private var _userAuth: UserManager = null
   private def userAuth = (appStatus, _userAuth) match {
     case (AppRunning, null) =>
-      _userAuth = Await.result(appManager ? GetUserManager, 5 seconds).asInstanceOf[UserManager]
+      _userAuth = Await.result(mediator ? GetUserManager, 5 seconds).asInstanceOf[UserManager]
       _userAuth
     case (AppRunning, userAuth) => userAuth
     case _ => throw new Exception ("Should not have asked for user manager while app is not running")
@@ -73,5 +73,5 @@ private[application] class AppProxy (val appManager: ActorRef) extends AppAccess
       }
 
   def alreadyLoggedIn (username: String) =
-    Await.result(appManager ? UserAlreadyLoggedIn(username), 4 seconds).asInstanceOf[Boolean]
+    Await.result(mediator ? UserAlreadyLoggedIn(username), 4 seconds).asInstanceOf[Boolean]
 }
