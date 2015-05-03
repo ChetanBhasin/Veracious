@@ -47,6 +47,11 @@ class ClientManagerSpec extends UnitTest {
     fakeClient.expectMsg(Push(Json.obj("log" -> Json.toJson(sLog))))
   }
 
+  it should "tell us that the client is already logged into the system" in {
+    parent ! UserAlreadyLoggedIn(user)
+    expectMsg(true)
+  }
+
   it should "not push messages to unavailable clients" in {
     parent ! MessageToClient("some1else", sLog)
     fakeClient.expectNoMsg()
