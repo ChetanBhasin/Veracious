@@ -79,8 +79,8 @@ object Job {
         MnALS(
           ds_train = textParams(0),
           ds_query = textParams(1),
-          ranks = numParams(0),
-          max_iter = numParams(1))
+          max_iter = numParams(0),
+          ranks = numParams(1))
       case "MnClustering" =>
         assert(textParams.nonEmpty)
         assert(numParams.length >= 2)

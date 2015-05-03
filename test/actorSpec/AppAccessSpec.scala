@@ -1,6 +1,6 @@
 package actorSpec
 
-import actorSpec.mocks.MockUserManager
+import _root_.mocks.MockUserManager
 import actors.application._
 import akka.actor.FSM.{CurrentState, SubscribeTransitionCallBack, Transition}
 import akka.actor._

@@ -1,4 +1,4 @@
-package actorSpec.mocks
+package mocks
 
 import actors.persistenceManager.UserManager
 import models.batch.OperationStatus

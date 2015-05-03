@@ -1,6 +1,6 @@
 package actorSpec
 
-import actorSpec.mocks.sampleLog
+import _root_.mocks.sampleLog
 import actors.client.ClientManager
 import actors.mediator.RegisterForReceive
 import akka.actor.{Props, Terminated}

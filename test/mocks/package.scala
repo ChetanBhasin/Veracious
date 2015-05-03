@@ -1,5 +1,3 @@
-package actorSpec
-
 import java.time.LocalDateTime
 
 import models.batch.job.{DataSetOp, DsAddFromUrl, MineOp}

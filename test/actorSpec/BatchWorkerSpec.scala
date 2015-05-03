@@ -1,6 +1,6 @@
 package actorSpec
 
-import actorSpec.mocks._
+import _root_.mocks.{MockDsOp, MockMineOp, mockBatch, mockBatch1}
 import actors.batchProcessor._
 import akka.actor.Props
 import models.batch.OperationStatus._
