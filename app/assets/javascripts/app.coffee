@@ -10,6 +10,7 @@ app.controller 'NavigationController', () ->
 
     this.setLogging = () -> this.visible = "logging"
     this.setData = () -> this.visible = "data"
+    this.setBatch = () -> this.visible = "batch"
     #this.setVisible = (str) ->
     #    console.log "Setting visible to : " + str
     #    this.visible = str
@@ -18,6 +19,7 @@ app.controller 'NavigationController', () ->
     #     this.visible == str
     this.isLogging = () -> this.visible == "logging"
     this.isData = () -> this.visible == "data"
+    this.isBatch = () -> this.visible == "batch"
 
 
 app.controller 'LogController', ($scope) ->
@@ -74,7 +76,7 @@ app.controller 'LogController', ($scope) ->
     return
 
 
-app.controller 'BatchController', () ->
+app.controller 'BatchController', ($scope) ->
     newJob = () ->
         opType: ""
         opName: ""
@@ -116,8 +118,17 @@ app.controller 'BatchController', () ->
             str = "jobs[#{i}]."
             formData.append(str+"opType", job.opType)
             formData.append(str+"opName", job.opName)
-            formData.append(str+"textParams", job.textParams)
-            formData.append(str+"numParams", job.numParams)
+            for text in job.textParams
+                formData.append(str+"textParams[]", text)
+            ## Just to be safe, a hack
+            job.numParams.push(1)
+            for num in job.numParams
+                formData.append(str+"numParams[]", num)
+            #
+            #if (job.numParams.length > 0)
+            #    alert "have some numbers"
+            #    formData.append(str+"numParams[]", job.numParams)
+            #else formData.append(str+"numParams[]", [0])
             if (job.file)
                 formData.append(str+"file", job.file, job.file.name)
             if (job.optionalTextParam)
@@ -126,7 +137,8 @@ app.controller 'BatchController', () ->
 
     $scope.submitBatch = () ->
         # call the method on window from connect
-        window.submitBatch createUFormData($scope.batch) (status) -> () ->
+        fData = createUFormData ($scope.batch)
+        window.submitBatch fData, (status) -> () ->
             if status == 200 then alert "Batch submitted successfully"
             else alert "There was a problem submitting the batch"
         $scope.clearBatch()

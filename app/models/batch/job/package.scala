@@ -11,12 +11,12 @@ import play.api.data._
  *  3. The Job Factory object
  */
 package object job {
-  val jobListForm = Form(
+  val jobListForm: Form[List[Job]] = Form(
     single(
       "jobs" -> list(
         mapping(
-          "opType" -> nonEmptyText,
-          "opName" -> nonEmptyText,
+          "opType" -> text,
+          "opName" -> text,
           "optionalTextParam" -> optional(text),
           "textParams" -> list(text),
           "numParams" -> list(number)
