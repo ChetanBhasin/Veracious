@@ -24,14 +24,15 @@
         </div>
       </div>
       <div ng-show='nCtrl.isBatch()' class="row" ng-controller="BatchController as batchCtrl">
-        <div class="col-xs-8">
-          @partials.batchForm()
+        <div class="col-md-8">
+          <div class="container">
+            @partials.batchForm()
+          </div>
         </div>
-        <div class="col-xs-2">
-          <button type="button" class="btn btn-warning" ng-click="submitBatch()">Submit Batch</button>
-        </div>
-        <div class="col-xs-2">
-          {{ batch }}
+        <div class="col-md-4">
+          <div class="container">
+            @partials.batchDisplay()
+          </div>
         </div>
       </div>
     </div>

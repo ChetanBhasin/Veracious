@@ -86,7 +86,14 @@ app.controller 'BatchController', ($scope) ->
 
     $scope.currentJob = newJob()
 
-    $scope.dsList = []                     # Actual Ds list from server
+    #$scope.dsList = []                     # Actual Ds list from server
+    $scope.dsList = [
+        { name: "SampleDsForALS", algo: "MnALS", url: "http://som.sdf.com" },
+        { name: "SampleDsForFP", algo: "MnFPgrowth" },
+        { name: "SampleDsForALS", algo: "MnALS", url: ""},
+        { name: "SampleDsForClustering", algo: "MnClustering" },
+        { name: "SampleDsForSVM", algo: "MnSVM", url: "https://www.google.com" },
+        { name: "SampleDsForALS", algo: "MnALS" } ]
     optimisticDsList = []           # Names of ds that are entered from previous Job
 
     # Setup batch here -----------------------------------
@@ -154,6 +161,9 @@ app.controller 'BatchController', ($scope) ->
         { name: "DsAddFromUrl", pretty: "Upload data-set from URL" },
         { name: "DsDelete", pretty: "Delete data-set" },
         { name: "DsRefresh", pretty: "Refresh data-set" }]
+
+    $scope.getPretty = (opName) ->
+        return op.pretty for op in $scope.operations when op.name is opName
 
     $scope.algorithms = $scope.operations[0...4]
 
