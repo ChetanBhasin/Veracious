@@ -30,10 +30,11 @@ object Application extends Controller with Secured {
     jobListForm.bindFromRequest.fold (
       formWithErrors => BadRequest,
       jobList => {
-        println(Batch(jobList, request))     // TODO: Need a submit method on the app Access
+        appAccess.submitBatch(username, Batch(jobList, request))     // TODO: Need a submit method on the app Access
         Ok
       }
     )
+  }
   /*
   def index = isAuthenticated { username => implicit request =>
     Ok("helloo" + username)   // Test
