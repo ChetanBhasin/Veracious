@@ -1,4 +1,4 @@
-@(conStr: String)
+@(conStr: String, batchSubStr: String)
 
 /* This file contains the web-socket connection
 function to be used by the required angular controller
@@ -40,4 +40,13 @@ the username to connect to will be given by the session
       close: function() { socket.close() }
     })
   };
+
+  /* Takes the batchData (FormData) and the onload function */
+  window.submitBatch = function (batchData, onloadFunc) {
+    var xhr = new XMLHttpRequest();
+    xhr.onload = onloadFunc;
+    xhr.open ('POST', '@batchSubStr', true);
+    xhr.send(batchData);
+  }
+
 })();

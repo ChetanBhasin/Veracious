@@ -35,6 +35,18 @@ object TestController extends Controller {
     (in, out)
   }
 
+  import models.batch.Batch
+  import models.batch.job.jobListForm
+  def submitBatch = Action { implicit request =>
+    jobListForm.bindFromRequest.fold (
+      formWithErrors => BadRequest,
+      jobList => {
+        println("Got the following batch : " + Batch(jobList, request))
+        Ok
+      }
+    )
+  }
+
   def testLoginForm = Action { implicit request =>
     loginForm.bindFromRequest.fold(
       formWithErrors => BadRequest(views.html.testPage()),
