@@ -1,6 +1,6 @@
 package actorSpec
 
-import actorSpec.mocks.sampleLog
+import _root_.mocks.sampleLog
 import actors.client.ClientManager
 import actors.mediator.RegisterForReceive
 import akka.actor.{Props, Terminated}
@@ -45,6 +45,11 @@ class ClientManagerSpec extends UnitTest {
   it should "send push message to correct user" in {
     parent ! MessageToClient(user, sLog)
     fakeClient.expectMsg(Push(Json.obj("log" -> Json.toJson(sLog))))
+  }
+
+  it should "tell us that the client is already logged into the system" in {
+    parent ! UserAlreadyLoggedIn(user)
+    expectMsg(true)
   }
 
   it should "not push messages to unavailable clients" in {

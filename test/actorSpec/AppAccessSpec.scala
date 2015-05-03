@@ -1,11 +1,12 @@
 package actorSpec
 
-import actorSpec.mocks.MockUserManager
+import _root_.mocks.MockUserManager
 import actors.application._
 import akka.actor.FSM.{CurrentState, SubscribeTransitionCallBack, Transition}
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
+import models.messages.client.UserAlreadyLoggedIn
 import models.messages.persistenceManaging.GetUserManager
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -19,7 +20,7 @@ import scala.util.{Left, Right}
 object AppAccessSpec {
   // Just because AppProxy throws exceptions and for testing we need that
   // it doesn't restart
-  class Supervisor(appManager: ActorRef) extends Actor {
+  class Supervisor(appManager: ActorRef, mediator: ActorRef) extends Actor {
     import akka.actor.OneForOneStrategy
     import akka.actor.SupervisorStrategy._
 
@@ -28,7 +29,7 @@ object AppAccessSpec {
         case _: Exception => Resume
       }
 
-    val appAccess: AppAccess = AppAccess(context, appManager, "testAccess")
+    val appAccess: AppAccess = AppAccess(context, appManager, mediator, "testAccess")
 
     def receive = {
       case msg => sender ! appAccess
@@ -45,7 +46,7 @@ class AppAccessSpec extends UnitTest {
   val appManager = mediator     // TestProbe
   implicit val timeout = Timeout(3 seconds)
 
-  val parent = system.actorOf(Props(classOf[AppAccessSpec.Supervisor], appManager.ref))
+  val parent = system.actorOf(Props(classOf[AppAccessSpec.Supervisor], appManager.ref, mediator.ref))
   val appAccess = Await.result(parent ? "get", 3 seconds).asInstanceOf[AppAccess]
 
   val sendMsg = TypedActor(system).getActorRefFor(appAccess) ! _
@@ -79,17 +80,17 @@ class AppAccessSpec extends UnitTest {
   var resAuth: Future[Boolean] = null
   it should "ask for userManager the first time it needs it" in {
     resAuth = Future(appAccess.authenticate(user, pass))
-    appManager.expectMsg(GetUserManager)
+    mediator.expectMsg(GetUserManager)
   }
 
   it should s"authenticate $user once it gets its userManager" in {
-    appManager.reply(new MockUserManager)
+    mediator.reply(new MockUserManager)
     Await.result(resAuth, 3 seconds) shouldBe true
   }
 
   it should s"not ask for userManager in subsequent operations and should change the password for $user" in {
     appAccess.changePassword(user, pass, pass2) shouldBe Right(())
-    appManager.expectNoMsg(1 second)
+    mediator.expectNoMsg(1 second)
   }
 
   it should s"give authentication failure message when trying to change passwords for $user" in {
@@ -110,5 +111,12 @@ class AppAccessSpec extends UnitTest {
 
   it should "let us sign up a new user" in {
     appAccess.signUp("Jerry", pass2) shouldBe Right(())
+  }
+
+  it should "Ask client manager if user is already logged in" in {
+    val res = Future(appAccess.alreadyLoggedIn(user))
+    mediator.expectMsg(UserAlreadyLoggedIn(user))
+    mediator.reply(true)
+    Await.result(res, 3 seconds) shouldBe true
   }
 }
