@@ -1,0 +1,59 @@
+@()
+<!-- Display the current batch in a very user friendly way -->
+<div ng-repeat="job in batch">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">
+      <span class="glyphicon" aria-hidden="true"
+            ng-class='{
+              "glyphicon-upload" : job.opName.substr(2,3) == "Add",
+              "glyphicon-trash" : job.opName == "DsDelete",
+              "glyphicon-refresh" : job.opName == "DsRefresh",
+              "glyphicon-filter" : job.opType == "MineOp"
+            }'></span>
+      <small>{{ $index + 1}}.</small> {{getPretty(job.opName) }}
+      </h3>
+    </div>
+    <div class="panel-body">
+      <div ng-if='job.opType == "DataSetOp"'>
+        <p><strong>Data-set: </strong>{{job.textParams[0]}}</p>
+        <div ng-if='job.opName.substr(2,3) == "Add"'>
+          <p><strong>Description: </strong>{{job.textParams[1]}}</p>
+          <p><strong>Target Algorithm: </strong>{{getPretty(job.textParams[2])}}</p>
+          <div ng-if='job.opName == "DsAddDirect"'>
+            <p><strong>File: </strong>{{job.file.name}}</p>
+          </div>
+          <div ng-if='job.opName == "DsAddFromUrl"'>
+            <p><strong>Data-set URL: </strong>{{job.textParams[3]}}</p>
+          </div>
+        </div>
+      </div>
+
+      <div ng-if='job.opType == "MineOp"'>
+        <div ng-if='job.opName == "MnALS"'>
+          <p><strong>Training Data-set: </strong>{{job.textParams[0]}}</p>
+          <p><strong>Query Data-set: </strong>{{job.textParams[1]}}</p>
+          <p><strong>Ranks: </strong>{{job.numParams[1]}}</p>
+        </div>
+        <div ng-if='job.opName == "MnClustering"'>
+          <p><strong>Data-set: </strong>{{job.textParams[0]}}</p>
+          <div ng-if='job.optionalTextParam'>
+            <p><strong>Predicate Data-set: </strong>{{job.optionalTextParam}}</p>
+          </div>
+          <p><strong>No. of Clusters: </strong>{{job.numParams[1]}}</p>
+        </div>
+        <div ng-if='job.opName == "MnFPgrowth"'>
+          <p><strong>Data-set: </strong>{{job.textParams[0]}}</p>
+          <p><strong>Minimum Support: </strong>{{job.textParams[1]}}</p>
+        </div>
+        <div ng-if='job.opName == "MnSVM"'>
+          <p><strong>Training Data-set: </strong>{{job.textParams[0]}}</p>
+          <p><strong>Testing Data-set: </strong>{{job.textParams[1]}}</p>
+        </div>
+        <div ng-if='job.opName == "MnALS" || job.opName == "MnClustering" || job.opName == "MnSVM"'>
+          <p><strong>Maximum Iterations: </strong>{{job.numParams[0]}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
