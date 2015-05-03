@@ -31,7 +31,7 @@ object Application extends Controller with Secured {
       formWithErrors => BadRequest,
       jobList => {
         appAccess.submitBatch(username, Batch(jobList, request))     // TODO: Need a submit method on the app Access
-        Ok
+        Status(200)
       }
     )
   }

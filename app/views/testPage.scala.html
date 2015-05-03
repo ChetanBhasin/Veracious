@@ -23,6 +23,17 @@
           @partials.logging()
         </div>
       </div>
+      <div ng-show='nCtrl.isBatch()' class="row" ng-controller="BatchController as batchCtrl">
+        <div class="col-xs-8">
+          @partials.batchForm()
+        </div>
+        <div class="col-xs-2">
+          <button type="button" class="btn btn-warning" ng-click="submitBatch()">Submit Batch</button>
+        </div>
+        <div class="col-xs-2">
+          {{ batch }}
+        </div>
+      </div>
     </div>
   </div>
 }
