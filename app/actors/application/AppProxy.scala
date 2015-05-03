@@ -6,13 +6,15 @@ import akka.actor.TypedActor.Receiver
 import akka.actor.{ActorRef, TypedActor}
 import akka.pattern.ask
 import akka.util.Timeout
-import models.batch.OperationStatus
+import models.batch.{Batch, OperationStatus}
 import models.messages.application.AppShutDown
+import models.messages.batchProcessing.SubmitBatch
 import models.messages.client.UserAlreadyLoggedIn
 import models.messages.persistenceManaging.GetUserManager
 
-import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 /**
  * Created by basso on 24/04/15.
@@ -44,17 +46,32 @@ private[application] class AppProxy (val appManager: ActorRef, mediator: ActorRe
 
   def shutdown = appManager ! AppShutDown
 
-  def authenticate(username: String, password: String) =
+  def authenticate(username: String, password: String) = Future(
     userAuth.authenticate(username, password)
+  )
 
+  val authError = Left("Authentication Failed")
+  val opError = Left("Operation Failed")
+
+  /*
   def removeUser(username: String, password: String) =
     if (authenticate(username, password))
       userAuth.removeUser(username) match {
         case OperationStatus.OpSuccess => Right(Unit)
         case _ => Left("Operation Failed")
       }
-    else Left("Authentication Failed")
+    else Left("Authentication Failed") */
 
+  def removeUser(username: String, password: String) =
+    authenticate(username, password).map {
+      case true => userAuth.removeUser(username) match {
+        case OperationStatus.OpSuccess => Right(Unit)
+        case _ => opError
+      }
+      case false => authError
+    }
+
+  /*
   def changePassword(username: String, oldP: String, newP: String) =
     if (authenticate(username, oldP))
       userAuth.changePassword(username, newP) match {
@@ -62,8 +79,17 @@ private[application] class AppProxy (val appManager: ActorRef, mediator: ActorRe
         case _ => Left("Operation Failed")
       }
     else Left("Authentication Failed")
+    */
+  def changePassword(username: String, oldP: String, newP: String) =
+    authenticate(username, oldP) map {
+      case true => userAuth.changePassword(username, newP) match {
+        case OperationStatus.OpSuccess => Right(Unit)
+        case _ => opError
+      }
+      case false => authError
+    }
 
-  def signUp(username: String, password: String) =
+  def signUp(username: String, password: String) = Future(
     if (userAuth.checkUsername(username))
       Left("User already exists")
     else
@@ -71,7 +97,11 @@ private[application] class AppProxy (val appManager: ActorRef, mediator: ActorRe
         case OperationStatus.OpSuccess => Right(Unit)
         case _ => Left("Operation Failed")
       }
+  )
 
   def alreadyLoggedIn (username: String) =
     Await.result(mediator ? UserAlreadyLoggedIn(username), 4 seconds).asInstanceOf[Boolean]
+
+  def submitBatch (username: String, batch: Batch) =
+    mediator ! SubmitBatch(username, batch)
 }
