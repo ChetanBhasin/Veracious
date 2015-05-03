@@ -44,7 +44,7 @@ the username to connect to will be given by the session
   /* Takes the batchData (FormData) and the onload function */
   window.submitBatch = function (batchData, onloadFunc) {
     var xhr = new XMLHttpRequest();
-    xhr.onload = onloadFunc;
+    xhr.onload = onloadFunc(xhr.status);
     xhr.open ('POST', '@batchSubStr', true);
     xhr.send(batchData);
   }
