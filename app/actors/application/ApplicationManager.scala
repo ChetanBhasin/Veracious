@@ -9,8 +9,6 @@ import actors.persistenceManager.Persistence
 import akka.actor.SupervisorStrategy.Resume
 import akka.actor._
 import models.messages.application._
-import models.messages.client.UserAlreadyLoggedIn
-import models.messages.persistenceManaging.GetUserManager
 
 import scala.collection.mutable.{Map => mMap}
 
@@ -86,22 +84,6 @@ with FSM[AppState, AppData] with ActorLogging {
     case Event (AppShutDown, Modules(mods)) =>
       mediator ! FinishWork
       goto (AppFinish) using Finishing(mods, 0)
-
-    /**
-     * The AppAccess will demand a userManager when it faces incoming connections. This userManager
-     * has been coded by @Chetan and manages the user authentication features of the application
-     */
-    case Event (GetUserManager, _) =>
-      mediator ! ((GetUserManager, sender))
-      stay
-
-    /**
-     * Check if the user has already logged in, will be accepted by the client manager and
-     * will eventually return Boolean
-     */
-    case Event (u @ UserAlreadyLoggedIn(user), _) =>
-      mediator ! ((u, sender))
-      stay
   }
 
 

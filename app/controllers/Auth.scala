@@ -12,20 +12,27 @@ import models.Application.appAccess
 import models.security.loginForm
 
 object Auth extends Controller {
+  val debug = (x: String) => println("Debug: >> "+x)
+
   def check(username: String, password: String) =
     appAccess.authenticate(username, password)
 
   /** Here we need to check whether the application is ready or not */
   def login = Action {
+    debug("Got login request")
     if (appAccess.appStatus == AppRunning)
       Ok(views.html.login())
     else Ok("Application is not running")
   }
 
   def authenticate = Action { implicit request =>
+    debug("Got authentication request")
     loginForm.bindFromRequest.fold(
-      formWithErrors => BadRequest(views.html.login()),
-      lgForm =>
+      formWithErrors => {
+        debug("Hit form with errors")
+        BadRequest(views.html.login()) },
+      lgForm => {
+        debug(s"Got proper form: $lgForm")
         if (lgForm.signUp.toBoolean)
           appAccess.signUp(lgForm.username, lgForm.password) match {
             case Left(str) => Redirect(routes.Auth.login).flashing("failure" -> str )
@@ -34,6 +41,7 @@ object Auth extends Controller {
         else if (check(lgForm.username, lgForm.password))
             Redirect(routes.Application.index).withSession(Security.username -> lgForm.username)  // If we have a Security.username, we are authenticated
         else Redirect(routes.Auth.login).flashing("failure" -> "Authentication Failure")
+      }
     )
   }
 
