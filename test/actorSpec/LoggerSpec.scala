@@ -2,7 +2,7 @@ package actorSpec
 
 import java.io.{File, PrintWriter}
 
-import actorSpec.mocks._
+import _root_.mocks.sampleLog
 import actors.logger._
 import actors.mediator.RegisterForReceive
 import akka.actor.Props

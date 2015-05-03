@@ -1,4 +1,4 @@
-package actorSpec
+package intSpec
 
 import actors.mediator._
 import akka.actor.ActorRef
