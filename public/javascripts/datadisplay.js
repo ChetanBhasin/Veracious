@@ -60,3 +60,4 @@ function makeChart(incoming) {
         incoming.data.defaults);
     }
 }
+
