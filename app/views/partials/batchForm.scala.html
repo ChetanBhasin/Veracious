@@ -3,8 +3,8 @@
 <form class="form-horizontal" ng-submit='addToBatch()' > <!-- TODO: No validate and use ng-validate -->
   <!-- We will select the operation directly and figure out the type later -->
   <div class="form-group">
-    <label class="control-label col-sm-4">Operation</label>
-    <div class="col-sm-8">
+    <label class="control-label col-sm-4 col-xs-12">Operation</label>
+    <div class="col-sm-8 col-xs-12">
       <select class="form-control"
               ng-model="currentJob.opName"
               ng-options="op.name as op.pretty group by getGroup(op.name).pretty for op in operations">
@@ -18,20 +18,20 @@
     <!-- Entering new data-set -->
     <div ng-if='checkName("DsAddDirect") || checkName("DsAddFromUrl")'>
       <div class="form-group">
-        <label class="control-label col-sm-4">Data-set name</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">Data-set name</label>
+        <div class="col-sm-8 col-xs-12">
           <input class="form-control" type="text" ng-model="currentJob.textParams[0]" required>
         </div>
       </div>
       <div class="form-group">
-        <label class="control-label col-sm-4">Description</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">Description</label>
+        <div class="col-sm-8 col-xs-12">
           <textarea ng-model="currentJob.textParams[1]" class="form-control" rows="3" required></textarea>
         </div>
       </div>
       <div class="form-group">
-        <label class="control-label col-sm-4">Target Algorithm</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">Target Algorithm</label>
+        <div class="col-sm-8 col-xs-12">
           <select class="form-control"
                   ng-model="currentJob.textParams[2]"
                   ng-options="op.name as op.pretty for op in algorithms"
@@ -42,14 +42,14 @@
 
       <!-- Now for the variables from DsAddDirect and DsAddFromUrl -->
       <div class="form-group" ng-if='checkName("DsAddDirect")'>
-        <label class="control-label col-sm-4">File</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">File</label>
+        <div class="col-sm-8 col-xs-12">
           <input class="form-control" type="file" id="dsFile" name="dsFile">
         </div>
       </div>
       <div class="form-group" ng-if='checkName("DsAddFromUrl")'>
-        <label class="control-label col-sm-4">Url</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">Url</label>
+        <div class="col-sm-8 col-xs-12">
           <input class="form-control" type="url" ng-model="currentJob.textParams[3]" required>
         </div>
       </div>
@@ -58,8 +58,8 @@
     <!-- Deleting a data-set -->
     <div ng-if='checkName("DsDelete")'>
       <div class="form-group">
-        <label class="control-label col-sm-4">Data-set name</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">Data-set name</label>
+        <div class="col-sm-8 col-xs-12">
           <select class="form-control"
                   ng-model="currentJob.textParams[0]"
                   ng-options="ds.name as ds.name for ds in getAllDs()" required>
@@ -71,8 +71,8 @@
     <!-- Refresh a data-set -->
     <div ng-if='checkName("DsRefresh")'>
       <div class="form-group">
-        <label class="control-label col-sm-4">Data-set name</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">Data-set name</label>
+        <div class="col-sm-8 col-xs-12">
           <select class="form-control"
                   ng-model="currentJob.textParams[0]"
                   ng-options="ds for ds in refreshables()" required>
@@ -89,30 +89,30 @@
     <!-- Als mining -->
     <div ng-if='checkName("MnALS")'>
       <div class="form-group">
-        <label class="control-label col-sm-4">Training Data-set</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">Training Data-set</label>
+        <div class="col-sm-8 col-xs-12">
           <select class="form-control"
                   ng-model="currentJob.textParams[0]"
                   ng-options='ds for ds in getValidDs("MnALS")'></select>
         </div>
       </div>
       <div class="form-group">
-        <label class="control-label col-sm-4">Query Data-set</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">Query Data-set</label>
+        <div class="col-sm-8 col-xs-12">
           <select class="form-control"
                   ng-model="currentJob.textParams[1]"
                   ng-options='ds for ds in getValidDs("MnALS")'></select>
         </div>
       </div>
       <div class="form-group">
-        <label class="control-label col-sm-4">Maximum Iterations</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">Maximum Iterations</label>
+        <div class="col-sm-8 col-xs-12">
           <input class="form-control" type="number" ng-model="currentJob.numParams[0]">
         </div>
       </div>
       <div class="form-group">
-        <label class="control-label col-sm-4">Ranks</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">Ranks</label>
+        <div class="col-sm-8 col-xs-12">
           <input class="form-control" type="number" ng-model="currentJob.numParams[1]">
         </div>
       </div>
@@ -121,16 +121,16 @@
     <!---- Clustering --->
     <div ng-if='checkName("MnClustering")'>
       <div class="form-group">
-        <label class="control-label col-sm-4">Data Set</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">Data Set</label>
+        <div class="col-sm-8 col-xs-12">
           <select class="form-control"
                   ng-model="currentJob.textParams[0]"
                   ng-options='ds for ds in getValidDs("MnClustering")'></select>
         </div>
       </div>
       <div class="form-group">
-        <label class="control-label col-sm-4">Predicate Data Set</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">Predicate Data Set</label>
+        <div class="col-sm-8 col-xs-12">
           <select class="form-control"
                   ng-model="currentJob.optionalTextParam"
                   ng-options='ds for ds in getValidDs("MnClustering")'>
@@ -139,14 +139,14 @@
         </div>
       </div>
       <div class="form-group">
-        <label class="control-label col-sm-4">Maximum Iterations</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">Maximum Iterations</label>
+        <div class="col-sm-8 col-xs-12">
           <input class="form-control" type="number" ng-model="currentJob.numParams[0]">
         </div>
       </div>
       <div class="form-group">
-        <label class="control-label col-sm-4">Number of clusters</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">Number of clusters</label>
+        <div class="col-sm-8 col-xs-12">
           <input class="form-control" type="number" ng-model="currentJob.numParams[1]">
         </div>
       </div>
@@ -155,16 +155,16 @@
     <!---- FP growth algorithm --->
     <div ng-if='checkName("MnFPgrowth")'>
       <div class="form-group">
-        <label class="control-label col-sm-4">Data Set</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">Data Set</label>
+        <div class="col-sm-8 col-xs-12">
           <select class="form-control"
                   ng-model="currentJob.textParams[0]"
                   ng-options='ds for ds in getValidDs("MnFPgrowth")'></select>
         </div>
       </div>
       <div class="form-group">
-        <label class="control-label col-sm-4">Minimum Support</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">Minimum Support</label>
+        <div class="col-sm-8 col-xs-12">
           <input class="form-control" type="text" ng-model="currentJob.textParams[1]">
         </div>
       </div>
@@ -173,24 +173,24 @@
     <!-- SVM -------->
     <div ng-if='checkName("MnSVM")'>
       <div class="form-group">
-        <label class="control-label col-sm-4">Training Data-set</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">Training Data-set</label>
+        <div class="col-sm-8 col-xs-12">
           <select class="form-control"
                   ng-model="currentJob.textParams[0]"
                   ng-options='ds for ds in getValidDs("MnSVM")'></select>
         </div>
       </div>
       <div class="form-group">
-        <label class="control-label col-sm-4">Testing Data-set</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">Testing Data-set</label>
+        <div class="col-sm-8 col-xs-12">
           <select class="form-control"
                   ng-model="currentJob.textParams[1]"
                   ng-options='ds for ds in getValidDs("MnSVM")'></select>
         </div>
       </div>
       <div class="form-group">
-        <label class="control-label col-sm-4">Maximum Iterations</label>
-        <div class="col-sm-8">
+        <label class="control-label col-sm-4 col-xs-12">Maximum Iterations</label>
+        <div class="col-sm-8 col-xs-12">
           <input class="form-control" type="number" ng-model="currentJob.numParams[0]">
         </div>
       </div>
@@ -200,14 +200,22 @@
 
   <!-------------------------------------------------------------------------------->
   <div class="form-group">
-    <div class="col-md-offset-4 col-sm-4">
-      <button type="submit" class="btn btn-default">Add this Job</button>
+    <div class="col-sm-offset-4 col-sm-8 col-xs-12">
+      <button type="submit" class="btn btn-default btn-block">
+        <span class="glyphicon glyphicon-plus-sign"></span>
+        Add Job</button>
     </div>
-    <div class="col-md-2">
-      <button class="btn btn-success" ng-click="submitBatch()">Submit Batch</button>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-4 col-sm-4 col-xs-12">
+      <button class="btn btn-success btn-block" ng-click="submitBatch()">
+        <span class="glyphicon glyphicon-ok-sign"></span>
+        Submit</button>
     </div>
-    <div class="col-md-2">
-      <button class="btn btn-danger" ng-click="clearBatch()">Clear Batch</button>
+    <div class="col-sm-4 col-xs-12">
+      <button class="btn btn-danger btn-block" ng-click="clearBatch()">
+        <span class="glyphicon glyphicon-remove-sign"></span>
+        Clear</button>
     </div>
   </div>
 </form
