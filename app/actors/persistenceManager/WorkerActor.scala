@@ -39,10 +39,10 @@ class WorkerActor(mediator: ActorRef) extends Actor {
     val filepath = s"./datastore/datasets/$uname/$name"
     result match {
       case Some(x: DataSetEntry) => x.targetAlgorithm match {
-        case "als" => new RALS(filepath).output
-        case "clustering" => new RClustering(filepath).output
-        case "fpm" => new RFPM(filepath).output
-        case "svm" => new RSVM(filepath).output
+        case "als" => new RALS(filepath, name).output
+        case "clustering" => new RClustering(filepath, name).output
+        case "fpm" => new RFPM(filepath, name).output
+        case "svm" => new RSVM(filepath, name).output
         case _ => None
       }
       case None => None

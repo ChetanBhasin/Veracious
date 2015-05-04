@@ -8,7 +8,7 @@ package models.mining.mlret
  * Read the ALS object file from the disk and output the data
  * @param filepath Path of the object file/folder
  */
-class RALS(filepath: String) extends MOutput {
+class RALS(filepath: String, name: String) extends MOutput {
 
   val obj = sc.objectFile[((Int, Int), Double)](filepath).cache()
 

@@ -10,7 +10,7 @@ import org.apache.spark.mllib.linalg.Vector
  * Read the K-Means clustering object file from the disk and display it to the user
  * @param filepath Path of the object file/folder
  */
-class RClustering(filepath: String) extends MOutput {
+class RClustering(filepath: String, name: String) extends MOutput {
 
   val obj = sc.objectFile[(Int, Vector)](filepath)
 
