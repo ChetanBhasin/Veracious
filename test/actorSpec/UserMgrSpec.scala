@@ -3,11 +3,13 @@ package actorSpec
 /**
  * Created by basso on 24/04/15.
  */
+
 import actors.persistenceManager.UserManagerImpl
 import models.batch.OperationStatus
 
 class UserMgrSpec extends UnitTest {
-  val userMgr = UserManagerImpl(system)
+
+  val userMgr = UserManagerImpl(system, mediator.ref)
   val userA = "Anish"
   val passA = "blahBlah"
   val passB = "bluBlu"
