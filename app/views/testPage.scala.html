@@ -23,6 +23,14 @@
           @partials.logging()
         </div>
       </div>
+      <div ng-show='nCtrl.isBatch()' class="row" ng-controller="BatchController as batchCtrl">
+        <div class="col-md-6">
+          @partials.batchDisplay()
+        </div>
+        <div class="col-md-6">
+            @partials.batchForm()
+        </div>
+      </div>
     </div>
   </div>
 }

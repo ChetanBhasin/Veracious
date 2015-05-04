@@ -9,10 +9,79 @@
     @partials.header()
     <div class="container">
       <div ng-show="nCtrl.isLogging()" ng-controller="LogController as logCtrl">
-        <div class="page-header">
-          <h1>Operational Log</h1>
+        <div class="row">
+          <div class="page-header">
+            <h1 class="text-center">
+              <span class="glyphicon glyphicon-book"></span>
+              Operational Log
+            </h1>
+          </div>
         </div>
         @partials.logging()
+      </div>
+      <div ng-controller="BatchController as batchCtrl">
+
+        <div ng-show="nCtrl.isBatch()">
+          <div class="row">
+            <div class="page-header">
+              <h1 class="text-center">
+                <span class="glyphicon glyphicon-tasks"></span>
+                Create a new batch
+              </h1>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6 col-xs-12">
+               @partials.batchDisplay()
+            </div>
+            <div class="col-sm-6 col-xs-12">
+              <div class="panel panel-default">
+                <div class="panel-body">
+                  @partials.batchForm()
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Part to show in the Data page -->
+        <div ng-show="nCtrl.isData()">
+          <div class="row">
+            <div class="page-header">
+              <h1 class="text-center">
+                <span class="glyphicon glyphicon-hdd"></span>
+                Source data-sets
+              </h1>
+            </div>
+          </div>
+          <div class="row">
+            <!-- Source data-sets -->
+          </div>
+        </div>
+        <!-- ---------------------------- -->
+      </div>
+
+      <div ng-controller="ResultController as resultCtrl">
+        <div ng-show="nCtrl.isResult()">
+          <!-- Form for result request and window to visualise result -->
+        </div>
+
+        <!-- Part to show in the Data page -->
+        <div ng-show="nCtrl.isData()">
+          <div class="row">
+            <div class="page-header">
+              <h1 class="text-center">
+                <span class="glyphicon glyphicon-equalizer"></span>
+                Mining result files
+              </h1>
+            </div>
+          </div>
+          <div class="row">
+            <!-- Source data-sets -->
+          </div>
+          <!-- ----------------------------- -->
+        </div>
       </div>
     </div>
   </div>

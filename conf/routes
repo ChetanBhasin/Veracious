@@ -7,6 +7,7 @@ GET     /                           controllers.Application.index
 
 # web-socket
 GET     /connect                    controllers.Application.connect
+POST    /submitBatch                controllers.Application.submitBatch
 
 # Authentication
 GET     /auth/login                 controllers.Auth.login
@@ -27,3 +28,4 @@ GET     /test/main                  controllers.TestController.testActual
 POST    /test/login                 controllers.TestController.testLoginForm
 GET     /test/connect.js            controllers.TestController.connectJs
 GET     /test/connect               controllers.TestController.connect
+POST    /test/submitBatch           controllers.TestController.submitBatch

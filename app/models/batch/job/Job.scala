@@ -44,7 +44,7 @@ object Job {
    * @param numParams : Extra numeric paramters again generically saved in an array
    * @return : An sub-type of class Job, to be saved in a batch
    */
-   val apply = (
+   val apply: (String, String, Option[String], List[String], List[Int]) => Job = (
     opType: String,
     opName: String,
     optionalTextParam: Option[String],    // One of the algorithm needs this one
@@ -57,13 +57,13 @@ object Job {
         DsAddDirect(
           name = textParams(0),
           description = textParams(1),
-          target_algo = Algorithm.withName(textParams(2)))
+          target_algo = Algorithm.withName(textParams(2).substring(2)))
       case "DsAddFromUrl" =>
         assert(textParams.length >= 4)
         DsAddFromUrl(
           name = textParams(0),
           description = textParams(1),
-          target_algo = Algorithm.withName(textParams(2)),
+          target_algo = Algorithm.withName(textParams(2).substring(2)),
           url = textParams(3))
       case "DsDelete" =>
         assert(textParams.nonEmpty)

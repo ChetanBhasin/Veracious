@@ -1,6 +1,9 @@
 package actors.application
 
 import akka.actor._
+import models.batch.Batch
+
+import scala.concurrent.Future
 
 /**
  * Created by basso on 24/04/15.
@@ -32,7 +35,7 @@ trait AppAccess {
    * @param password
    * @return True for success and false for not
    */
-  def authenticate(username: String, password: String): Boolean
+  def authenticate(username: String, password: String): Future[Boolean]
 
   /**
    * Remove the given user from system, will first check that its authentic
@@ -40,7 +43,7 @@ trait AppAccess {
    *         or "Operation Failed" if the persistence messed up
    *         or Unit if user was removed successfully
    */
-  def removeUser(username: String, password: String): Either[String, Unit]
+  def removeUser(username: String, password: String): Future[Either[String, Unit]]
 
   /**
    * Change password for a given user
@@ -51,7 +54,7 @@ trait AppAccess {
    *         or "Operation Failed" if the persistence messed up
    *         or Unit if password was changed successfully
    */
-  def changePassword(username: String, oldP: String, newP: String): Either[String, Unit]
+  def changePassword(username: String, oldP: String, newP: String): Future[Either[String, Unit]]
 
   /**
    * Signup a new user to the system
@@ -61,7 +64,7 @@ trait AppAccess {
    *         or "Operation Failed" if the persistence messed up
    *         or Unit if user signed up successfully
    */
-  def signUp(username: String, password: String): Either[String, Unit]
+  def signUp(username: String, password: String): Future[Either[String, Unit]]
 
   /**
    * Check if the given user is already logged in
@@ -69,6 +72,8 @@ trait AppAccess {
    * @return true if its already logged in, else false
    */
   def alreadyLoggedIn(username: String): Boolean
+
+  def submitBatch(username: String, batch: Batch): Unit
 
   def shutdown: Unit
 }
