@@ -6,20 +6,17 @@ receivers = []      # Set of receiving functions
 app = angular.module('Veracious', [])
 
 app.controller 'NavigationController', () ->
-    this.visible = "data"
+    this.visible = "logging"
 
     this.setLogging = () -> this.visible = "logging"
-    this.setData = () -> this.visible = "data"
+    this.setData = () -> this.visible = "data"      # Will have data-sets and results
     this.setBatch = () -> this.visible = "batch"
-    #this.setVisible = (str) ->
-    #    console.log "Setting visible to : " + str
-    #    this.visible = str
-    # this.isVisible = (str) ->
-    #     console.log "checking is visible for : "+str
-    #     this.visible == str
+    this.setResult = () -> this.visible = "result"
+
     this.isLogging = () -> this.visible == "logging"
     this.isData = () -> this.visible == "data"
     this.isBatch = () -> this.visible == "batch"
+    this.isResult = () -> this.visible == "result"
 
 
 app.controller 'LogController', ($scope) ->
@@ -128,15 +125,9 @@ app.controller 'BatchController', ($scope) ->
             formData.append(str+"opName", job.opName)
             for text in job.textParams
                 formData.append(str+"textParams[]", text)
-            ## Just to be safe, a hack
-            job.numParams.push(1)
+            job.numParams.push(1) # just to be safe, a hack
             for num in job.numParams
                 formData.append(str+"numParams[]", num)
-            #
-            #if (job.numParams.length > 0)
-            #    alert "have some numbers"
-            #    formData.append(str+"numParams[]", job.numParams)
-            #else formData.append(str+"numParams[]", [0])
             if (job.file)
                 formData.append(str+"file", job.file, job.file.name)
             if (job.optionalTextParam)
@@ -146,9 +137,9 @@ app.controller 'BatchController', ($scope) ->
     $scope.submitBatch = () ->
         # call the method on window from connect
         fData = createUFormData ($scope.batch)
-        window.submitBatch fData, (status) -> () ->
+        window.submitBatch fData, (status) ->
             if status == 200 then alert "Batch submitted successfully"
-            else alert "There was a problem submitting the batch"
+            else alert "There was a problem submitting the batch, status: "+status
         $scope.clearBatch()
         return
     #   ----------------------------------------------------
@@ -199,7 +190,7 @@ app.controller 'BatchController', ($scope) ->
     receivers.push($scope.receiveFunction)     # Add this receiver to the line
     return
 
-app.controller('DataController', () -> )
+app.controller('ResultController', () -> )
 
 # Now for setting up the websocket connection
 testReceiver = (data) ->
