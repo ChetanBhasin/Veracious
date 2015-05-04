@@ -132,7 +132,7 @@ private[persistenceManager] class UserManagerImpl(parent: ActorRef) extends User
    */
   def addUser(username: String, password: String) = {
 
-    lazy val PathStoreFileUser = UserManagerImpl.checkSources
+    val PathStoreFileUser = UserManagerImpl.checkSources
 
     if (UserManagerImpl.checkUsername(username)) {
       OperationStatus.OpFailure
