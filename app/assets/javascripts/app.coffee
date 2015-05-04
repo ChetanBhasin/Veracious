@@ -116,6 +116,7 @@ app.controller 'BatchController', ($scope) ->
         $scope.currentJob = newJob()
 
     $scope.clearBatch = () ->
+        $("#batchDisplay").remove()
         $scope.batch = []
         optimisticDsList = []
 
