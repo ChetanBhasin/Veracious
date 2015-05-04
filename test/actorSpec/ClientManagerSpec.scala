@@ -42,9 +42,12 @@ class ClientManagerSpec extends UnitTest {
 
   import models.jsonWrites._
   val sLog = sampleLog(user)
-  it should "send push message to correct user" in {
+  it should "send push message to correct user and ask for update" in {
     parent ! MessageToClient(user, sLog)
+    mediator.expectMsg(GetUserDataSets(user))
     fakeClient.expectMsg(Push(Json.obj("log" -> Json.toJson(sLog))))
+    mediator.reply(JsNull)
+    fakeClient.expectMsg(Push(Json.obj("data-sets" -> JsNull)))
   }
 
   it should "tell us that the client is already logged into the system" in {
