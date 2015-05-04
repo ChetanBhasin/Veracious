@@ -10,7 +10,7 @@ import org.apache.spark.mllib.linalg
  * Read the SVM object file from the disk and output the data
  * @param filepath Path of the object file/folder
  */
-class RSVM(filepath: String) extends MOutput {
+class RSVM(filepath: String, name: String) extends MOutput {
 
   val obj = sc.objectFile[(Double, linalg.Vector)](filepath)
 
