@@ -6,18 +6,17 @@ receivers = []      # Set of receiving functions
 app = angular.module('Veracious', [])
 
 app.controller 'NavigationController', () ->
-    this.visible = "data"
+    this.visible = "logging"
 
     this.setLogging = () -> this.visible = "logging"
-    this.setData = () -> this.visible = "data"
-    #this.setVisible = (str) ->
-    #    console.log "Setting visible to : " + str
-    #    this.visible = str
-    # this.isVisible = (str) ->
-    #     console.log "checking is visible for : "+str
-    #     this.visible == str
+    this.setData = () -> this.visible = "data"      # Will have data-sets and results
+    this.setBatch = () -> this.visible = "batch"
+    this.setResult = () -> this.visible = "result"
+
     this.isLogging = () -> this.visible == "logging"
     this.isData = () -> this.visible == "data"
+    this.isBatch = () -> this.visible == "batch"
+    this.isResult = () -> this.visible == "result"
 
 
 app.controller 'LogController', ($scope) ->
@@ -74,8 +73,124 @@ app.controller 'LogController', ($scope) ->
     return
 
 
-app.controller('BatchController', () -> )       # TODO, implement
-app.controller('DataController', () -> )
+app.controller 'BatchController', ($scope) ->
+    newJob = () ->
+        opType: ""
+        opName: ""
+        optionalTextParam: ""
+        textParams: []
+        numParams: []
+
+    $scope.currentJob = newJob()
+
+    #$scope.dsList = []                     # Actual Ds list from server
+    $scope.dsList = [
+        { name: "SampleDsForALS", algo: "MnALS", url: "http://som.sdf.com" },
+        { name: "SampleDsForFP", algo: "MnFPgrowth" },
+        { name: "SampleDsForALS", algo: "MnALS", url: ""},
+        { name: "SampleDsForClustering", algo: "MnClustering" },
+        { name: "SampleDsForSVM", algo: "MnSVM", url: "https://www.google.com" },
+        { name: "SampleDsForALS", algo: "MnALS" } ]
+    optimisticDsList = []           # Names of ds that are entered from previous Job
+
+    # Setup batch here -----------------------------------
+    $scope.batch = []
+    finaliseJob = (job) ->
+        job.opType = $scope.getGroup(job.opName).name
+        if (job.optionalTextParam == "")
+            delete job.optionalTextParam
+        if (job.opName == "DsAddDirect")
+            job.file = $("#dsFile")[0].files[0]
+
+        if (job.opName == "DsAddDirect" || job.opName == "DsAddFromUrl")
+            optimisticDsList.push({name: job.textParams[0], algo: job.textParams[2]})
+        # More
+        # todo: delete a dataset when asked to
+        return job
+
+    $scope.addToBatch = () ->
+        $scope.batch.push( finaliseJob($scope.currentJob) )
+        $scope.currentJob = newJob()
+
+    $scope.clearBatch = () ->
+        $("#batchDisplay").remove()
+        $scope.batch = []
+        optimisticDsList = []
+
+    createUFormData = (batch) ->
+        formData = new FormData()
+        for job, i in batch
+            str = "jobs[#{i}]."
+            formData.append(str+"opType", job.opType)
+            formData.append(str+"opName", job.opName)
+            for text in job.textParams
+                formData.append(str+"textParams[]", text)
+            job.numParams.push(1) # just to be safe, a hack
+            for num in job.numParams
+                formData.append(str+"numParams[]", num)
+            if (job.file)
+                formData.append(str+"file", job.file, job.file.name)
+            if (job.optionalTextParam)
+                formData.append(str+"optionalTextParam", job.optionalTextParam)
+        return formData
+
+    $scope.submitBatch = () ->
+        # call the method on window from connect
+        fData = createUFormData ($scope.batch)
+        window.submitBatch fData, (status) ->
+            if status == 200 then alert "Batch submitted successfully"
+            else alert "There was a problem submitting the batch, status: "+status
+        $scope.clearBatch()
+        return
+    #   ----------------------------------------------------
+
+    $scope.operations = [
+        { name: "MnALS", pretty: "ALS mining" },
+        { name: "MnClustering", pretty: "Cluster Mining" },
+        { name: "MnFPgrowth", pretty: "FP growth algorithm" },
+        { name: "MnSVM", pretty: "State Vector Machine" },
+        { name: "DsAddDirect", pretty: "Upload data-set" },
+        { name: "DsAddFromUrl", pretty: "Upload data-set from URL" },
+        { name: "DsDelete", pretty: "Delete data-set" },
+        { name: "DsRefresh", pretty: "Refresh data-set" }]
+
+    $scope.getPretty = (opName) ->
+        return op.pretty for op in $scope.operations when op.name is opName
+
+    $scope.algorithms = $scope.operations[0...4]
+
+    $scope.operationTypes = [
+        { name: "MineOp", pretty: "Mining Operations"},
+        { name: "DataSetOp", pretty: "Data-set Operations"}]
+
+    $scope.getGroup = (op) ->
+        if not op then {}
+        else if op.substr(0,2) == "Mn"
+            $scope.operationTypes[0]
+        else $scope.operationTypes[1]
+
+    $scope.checkName = (name) ->
+        $scope.currentJob.opName == name
+
+    # ----------- Data-set manipulation
+    $scope.getAllDs = () -> $scope.dsList.concat(optimisticDsList)
+    $scope.refreshables = () ->
+        res = []
+        res.push(ds.name) for ds in $scope.dsList when ds.url
+        return res
+
+    $scope.getValidDs = (algoName) ->
+        combinedList = $scope.getAllDs()
+        res = []
+        res.push(ds.name) for ds in combinedList when ds.algo is algoName
+        return res
+
+    $scope.receiveFunction = (data) -> $scope.$apply () ->  # TODO:implement
+
+    receivers.push($scope.receiveFunction)     # Add this receiver to the line
+    return
+
+app.controller('ResultController', () -> )
 
 # Now for setting up the websocket connection
 testReceiver = (data) ->
