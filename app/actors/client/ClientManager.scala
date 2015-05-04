@@ -5,6 +5,7 @@ import actors.mediator.RegisterForReceive
 import akka.actor.{ActorRef, PoisonPill}
 import akka.pattern.ask
 import akka.util.Timeout
+import models.batch.OperationStatus
 import models.messages.application.{FinishWork, FinishedWork}
 import models.messages.batchProcessing.BatchProcessorMessage
 import models.messages.client._
@@ -21,8 +22,9 @@ import scala.util.{Failure, Success}
  */
 
 object ClientManager {
+  case class PushData(username: String, data: JsValue)
 }
-
+import actors.client.ClientManager._
 import models.jsonWrites._
 
 import scala.concurrent.duration._
@@ -33,6 +35,12 @@ class ClientManager (val mediator: ActorRef) extends AppModule {
   import context.dispatcher       // Exectution context for Future
   implicit val timeout = Timeout(30 seconds)
 
+  def updateClientData(username: String) =
+    (mediator ? GetUserDataSets(username)).asInstanceOf[Future[JsValue]].onComplete {       // TODO: Have to work on this
+      case Success(ds) => self ! PushData(username, Json.obj("data-sets" -> ds))
+      case Failure(ex) => moduleError("Couldn't get Data-sets: exception =>"+ex)
+    }
+
   def receive = {
     case UserAlreadyLoggedIn(username) =>
       sender ! clientTable.contains(username)
@@ -41,13 +49,10 @@ class ClientManager (val mediator: ActorRef) extends AppModule {
       clientTable += ((username, sender))   // Invariant, the user is unique
       mediator ! new LogIn(username) with BatchProcessorMessage     // Notifiy the batch processor that a new user has logged in
       (mediator ? GetLogs(username)).asInstanceOf[Future[JsValue]].onComplete {
-        case Success(logs) => clientTable(username) ! Push(Json.obj("logs" -> logs))
+        case Success(logs) => self ! PushData(username, Json.obj("logs" -> logs))
         case Failure(ex) => moduleError("Couldn't get logs: exception =>"+ex)
       }
-      (mediator ? GetUserDataSets(username)).asInstanceOf[Future[JsValue]].onComplete {       // TODO: Have to work on this
-        case Success(ds) => clientTable(username) ! Push(Json.obj("data-sets" -> ds))
-        case Failure(ex) => moduleError("Couldn't get Data-sets: exception =>"+ex)
-      }
+      updateClientData(username)
 
     case LogOut(username) =>
       clientTable -= username
@@ -56,7 +61,10 @@ class ClientManager (val mediator: ActorRef) extends AppModule {
     case MessageToClient(user, pushData) =>
       clientTable get user match {
         case Some (act) => pushData match {
-          case lg: Log => act ! Push(Json.obj("log" -> Json.toJson(lg)))
+          case lg: Log =>
+            act ! Push(Json.obj("log" -> Json.toJson(lg)))
+            if (lg.status == OperationStatus.OpSuccess)
+              updateClientData(user)
           case ds: DataSetEntry => Push(Json.obj("data-set" -> Json.toJson(ds)))      // TODO: How to update data-set deletions and all that
         }
         case None => Unit   // The client is unavailable, so no push
@@ -65,6 +73,12 @@ class ClientManager (val mediator: ActorRef) extends AppModule {
     case FinishWork =>
       clientTable.values.foreach { _ ! PoisonPill }
       sender ! FinishedWork
+
+    case PushData(user, obj) =>
+      clientTable get user match {
+        case Some (act) => act ! Push(obj)
+        case None => Unit
+      }
 
   }
 }
