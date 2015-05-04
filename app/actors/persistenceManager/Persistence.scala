@@ -4,6 +4,7 @@ import actors.application.AppModule
 import actors.mediator.RegisterForReceive
 import akka.actor.{ActorRef, Props, Terminated}
 import akka.routing.{ActorRefRoutee, Router, SmallestMailboxRoutingLogic}
+import models.messages.application.Ready
 import models.messages.batchProcessing.{DsOperatorMessage, SubmitDsOpJob}
 import models.messages.persistenceManaging._
 import models.mining.MinerResult
@@ -25,9 +26,13 @@ class Persistence(val mediator: ActorRef) extends AppModule {
   mediator ! RegisterForReceive (self, classOf[DsOperatorMessage])
 
   // UserManager TypedActor for user related meta operations
-  lazy val userManager = UserManagerImpl(context system)
+  val userManager = UserManagerImpl(context system, context self)
   // DatastoreManager TypedActor for datastore related meta operations
-  lazy val datastoreManager = DatastoreManager(context system)
+  val datastoreManager = DatastoreManager(context system)
+
+  override def preStart() {
+    context.parent ! Ready(this.getClass)
+  }
 
   // Router to route jobs to Worker actors
   var router = {
@@ -66,6 +71,12 @@ class Persistence(val mediator: ActorRef) extends AppModule {
      * Perform a miner result operation
      */
     case operation: MinerResult => router.route((operation, datastoreManager), sender)
+
+    /**
+     * Remove the user entirely
+     * This call is used to pass the message to DSM
+     */
+    case RemoveUserEntirely(username) => datastoreManager ! RemoveUserEntirely(username)
 
     /**
      * Renew and reroute expired children actor

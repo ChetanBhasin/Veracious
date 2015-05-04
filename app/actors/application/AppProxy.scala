@@ -26,7 +26,7 @@ import scala.concurrent.{Await, Future}
 private[application] class AppProxy (val appManager: ActorRef, mediator: ActorRef) extends AppAccess with Receiver {
   var _appStatus: AppState = AppSetup
   appManager ! SubscribeTransitionCallBack(TypedActor.context.self)
-  implicit val timeout = Timeout(5 seconds)
+  implicit val timeout = Timeout(10 seconds)
 
   def onReceive(msg: Any, sender: ActorRef) = msg match {
     case CurrentState(_, state: AppState) => _appStatus = state
@@ -36,7 +36,7 @@ private[application] class AppProxy (val appManager: ActorRef, mediator: ActorRe
   private var _userAuth: UserManager = null
   private def userAuth = (appStatus, _userAuth) match {
     case (AppRunning, null) =>
-      _userAuth = Await.result(mediator ? GetUserManager, 5 seconds).asInstanceOf[UserManager]
+      _userAuth = Await.result(mediator ? GetUserManager, 10 seconds).asInstanceOf[UserManager]
       _userAuth
     case (AppRunning, userAuth) => userAuth
     case _ => throw new Exception ("Should not have asked for user manager while app is not running")
