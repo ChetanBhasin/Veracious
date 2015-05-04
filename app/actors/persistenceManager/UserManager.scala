@@ -74,10 +74,10 @@ object UserManagerImpl {
    * @param system The ActorSystem to be used
    * @return
    */
-  def apply(system: ActorSystem, parent: ActorRef) = {
+  def apply(system: ActorSystem, mediator: ActorRef) = {
     if (singleton) {
       singleton = false
-      val obj: UserManager = TypedActor(system).typedActorOf(TypedProps(classOf[UserManagerImpl], new UserManagerImpl(parent)))
+      val obj: UserManager = TypedActor(system).typedActorOf(TypedProps(classOf[UserManagerImpl], new UserManagerImpl(mediator)))
       obj
     } else {
       throw new Exception("Only one object at a time is allowed")
@@ -101,7 +101,7 @@ trait UserManager {
 /**
  * Class intented to be used as TypedActor for user management
  */
-private[persistenceManager] class UserManagerImpl(parent: ActorRef) extends UserManager {
+private[persistenceManager] class UserManagerImpl(mediator: ActorRef) extends UserManager {
 
   /**
    * Authenticate a user
@@ -168,7 +168,7 @@ private[persistenceManager] class UserManagerImpl(parent: ActorRef) extends User
       val writer = new PrintWriter(new BufferedWriter(new FileWriter("./.datastore/meta/users.dat", false)))
       newRecs.map(writer.println(_))
       writer.close()
-      parent ! RemoveUserEntirely(username)
+      mediator ! RemoveUserEntirely(username)
       OperationStatus.OpSuccess
     } catch {
       case _: Throwable => OperationStatus.OpFailure

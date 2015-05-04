@@ -14,7 +14,7 @@ import org.apache.spark.rdd.RDD
 class RFPM(filepath: String) extends MOutput {
 
   // Load the object from the disk
-  lazy val obj: RDD[FreqItemset] = sc.objectFile[FreqItemset](filepath)
+  lazy val obj: RDD[FreqItemset[String]] = sc.objectFile[FreqItemset[String]](filepath)
 
   // Get the data and put it out
   def getItemSet = {
