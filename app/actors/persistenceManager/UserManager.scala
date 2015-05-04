@@ -3,7 +3,7 @@ package actors.persistenceManager
 import java.io.{BufferedWriter, FileWriter, PrintWriter}
 import java.nio.file.{Files, Paths}
 
-import akka.actor.{ActorSystem, TypedActor, TypedProps}
+import akka.actor.{ActorRef, ActorSystem, TypedActor, TypedProps}
 import models.batch.OperationStatus.OperationStatus
 import models.batch._
 
@@ -74,10 +74,10 @@ object UserManagerImpl {
    * @param system The ActorSystem to be used
    * @return
    */
-  def apply(system: ActorSystem) = {
+  def apply(system: ActorSystem, parent: ActorRef) = {
     if (singleton) {
       singleton = false
-      val obj: UserManager = TypedActor(system).typedActorOf(TypedProps[UserManagerImpl]())
+      val obj: UserManager = TypedActor(system).typedActorOf(TypedProps(classOf[UserManagerImpl], new UserManagerImpl(parent)))
       obj
     } else {
       throw new Exception("Only one object at a time is allowed")
@@ -101,7 +101,7 @@ trait UserManager {
 /**
  * Class intented to be used as TypedActor for user management
  */
-private[persistenceManager] class UserManagerImpl extends UserManager {
+private[persistenceManager] class UserManagerImpl(parent: ActorRef) extends UserManager {
 
   /**
    * Authenticate a user
@@ -132,7 +132,7 @@ private[persistenceManager] class UserManagerImpl extends UserManager {
    */
   def addUser(username: String, password: String) = {
 
-    lazy val PathStoreFileUser = UserManagerImpl.checkSources
+    val PathStoreFileUser = UserManagerImpl.checkSources
 
     if (UserManagerImpl.checkUsername(username)) {
       OperationStatus.OpFailure
@@ -168,6 +168,7 @@ private[persistenceManager] class UserManagerImpl extends UserManager {
       val writer = new PrintWriter(new BufferedWriter(new FileWriter("./.datastore/meta/users.dat", false)))
       newRecs.map(writer.println(_))
       writer.close()
+      parent ! RemoveUserEntirely(username)
       OperationStatus.OpSuccess
     } catch {
       case _: Throwable => OperationStatus.OpFailure
