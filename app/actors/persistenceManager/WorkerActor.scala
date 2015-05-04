@@ -12,6 +12,7 @@ import models.batch.job._
 import models.messages.batchProcessing._
 import models.messages.logger.Log
 import models.messages.persistenceManaging.DataSetEntry
+import models.mining.mlret._
 import models.mining.{Algorithm, MinerResult}
 
 import scala.concurrent.duration._
@@ -25,6 +26,28 @@ import scala.sys.process._
 class WorkerActor(mediator: ActorRef) extends Actor {
 
   private implicit val timeout = Timeout(10 seconds)
+
+  /**
+   * Handles output operations of the mining results
+   * @param operation Details of user and dataset wrapped in GetDsData case object Details of user and dataset wrapped in GetDsData case object Details of user and dataset wrapped in GetDsData case object Details of user and dataset wrapped in GetDsData case object
+   * @param dsm Actor reference to datastore manager
+   * @return Option[JSON-Output]
+   */
+  private def handleDsOutput(operation: GetDsData, dsm: ActorRef) = {
+    val (uname, name) = (operation.username, operation.Ds)
+    val result = Await.result(dsm ? CheckUserDataset(uname, name), 10 seconds).asInstanceOf[Option[DataSetEntry]]
+    val filepath = s"./datastore/datasets/$uname/$name"
+    result match {
+      case Some(x: DataSetEntry) => x.targetAlgorithm match {
+        case "als" => new RALS(filepath).output
+        case "clustering" => new RClustering(filepath).output
+        case "fpm" => new RFPM(filepath).output
+        case "svm" => new RSVM(filepath).output
+        case _ => None
+      }
+      case None => None
+    }
+  }
 
   /**
    * handles all the jobs for the actor reciever
@@ -127,9 +150,14 @@ class WorkerActor(mediator: ActorRef) extends Actor {
         save(s"./datastore/datasets/$user/$name.dat")
         // Log here
       } catch {
-        case _: Throwable => ??? //Log here
+        case _: Throwable => println("Something went wrong.") //Log here
       }
     }
+
+    /**
+     * Manage the request for mine operation results
+     */
+    case (operation: GetDsData, dsm: ActorRef) => handleDsOutput(operation, dsm)
 
   }
 
