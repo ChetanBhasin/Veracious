@@ -2,7 +2,7 @@ package models.mining.mlret
 
 import org.apache.spark.mllib.fpm.FPGrowth.FreqItemset
 import org.apache.spark.rdd.RDD
-import play.api.libs.json.{JsString, JsNumber, JsObject}
+import play.api.libs.json.{JsNumber, JsObject, JsString}
 
 /**
  * Created by chetan on 28/04/15.
@@ -15,7 +15,7 @@ import play.api.libs.json.{JsString, JsNumber, JsObject}
 class RFPM(filepath: String, name: String) extends MOutput {
 
   // Load the object from the disk
-  lazy val obj: RDD[FreqItemset[String]] = sc.objectFile[FreqItemset[String]](filepath)
+  lazy val obj: RDD[FreqItemset[String]] = sc.objectFile[FreqItemset[String]](filepath).cache()
 
   // Get the data and put it out
   lazy val getItemSet: Seq[(Array[String], Long)] = {
