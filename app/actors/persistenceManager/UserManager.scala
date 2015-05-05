@@ -74,7 +74,7 @@ object UserManagerImpl {
    * @param system The ActorSystem to be used
    * @return
    */
-  def apply(system: ActorSystem, mediator: ActorRef) = {
+  def apply(system: ActorSystem, mediator: ActorRef): UserManager = {
     if (singleton) {
       singleton = false
       val obj: UserManager = TypedActor(system).typedActorOf(TypedProps(classOf[UserManagerImpl], new UserManagerImpl(mediator)))

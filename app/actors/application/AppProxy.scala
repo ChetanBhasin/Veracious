@@ -38,7 +38,7 @@ private[application] class AppProxy (val appManager: ActorRef, mediator: ActorRe
     case (AppRunning, null) =>
       _userAuth = Await.result(mediator ? GetUserManager, 10 seconds).asInstanceOf[UserManager]
       _userAuth
-    case (AppRunning, userAuth) => userAuth
+    case (AppRunning, _) => _userAuth
     case _ => throw new Exception ("Should not have asked for user manager while app is not running")
   }
 
