@@ -6,7 +6,7 @@ import akka.actor.FSM.{CurrentState, SubscribeTransitionCallBack, Transition}
 import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
-import models.messages.client.UserAlreadyLoggedIn
+import models.messages.client.{AskForResult, UserAlreadyLoggedIn}
 import models.messages.persistenceManaging.GetUserManager
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -118,5 +118,10 @@ class AppAccessSpec extends UnitTest {
     mediator.expectMsg(UserAlreadyLoggedIn(user))
     mediator.reply(true)
     Await.result(res, 3 seconds) shouldBe true
+  }
+
+  it should "make the client manager ask for result" in {
+    appAccess.requestResult(user, "blah")
+    mediator.expectMsg(AskForResult(user, "blah"))
   }
 }
