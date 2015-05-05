@@ -60,7 +60,7 @@ class AppAccessSpec extends UnitTest {
   }
 
   it should "throw exception when requesting access while app is in setup" in {
-    an [Exception] should be thrownBy appAccess.authenticate(user, pass)
+    an [Exception] should be thrownBy Await.result(appAccess.authenticate(user, pass), 3 seconds)
   }
 
   it should "change its state when received a current state message" in {
@@ -69,7 +69,7 @@ class AppAccessSpec extends UnitTest {
   }
 
   it should "throw exception when requesting access while app is finishing" in {
-    an [Exception] should be thrownBy appAccess.authenticate(user, pass)
+    an [Exception] should be thrownBy Await.result(appAccess.authenticate(user, pass), 3 seconds)
   }
 
   it should "change state when received a transition state message" in {
@@ -79,7 +79,7 @@ class AppAccessSpec extends UnitTest {
 
   var resAuth: Future[Boolean] = null
   it should "ask for userManager the first time it needs it" in {
-    resAuth = Future(appAccess.authenticate(user, pass))
+    resAuth = appAccess.authenticate(user, pass)
     mediator.expectMsg(GetUserManager)
   }
 
@@ -89,28 +89,28 @@ class AppAccessSpec extends UnitTest {
   }
 
   it should s"not ask for userManager in subsequent operations and should change the password for $user" in {
-    appAccess.changePassword(user, pass, pass2) shouldBe Right(())
+    Await.result(appAccess.changePassword(user, pass, pass2), 3 seconds) shouldBe Right(())
     mediator.expectNoMsg(1 second)
   }
 
   it should s"give authentication failure message when trying to change passwords for $user" in {
-    appAccess.changePassword(user, pass, pass2) shouldBe Left("Authentication Failed")
+    Await.result(appAccess.changePassword(user, pass, pass2), 3 seconds) shouldBe Left("Authentication Failed")
   }
 
   it should s"give authentication failure when trying to remove $user with wrong pass" in {
-    appAccess.removeUser(user, pass) shouldBe Left("Authentication Failed")
+    Await.result(appAccess.removeUser(user, pass), 3 seconds) shouldBe Left("Authentication Failed")
   }
 
   it should s"successfully remove $user with correct pass" in {
-    appAccess.removeUser(user, pass2) shouldBe Right(())
+    Await.result(appAccess.removeUser(user, pass2), 3 seconds) shouldBe Right(())
   }
 
   it should "bar us from signing up a username that already exists" in {
-    appAccess.signUp("Jibin", pass2) shouldBe Left("User already exists")
+    Await.result(appAccess.signUp("Jibin", pass2), 3 seconds) shouldBe Left("User already exists")
   }
 
   it should "let us sign up a new user" in {
-    appAccess.signUp("Jerry", pass2) shouldBe Right(())
+    Await.result(appAccess.signUp("Jerry", pass2), 3 seconds) shouldBe Right(())
   }
 
   it should "Ask client manager if user is already logged in" in {
