@@ -73,7 +73,19 @@ trait AppAccess {
    */
   def alreadyLoggedIn(username: String): Boolean
 
+  /**
+   * Submit a new batch from the user
+   * @param username
+   * @param batch The batch created using the amazing front-end form
+   */
   def submitBatch(username: String, batch: Batch): Unit
+
+  /**
+   * Request data-set for visualisation
+   * @param username
+   * @param dsName Name of the data-set pertaining to a result perviously generated
+   */
+  def requestResult(username: String, dsName: String): Unit
 
   def shutdown: Unit
 }

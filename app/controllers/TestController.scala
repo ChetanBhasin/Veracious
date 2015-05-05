@@ -59,4 +59,15 @@ object TestController extends Controller {
       form => Ok("Got Login Form : "+form)
     )
   }
+
+  def getResult = Action { implicit request =>
+    request.body.asFormUrlEncoded.get.get("datasetName") match {
+      case None =>
+        println("DEBUG: Bad request for result")
+        BadRequest
+      case Some(seq) =>
+        println("DEBUG: Got request for result of : "+seq.head)
+        Ok
+    }
+  }
 }

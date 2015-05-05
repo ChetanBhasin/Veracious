@@ -9,7 +9,7 @@ import akka.util.Timeout
 import models.batch.{Batch, OperationStatus}
 import models.messages.application.AppShutDown
 import models.messages.batchProcessing.SubmitBatch
-import models.messages.client.UserAlreadyLoggedIn
+import models.messages.client.{AskForResult, UserAlreadyLoggedIn}
 import models.messages.persistenceManaging.GetUserManager
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -38,7 +38,7 @@ private[application] class AppProxy (val appManager: ActorRef, mediator: ActorRe
     case (AppRunning, null) =>
       _userAuth = Await.result(mediator ? GetUserManager, 10 seconds).asInstanceOf[UserManager]
       _userAuth
-    case (AppRunning, userAuth) => userAuth
+    case (AppRunning, _) => _userAuth
     case _ => throw new Exception ("Should not have asked for user manager while app is not running")
   }
 
@@ -104,4 +104,7 @@ private[application] class AppProxy (val appManager: ActorRef, mediator: ActorRe
 
   def submitBatch (username: String, batch: Batch) =
     mediator ! SubmitBatch(username, batch)
+
+  def requestResult (username: String, dsName: String) =
+    mediator ! AskForResult (username, dsName)
 }
