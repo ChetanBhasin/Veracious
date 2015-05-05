@@ -35,6 +35,15 @@ object Application extends Controller with Secured {
       }
     )
   }
+
+  def getResult = isAuthenticated { username => implicit request =>
+    request.body.asFormUrlEncoded.get.get("datasetName") match {
+      case None => BadRequest
+      case Some(seq) =>
+        appAccess.requestResult(username, seq.head)
+        Ok
+    }
+  }
   /*
   def index = isAuthenticated { username => implicit request =>
     Ok("helloo" + username)   // Test

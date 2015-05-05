@@ -23,13 +23,13 @@ class Mediator extends Actor {
     broadcastSet = {
       if (fTable.values.isEmpty)
         notifySet
-      else notifySet ++ fTable.values.reduce(_ ++ _)
+      else notifySet ++ fTable.values.reduce(_ ++ _)    // PROBLEMATIC??
     }
   }
   /** -------------------------- */
 
   def sendMsgFn(sender: ActorRef)(act: ActorRef, msg: Any) {
-    if (act != sender) act ! msg
+    if (act != sender) act.tell(msg, sender)      // Has to forward!!
   }
 
   def receive = {

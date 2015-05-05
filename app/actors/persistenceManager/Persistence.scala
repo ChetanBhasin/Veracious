@@ -13,9 +13,10 @@ import models.mining.MinerResult
  * Created by chetan on 12/04/15.
  */
 
-case class GetUserDatasetsJson(username: String)
+case class GetUserDatasetsJson(username: String) extends PersistenceMessage
 
-case class GetDsData(username: String, Ds: String)
+// This class will not extends PersistenceMessage yet... will be mixed in later
+case class GetDsData(username: String, Ds: String) extends PersistenceMessage
 
 /**
  * Persistence actor
@@ -26,7 +27,7 @@ class Persistence(val mediator: ActorRef) extends AppModule {
 
   mediator ! RegisterForReceive (self, classOf[PersistenceMessage])
   mediator ! RegisterForReceive (self, classOf[DsOperatorMessage])
-  mediator ! RegisterForReceive(self, classOf[RemoveUserEntirely])
+  mediator ! RegisterForReceive(self, classOf[RemoveUserEntirely])    // @chetan.. Just mix in the PersistenceMessage you know
 
   // UserManager TypedActor for user related meta operations
   val userManager = UserManagerImpl(context system, context self)

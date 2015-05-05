@@ -2,6 +2,7 @@ package actors.client
 
 import actors.application.AppModule
 import actors.mediator.RegisterForReceive
+import actors.persistenceManager.GetDsData
 import akka.actor.{ActorRef, PoisonPill}
 import akka.pattern.ask
 import akka.util.Timeout
@@ -80,5 +81,10 @@ class ClientManager (val mediator: ActorRef) extends AppModule {
         case None => Unit
       }
 
+    case AskForResult(user, dsName) =>
+      mediator ? GetDsData(user, dsName) onComplete {
+        case Failure(_) => self ! PushData(user, Json.obj("resultError" -> "Could Not retrieve result"))
+        case Success(res: JsValue) => self ! PushData(user, res)
+      }
   }
 }
