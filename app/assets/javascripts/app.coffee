@@ -5,6 +5,7 @@ receivers = []      # Set of receiving functions
 
 app = angular.module('Veracious', [])
 
+# Navigation Controller
 app.controller 'NavigationController', () ->
     this.visible = "logging"
 
@@ -18,7 +19,7 @@ app.controller 'NavigationController', () ->
     this.isBatch = () -> this.visible == "batch"
     this.isResult = () -> this.visible == "result"
 
-
+# Logging Controller
 app.controller 'LogController', ($scope) ->
     ###
     format: { status: String E { SUCCESS, FAILURE, WARNING, INFO },
@@ -51,18 +52,14 @@ app.controller 'LogController', ($scope) ->
     # the received server data and stopping till it gets a true, then it might just work right??
 
     # UPDATE, got it to work, FINALLLY!!
-    $scope.receiveFunction = (data) -> $scope.$apply () ->  # TODO:check if the model update reflects correctly on the view
-        #console.log "Debug: received data: "+JSON.stringify(data)
+    $scope.receiveFunction = (data) -> $scope.$apply () ->
         if data.logs or data.log
             if data.log
                 $scope.logs.push(data.log)
             else $scope.logs = data.logs
             loggingWell.scrollTop = loggingWell.scrollHeight
-            #console.log "Debug: apparently saved logs/log data"
-            #console.log "Debug: this.logs: "+JSON.stringify($scope.logs)
             true
         else
-            #console.log "Debug: didn't save logs/log data"
             false
 
     #$scope.toggle = (b) -> $scope.$apply () -> $scope.showCtrl = b
@@ -72,8 +69,10 @@ app.controller 'LogController', ($scope) ->
 
     return
 
-
+# Batch Controller
 app.controller 'BatchController', ($scope) ->
+
+    # Batch Manipulation
     newJob = () ->
         opType: ""
         opName: ""
@@ -83,15 +82,34 @@ app.controller 'BatchController', ($scope) ->
 
     $scope.currentJob = newJob()
 
-    #$scope.dsList = []                     # Actual Ds list from server
-    $scope.dsList = [
-        { name: "SampleDsForALS", algo: "MnALS", url: "http://som.sdf.com" },
-        { name: "SampleDsForFP", algo: "MnFPgrowth" },
-        { name: "SampleDsForALS", algo: "MnALS", url: ""},
-        { name: "SampleDsForClustering", algo: "MnClustering" },
-        { name: "SampleDsForSVM", algo: "MnSVM", url: "https://www.google.com" },
-        { name: "SampleDsForALS", algo: "MnALS" } ]
-    optimisticDsList = []           # Names of ds that are entered from previous Job
+    # -------------- Opertations ---------------
+    $scope.operations = [
+        { name: "MnALS", pretty: "ALS mining" },
+        { name: "MnClustering", pretty: "Cluster Mining" },
+        { name: "MnFPgrowth", pretty: "FP growth algorithm" },
+        { name: "MnSVM", pretty: "State Vector Machine" },
+        { name: "DsAddDirect", pretty: "Upload data-set" },
+        { name: "DsAddFromUrl", pretty: "Upload data-set from URL" },
+        { name: "DsDelete", pretty: "Delete data-set" },
+        { name: "DsRefresh", pretty: "Refresh data-set" }]
+
+    $scope.getPretty = (opName) ->
+        return op.pretty for op in $scope.operations when op.name is opName
+
+    $scope.algorithms = $scope.operations[0...4]
+
+    $scope.operationTypes = [
+        { name: "MineOp", pretty: "Mining Operations"},
+        { name: "DataSetOp", pretty: "Data-set Operations"}]
+
+    $scope.getGroup = (op) ->
+        if not op then {}
+        else if op.substr(0,2) == "Mn"
+            $scope.operationTypes[0]
+        else $scope.operationTypes[1]
+
+    $scope.checkName = (name) ->
+        $scope.currentJob.opName == name
 
     # Setup batch here -----------------------------------
     $scope.batch = []
@@ -105,7 +123,6 @@ app.controller 'BatchController', ($scope) ->
         if (job.opName == "DsAddDirect" || job.opName == "DsAddFromUrl")
             optimisticDsList.push({name: job.textParams[0], algo: job.textParams[2]})
         # More
-        # todo: delete a dataset when asked to
         return job
 
     $scope.addToBatch = () ->
@@ -144,52 +161,26 @@ app.controller 'BatchController', ($scope) ->
         return
     #   ----------------------------------------------------
 
-    $scope.operations = [
-        { name: "MnALS", pretty: "ALS mining" },
-        { name: "MnClustering", pretty: "Cluster Mining" },
-        { name: "MnFPgrowth", pretty: "FP growth algorithm" },
-        { name: "MnSVM", pretty: "State Vector Machine" },
-        { name: "DsAddDirect", pretty: "Upload data-set" },
-        { name: "DsAddFromUrl", pretty: "Upload data-set from URL" },
-        { name: "DsDelete", pretty: "Delete data-set" },
-        { name: "DsRefresh", pretty: "Refresh data-set" }]
-
-    $scope.getPretty = (opName) ->
-        return op.pretty for op in $scope.operations when op.name is opName
-
-    $scope.algorithms = $scope.operations[0...4]
-
-    $scope.operationTypes = [
-        { name: "MineOp", pretty: "Mining Operations"},
-        { name: "DataSetOp", pretty: "Data-set Operations"}]
-
-    $scope.getGroup = (op) ->
-        if not op then {}
-        else if op.substr(0,2) == "Mn"
-            $scope.operationTypes[0]
-        else $scope.operationTypes[1]
-
-    $scope.checkName = (name) ->
-        $scope.currentJob.opName == name
-
     # ----------- Data-set manipulation
+    #$scope.dsList = []                     # Actual Ds list from server
+    $scope.dsList = [
+        { name: "SampleDsForALS", algo: "MnALS", url: "http://som.sdf.com" },
+        { name: "SampleDsForFP", algo: "MnFPgrowth" },
+        { name: "SampleDsForALS", algo: "MnALS", url: ""},
+        { name: "SampleDsForClustering", algo: "MnClustering" },
+        { name: "SampleDsForSVM", algo: "MnSVM", url: "https://www.google.com" },
+        { name: "SampleDsForALS", algo: "MnALS" } ]
+    optimisticDsList = []           # Names of ds that are entered from previous Job
+
     $scope.getAllDs = () -> $scope.dsList.concat(optimisticDsList)
     $scope.refreshables = () ->
-        ds.name for ds in $scope.dsList when ds.url
+        ds.name for ds in $scope.dsList when ds.source != ""
 
     $scope.getValidDs = (algoName) ->
-        ds.name for ds in $scope.getAllDs() when ds.algo is algoName
+        ds.name for ds in $scope.getAllDs() when ds.algo is algoName && ds.status == "available" # TODO: confirm
 
     getDataSets = (dsList) ->            # filters out the result types
-        ds for ds in dsList when ds.type == "dataset"
-
-    convertDataSets = (dsList) ->        # convert each data-set to correct format
-        for ds in dsList
-            ds.algo = switch ds.algo
-                when "clustering" then "MnClustering"
-                when "svm" then "MnSVM"
-                when "als" then "MnALS"
-                else "MnFPgrowth"
+        ds for ds in dsList when ds.type == "dataset" && ds.status != "removed" #TODO: confirm
 
     $scope.receiveFunction = (data) -> $scope.$apply () ->
         if data.datasets
@@ -200,7 +191,19 @@ app.controller 'BatchController', ($scope) ->
     receivers.push($scope.receiveFunction)     # Add this receiver to the line
     return
 
-app.controller('ResultController', () -> )
+## A conversion function to make up for the difference in API
+convertDataSets = (dsList) ->        # convert each data-set to correct format
+    for ds in dsList
+        ds.algo = switch ds.algo
+            when "clustering" then "MnClustering"
+            when "svm" then "MnSVM"
+            when "als" then "MnALS"
+            else "MnFPgrowth"
+# ---------------------------------
+
+
+app.controller 'ResultController', () ->
+    $scope.results = []
 
 # Now for setting up the websocket connection
 testReceiver = (data) ->
