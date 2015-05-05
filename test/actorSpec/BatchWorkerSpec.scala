@@ -21,7 +21,7 @@ class BatchWorkerSpec extends UnitTest {
   it should "log a batch failure and become available when a job is unsuccessful" in {
     parent ! OpFailure
     val log = mediator.expectMsgClass(classOf[Log])
-    assert(log.status == OpFailure)
+    log.status shouldBe OpFailure
     parentProbe.expectMsg(IAmFree(user))
   }
 
@@ -34,7 +34,7 @@ class BatchWorkerSpec extends UnitTest {
   it should "log a batch success and become available when the batch finishes" in {
     parent ! OpSuccess
     val log = mediator.expectMsgClass(classOf[Log])
-    assert(log.status == OpSuccess)
+    log.status shouldBe OpSuccess
     parentProbe.expectMsg(IAmFree(user))
   }
 

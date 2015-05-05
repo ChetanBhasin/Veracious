@@ -37,7 +37,7 @@ class ClientManager (val mediator: ActorRef) extends AppModule {
   implicit val timeout = Timeout(30 seconds)
 
   def updateClientData(username: String) =
-    (mediator ? GetUserDataSets(username)).asInstanceOf[Future[JsValue]].onComplete {       // TODO: Have to work on this
+    (mediator ? GetUserDataSets(username)).asInstanceOf[Future[JsValue]].onComplete {
       case Success(ds) => self ! PushData(username, Json.obj("datasets" -> ds))
       case Failure(ex) => moduleError("Couldn't get Data-sets: exception =>"+ex)
     }
@@ -66,7 +66,7 @@ class ClientManager (val mediator: ActorRef) extends AppModule {
             act ! Push(Json.obj("log" -> Json.toJson(lg)))
             if (lg.status == OperationStatus.OpSuccess)
               updateClientData(user)
-          case ds: DataSetEntry => Push(Json.obj("data-set" -> Json.toJson(ds)))      // TODO: How to update data-set deletions and all that
+          case ds: DataSetEntry => Push(Json.obj("data-set" -> Json.toJson(ds))) // NOT needed actually
         }
         case None => Unit   // The client is unavailable, so no push
       }
@@ -84,7 +84,7 @@ class ClientManager (val mediator: ActorRef) extends AppModule {
     case AskForResult(user, dsName) =>
       mediator ? GetDsData(user, dsName) onComplete {
         case Failure(_) => self ! PushData(user, Json.obj("resultError" -> "Could Not retrieve result"))
-        case Success(res: JsValue) => self ! PushData(user, res)
+        case Success(res: JsValue) => self ! PushData(user, Json.obj("result" -> res))
       }
   }
 }

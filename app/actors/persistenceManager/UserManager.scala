@@ -73,6 +73,9 @@ object UserManagerImpl {
    * Returns a typed actor of type User Manager
    * @param system The ActorSystem to be used
    * @return
+   *
+   * @chetan... Throwing that exception messes up full tests... I think you better allow for more than a single
+   *           userManager or else make sure that the old one is killed and then create a new one
    */
   def apply(system: ActorSystem, mediator: ActorRef): UserManager = {
     if (singleton) {

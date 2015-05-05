@@ -15,7 +15,7 @@ import scala.io.Source
  *  Outgoing:
  *    JobStatus (user, OperationStatus)  =>> Directly back to the batchProcessor.Worker that sent the SubmitMineJob
  *    Log(...)
- *    Result (...) =>> Sent to the mediator, TODO
+ *    Result (...) =>> Sent to the mediator,
  */
 package object miner {
 
