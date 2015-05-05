@@ -22,7 +22,7 @@ class BatchProcessorSpec extends UnitTest {
 
   "Batch Processor" should "Setup correctly" in {
     val msg = mediator.expectMsgClass(classOf[RegisterForReceive])
-    assert (msg.messageType == classOf[BatchProcessorMessage])
+    msg.messageType shouldBe classOf[BatchProcessorMessage]
     parentProbe.expectMsg(Ready(classOf[BatchProcessor]))
   }
 
