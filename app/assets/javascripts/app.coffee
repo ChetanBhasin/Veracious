@@ -175,17 +175,27 @@ app.controller 'BatchController', ($scope) ->
     # ----------- Data-set manipulation
     $scope.getAllDs = () -> $scope.dsList.concat(optimisticDsList)
     $scope.refreshables = () ->
-        res = []
-        res.push(ds.name) for ds in $scope.dsList when ds.url
-        return res
+        ds.name for ds in $scope.dsList when ds.url
 
     $scope.getValidDs = (algoName) ->
-        combinedList = $scope.getAllDs()
-        res = []
-        res.push(ds.name) for ds in combinedList when ds.algo is algoName
-        return res
+        ds.name for ds in $scope.getAllDs() when ds.algo is algoName
 
-    $scope.receiveFunction = (data) -> $scope.$apply () ->  # TODO:implement
+    getDataSets = (dsList) ->            # filters out the result types
+        ds for ds in dsList when ds.type == "dataset"
+
+    convertDataSets = (dsList) ->        # convert each data-set to correct format
+        for ds in dsList
+            ds.algo = switch ds.algo
+                when "clustering" then "MnClustering"
+                when "svm" then "MnSVM"
+                when "als" then "MnALS"
+                else "MnFPgrowth"
+
+    $scope.receiveFunction = (data) -> $scope.$apply () ->
+        if data.datasets
+            $scope.dsList = convertDataSets getDataSets data.datasets
+        false   # The other controller needs this data
+
 
     receivers.push($scope.receiveFunction)     # Add this receiver to the line
     return
