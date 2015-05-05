@@ -3,6 +3,7 @@ package actorSpec
 import _root_.mocks.sampleLog
 import actors.client.ClientManager
 import actors.mediator.RegisterForReceive
+import actors.persistenceManager.GetDsData
 import akka.actor.{Props, Terminated}
 import akka.testkit.TestProbe
 import models.messages.application.{FinishWork, FinishedWork, Ready}
@@ -21,7 +22,7 @@ class ClientManagerSpec extends UnitTest {
 
   "Client Manager" should "Setup correctly" in {
     val msg = mediator.expectMsgClass(classOf[RegisterForReceive])
-    assert(msg.messageType == classOf[ClientManagerMessage])
+    msg.messageType shouldBe classOf[ClientManagerMessage]
     parentProbe.expectMsg(Ready(classOf[ClientManager]))
   }
 
@@ -34,7 +35,7 @@ class ClientManagerSpec extends UnitTest {
     fakeClient.expectMsg(Push(Json.obj("logs" -> JsNull)))
     mediator.expectMsg(GetUserDataSets(user))
     mediator.reply(JsNull)
-    fakeClient.expectMsg(Push(Json.obj("data-sets" -> JsNull)))
+    fakeClient.expectMsg(Push(Json.obj("datasets" -> JsNull)))
   }
 
   it should "Do the initial honors of notifying LogIn, " +
@@ -47,12 +48,22 @@ class ClientManagerSpec extends UnitTest {
     mediator.expectMsg(GetUserDataSets(user))
     fakeClient.expectMsg(Push(Json.obj("log" -> Json.toJson(sLog))))
     mediator.reply(JsNull)
-    fakeClient.expectMsg(Push(Json.obj("data-sets" -> JsNull)))
+    fakeClient.expectMsg(Push(Json.obj("datasets" -> JsNull)))
   }
 
   it should "tell us that the client is already logged into the system" in {
     parent ! UserAlreadyLoggedIn(user)
     expectMsg(true)
+  }
+
+  it should "ask persistence for result when required" in {
+    parent ! AskForResult(user, "dsName")
+    mediator.expectMsg(GetDsData(user, "dsName"))
+  }
+
+  it should "push the result to client on receiving it" in {
+    mediator.reply(JsNull)
+    fakeClient.expectMsg(Push(Json.obj("result" -> JsNull)))
   }
 
   it should "not push messages to unavailable clients" in {

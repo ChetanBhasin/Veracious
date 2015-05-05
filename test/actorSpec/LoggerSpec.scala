@@ -44,16 +44,11 @@ class LoggerSpec extends UnitTest {
   it should "send the clientManager the list of logs when asked" in {
     parent ! GetLogs(user)
     msg = expectMsgClass(classOf[JsValue])
-    assert (msg != JsNull)
-    /*parent ! LogIn(user)    // Simulating Client Login
-    val fMsg = expectMsgClass(classOf[MessageToClient])
-    assert (fMsg.username == user)
-    msg = fMsg.msg
-    msg \ "log" != JsNull*/
+    msg should not be JsNull
   }
 
   it should "send correct number of logs" in {
-    (msg).asOpt[List[JsObject]] match {
+    msg.asOpt[List[JsObject]] match {
       case None => fail("Log object failure")
       case Some(lst) =>
         if (lst.length != 5) fail("Some logs from other users have been supplied")
@@ -63,7 +58,7 @@ class LoggerSpec extends UnitTest {
   it should "send the log that belongs to the client" in {
     parent ! sampleLog(user)
     val msg = mediator.expectMsgClass(classOf[MessageToClient])
-    assert (msg.username == user)
+    msg.username shouldBe user
   }
 
   it should "write the log to file" in {
