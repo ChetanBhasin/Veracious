@@ -27,7 +27,7 @@ class Persistence(val mediator: ActorRef) extends AppModule {
 
   mediator ! RegisterForReceive (self, classOf[PersistenceMessage])
   mediator ! RegisterForReceive (self, classOf[DsOperatorMessage])
-  mediator ! RegisterForReceive(self, classOf[RemoveUserEntirely])
+  mediator ! RegisterForReceive(self, classOf[RemoveUserEntirely])    // @chetan.. Just mix in the PersistenceMessage you know
 
   // UserManager TypedActor for user related meta operations
   val userManager = UserManagerImpl(context system, context self)
