@@ -51,11 +51,11 @@ app.controller 'LogController', ($scope) ->
     # It needs to call $scope.$apply or else the changes to scope may not be digested
     # by the model immediately as this function will be called outside the control of angularJs
     $scope.receiveFunction = (data) -> $scope.$apply () ->
-        if data.logs or data.log                                # we only accept logs or log messages
+        if data.hasOwnProperty("logs") or data.hasOwnProperty("log")                               # we only accept logs or log messages
             if data.log
                 $scope.logs.push(data.log)
             else $scope.logs = data.logs
-            loggingWell.scrollTop = loggingWell.scrollHeight    # scroll to the bottom of the well
+            loggingWell.scrollTop = loggingWell.scrollHeight    # scroll to the bottom of the well, TODO,not working
             true
         else
             false
@@ -192,8 +192,10 @@ app.controller 'BatchController', ($scope) ->
 
     # The BatchController's receiver
     $scope.receiveFunction = (data) -> $scope.$apply () ->
-        if data.datasets                                        # Only concerned with the data-set list
-            $scope.dsList = getDataSets data.datasets      # conversions necessary because of API difference (algo naming), courtesy of @Chetan
+        if data.hasOwnProperty("datasets")                   # Only concerned with the data-set list
+            if data.datasets == null
+                $scope.dsList = []
+            else $scope.dsList = getDataSets data.datasets      # conversions necessary because of API difference (algo naming), courtesy of @Chetan
         false   # The other controller needs this data
 
     receivers.push($scope.receiveFunction)     # Add this receiver to the line
@@ -234,10 +236,12 @@ app.controller 'ResultController', ($scope) ->
         return op.pretty for op in operations when op.name is opName
 
     $scope.receiveFunction = (data) -> $scope.$apply () ->
-        if data.datasets
-            $scope.results = (ds for ds in data.datasets when ds.type is "result")
+        if data.hasOwnProperty("datasets")
+            if (data.datasets == null)
+                $scope.results = []
+            else $scope.results = (ds for ds in data.datasets when ds.type is "result")
             true
-        else if data.result
+        else if data.hasOwnProperty("result")
             chartMaker.makeChart(data.result)
             true
         else false   # The other controller needs this data

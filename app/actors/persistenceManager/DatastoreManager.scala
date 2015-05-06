@@ -144,6 +144,7 @@ class DatastoreManager extends Actor {
    * @param dsName dataset to remove
    * @return unit
    */
+  // TODO: Delete Not working
   private def removeUserDataset(username: String, dsName: String) = {
     val filePath = Paths.get(s"./.datastore/meta/usersets/$username.dat")
     if (Files.exists(filePath)) {
