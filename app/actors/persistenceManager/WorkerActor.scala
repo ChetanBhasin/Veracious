@@ -161,11 +161,9 @@ class WorkerActor(mediator: ActorRef) extends Actor {
      *
      * Modified by Anish,
      * The reply should be a JobStatus message
-     *
-     * UPDATE: JobStatus should be sent to mediator, sorry
      */
     case (SubmitDsOpJob(username: String, job: DataSetOp), dsm: ActorRef) =>
-      println("Indise persWorker, got submitDsOp")
+      println("inside presWorker, got submitDsOp")
       handleDsJob(username, job, dsm) match {
       case s @ OperationStatus.OpSuccess =>
         mediator ! JobStatus(username,s)
