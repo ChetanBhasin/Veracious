@@ -69,6 +69,17 @@ app.controller 'LogController', ($scope) ->
 
     return
 
+
+operations = [
+    { name: "MnALS", pretty: "ALS mining" },
+    { name: "MnClustering", pretty: "Cluster Mining" },
+    { name: "MnFPgrowth", pretty: "FP growth algorithm" },
+    { name: "MnSVM", pretty: "State Vector Machine" },
+    { name: "DsAddDirect", pretty: "Upload data-set" },
+    { name: "DsAddFromUrl", pretty: "Upload data-set from URL" },
+    { name: "DsDelete", pretty: "Delete data-set" },
+    { name: "DsRefresh", pretty: "Refresh data-set" }]
+
 # Batch Controller
 app.controller 'BatchController', ($scope) ->
 
@@ -83,17 +94,9 @@ app.controller 'BatchController', ($scope) ->
     $scope.currentJob = newJob()
 
     # -------------- Opertations ---------------
-    $scope.operations = [
-        { name: "MnALS", pretty: "ALS mining" },
-        { name: "MnClustering", pretty: "Cluster Mining" },
-        { name: "MnFPgrowth", pretty: "FP growth algorithm" },
-        { name: "MnSVM", pretty: "State Vector Machine" },
-        { name: "DsAddDirect", pretty: "Upload data-set" },
-        { name: "DsAddFromUrl", pretty: "Upload data-set from URL" },
-        { name: "DsDelete", pretty: "Delete data-set" },
-        { name: "DsRefresh", pretty: "Refresh data-set" }]
+    $scope.operations = operations
 
-    $scope.getPretty = (opName) ->
+    $scope.getPretty = (opName) ->      # todo: Need this one in the other controller as well
         return op.pretty for op in $scope.operations when op.name is opName
 
     $scope.algorithms = $scope.operations[0...4]
@@ -164,12 +167,12 @@ app.controller 'BatchController', ($scope) ->
     # ----------- Data-set manipulation
     #$scope.dsList = []                     # Actual Ds list from server
     $scope.dsList = [
-        { name: "SampleDsForALS", algo: "MnALS", url: "http://som.sdf.com" },
-        { name: "SampleDsForFP", algo: "MnFPgrowth" },
-        { name: "SampleDsForALS", algo: "MnALS", url: ""},
-        { name: "SampleDsForClustering", algo: "MnClustering" },
-        { name: "SampleDsForSVM", algo: "MnSVM", url: "https://www.google.com" },
-        { name: "SampleDsForALS", algo: "MnALS" } ]
+        { name: "SampleDsForALS", algo: "MnALS", desc: "Short description for the set", type: "dataset", status: "available", source: "http://som.sdf.com" },
+        { name: "SampleDsForFP", desc: "Short description for the set", type: "dataset", status: "unavailable",  algo: "MnFPgrowth" },
+        { name: "SampleDsForALS", algo: "MnALS", desc: "Short description for the set", type: "dataset", status: "available",  source: ""},
+        { name: "SampleDsForClustering", desc: "Short description for the set", type: "dataset", status: "available",  algo: "MnClustering" },
+        { name: "SampleDsForSVM", desc: "Short description for the set", type: "dataset", status: "unavailable",  algo: "MnSVM", source: "https://www.google.com" },
+        { name: "SampleDsForALS", desc: "Short description for the set", type: "dataset", status: "removed",  algo: "MnALS" } ]
     optimisticDsList = []           # Names of ds that are entered from previous Job
 
     $scope.getAllDs = () -> $scope.dsList.concat(optimisticDsList)
@@ -192,18 +195,33 @@ app.controller 'BatchController', ($scope) ->
     return
 
 ## A conversion function to make up for the difference in API
+
+getOfficialName = (opname) ->
+    switch opname
+        when "clustering" then "MnClustering"
+        when "svm" then "MnSVM"
+        when "als" then "MnALS"
+        else "MnFPgrowth"
+
 convertDataSets = (dsList) ->        # convert each data-set to correct format
     for ds in dsList
-        ds.algo = switch ds.algo
-            when "clustering" then "MnClustering"
-            when "svm" then "MnSVM"
-            when "als" then "MnALS"
-            else "MnFPgrowth"
+        ds.algo = getOfficialName(ds.algo)
 # ---------------------------------
 
 
-app.controller 'ResultController', () ->
-    $scope.results = []
+app.controller 'ResultController', ($scope) ->
+    #$scope.results = []
+    $scope.results = [
+        { name: "JobAres", algo: "als", desc: "Short description for the set", type: "dataset", status: "available", source: "http://som.sdf.com" },
+        { name: "Some other res", desc: "Short description for the set", type: "dataset", status: "unavailable",  algo: "fpm" },
+        { name: "res3", algo: "als", desc: "Short description for the set", type: "dataset", status: "available",  source: ""},
+        { name: "BatchRes3", desc: "Short description for the set", type: "dataset", status: "available",  algo: "clustering" },
+        { name: "sampless", desc: "Short description for the set", type: "dataset", status: "unavailable",  algo: "svm", source: "https://www.google.com" },
+        { name: "res321", desc: "Short description for the set", type: "dataset", status: "removed",  algo: "als" } ]
+
+    $scope.getPretty = (opName) ->      # todo: Need this one in the other controller as well
+        actual = getOfficialName(opName)
+        return op.pretty for op in operations when op.name is actual
 
 # Now for setting up the websocket connection
 testReceiver = (data) ->
