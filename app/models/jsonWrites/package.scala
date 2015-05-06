@@ -23,7 +23,7 @@ package object jsonWrites {
       "name" -> dsEntry.name,
       "desc" -> dsEntry.desc,
       "type" -> dsEntry.datatype,
-      "algo" -> dsEntry.targetAlgorithm,
+      "algo" -> JsString("Mn" + dsEntry.targetAlgorithm.toString),    // Front end conventions
       "status" -> dsEntry.status,
       "source" -> dsEntry.source
     )

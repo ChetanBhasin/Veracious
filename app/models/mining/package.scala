@@ -8,7 +8,7 @@ package object mining {
   /** An enumeration of all the mlops we use **/
   object Algorithm extends Enumeration {
     type Algorithm = Value
-    val Clustering, FPgrowth, SVM, ALS = Value
+    val Clustering, FPM, SVM, ALS = Value
   }
 }
 

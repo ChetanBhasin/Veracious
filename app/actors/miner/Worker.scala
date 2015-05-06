@@ -1,7 +1,7 @@
 package actors.miner
 
 import akka.actor._
-import models.batch.job.{MnALS, MnClustering, MnFPgrowth, MnSVM}
+import models.batch.job.{MnALS, MnClustering, MnFPM, MnSVM}
 import models.messages.batchProcessing.SubmitMineJob
 import models.mining
 import models.mining.MinerResult
@@ -29,12 +29,12 @@ class Worker(mediator: ActorRef) extends Actor {
     mediator ! MinerResult(mining.Algorithm.SVM, username, name, sparkWorker.saveToTextFile, svm)
   }
 
-  private def handleFPM(username: String, name: String, fpm: MnFPgrowth) = {
+  private def handleFPM(username: String, name: String, fpm: MnFPM) = {
     val sparkWorker = fpm match {
-      case MnFPgrowth(name: String, minSupport: Double, id: String) => new VFPM(name, minSupport)
+      case MnFPM(name: String, minSupport: Double, id: String) => new VFPM(name, minSupport)
     }
 
-    mediator ! MinerResult(mining.Algorithm.FPgrowth, username, name, sparkWorker.saveToTextFile, fpm)
+    mediator ! MinerResult(mining.Algorithm.FPM, username, name, sparkWorker.saveToTextFile, fpm)
   }
 
   private def handleClustering(username: String, name: String, clustering: MnClustering) = {
@@ -59,7 +59,7 @@ class Worker(mediator: ActorRef) extends Actor {
 
     case SubmitMineJob(username: String, job: MnALS) => handleALS(username, job.id, job)
     case SubmitMineJob(username: String, job: MnSVM) => handleSVM(username, job.id, job)
-    case SubmitMineJob(username: String, job: MnFPgrowth) =>
+    case SubmitMineJob(username: String, job: MnFPM) =>
       println("Miner worker received MnFPgrowth")
       handleFPM(username, job.id, job)
     case SubmitMineJob(username: String, job: MnClustering) => handleClustering(username, job.id, job)
