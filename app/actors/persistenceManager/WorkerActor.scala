@@ -146,7 +146,13 @@ class WorkerActor(mediator: ActorRef) extends Actor {
      * Save the incoming miner result to the disk
      */
     case MinerResult(al: Algorithm.Algorithm, user: String, name: String, save: (String => Unit)) => {
+      val dsdir = Paths.get(s"./datastore/")
+      val dssdir = Paths.get(s"./datastore/datasets/")
+      val userdir = Paths.get(s"./datastore/datasets/$user")
       try {
+        if (!Files.exists(dsdir)) Files.createDirectory(dsdir)
+        if (!Files.exists((dssdir))) Files.createDirectories((dssdir))
+        if (!Files.exists(userdir)) Files.createDirectories(userdir)
         save(s"./datastore/datasets/$user/$name.dat")
         // Log here
       } catch {
