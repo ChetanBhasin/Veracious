@@ -50,7 +50,6 @@ object TestController extends Controller {
         Ok
       }
     )
-    //Ok(200)
   }
 
   def testLoginForm = Action { implicit request =>

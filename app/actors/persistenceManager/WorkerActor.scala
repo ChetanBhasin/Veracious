@@ -53,16 +53,17 @@ class WorkerActor(mediator: ActorRef) extends Actor {
    * @param dsm Actor reference to datastore manager
    * @return Option[JSON-Output]
    */
+  import models.mining.Algorithm._
   private def handleDsOutput(operation: GetDsData, dsm: ActorRef) = {
     val (uname, name) = (operation.username, operation.Ds)
     val result = Await.result(dsm ? CheckUserDataset(uname, name), 10 seconds).asInstanceOf[Option[DataSetEntry]]
     val filepath = s"./.datastore/datasets/$uname/$name"
     result match {
       case Some(x: DataSetEntry) => x.targetAlgorithm match {
-        case "als" => new RALS(filepath, name).output
-        case "clustering" => new RClustering(filepath, name).output
-        case "fpm" => new RFPM(filepath, name).output
-        case "svm" => new RSVM(filepath, name).output
+        case ALS => new RALS(filepath, name).output
+        case Clustering => new RClustering(filepath, name).output
+        case FPM => new RFPM(filepath, name).output
+        case SVM => new RSVM(filepath, name).output
         case _ => None
       }
       case None => None
@@ -100,14 +101,7 @@ class WorkerActor(mediator: ActorRef) extends Actor {
     /**
      * Add a file directly from the supplied resource
      */
-    case DsAddDirect(name, desc, target_algo, file, id) =>
-      val targetalgo = target_algo match {
-        case Algorithm.ALS => "ALS"
-        case Algorithm.Clustering => "Clustering"
-        case Algorithm.FPgrowth => "FPM"
-        case Algorithm.SVM => "SVM"
-      }
-
+    case DsAddDirect(name, desc, targetAlgo, file, id) =>
       try {
         checkPathDir("./.datastore")
         checkPathDir("./.datastore/datasets")
@@ -116,20 +110,24 @@ class WorkerActor(mediator: ActorRef) extends Actor {
         if (Files.exists(filepath)) OperationStatus.OpWarning
         else {
           file.moveTo(new File(s"./.datastore/datasets/$username/$name"))
-          dsm ! AddDatasetRecord(username, DataSetEntry(name, desc, "dataset", targetalgo, "available", ""))
+          dsm ! AddDatasetRecord(username, DataSetEntry(name, desc, "dataset", targetAlgo, "available", ""))
           OperationStatus.OpSuccess
         }
       } catch {
-        case _: Throwable => OperationStatus.OpFailure
+        case e: Throwable =>
+          println("DSM error: ")
+          println(e.getMessage)
+          OperationStatus.OpFailure
       }
 
     /**
      * Removes a dataset on a user's account
      */
     case DsDelete(name, id) =>
+      println(s"Got delete request: $username -> $name")
       val filepath = Paths.get(s"./.datastore/datasets/$username/$name")
       try {
-        if (!Files.exists(filepath)) {
+        if (Files.exists(filepath)) {                // Dumb mistake here !Files.exists(filepath)    ???
           dsm ! RemoveDatasetRecord(username, name)
           Files.delete(filepath)
           OperationStatus.OpSuccess
@@ -185,7 +183,8 @@ class WorkerActor(mediator: ActorRef) extends Actor {
     /**
      * Save the incoming miner result to the disk
      */
-    case MinerResult(al: Algorithm.Algorithm, user: String, name: String, save: (String => Unit), job) => {
+    case (MinerResult(al: Algorithm.Algorithm, user: String, name: String, save: (String => Unit), job), dsm: ActorRef) => {
+      println("PersistenceWorker received MinerResult")
       val dsdir = Paths.get(s"./.datastore/")
       val dssdir = Paths.get(s"./.datastore/datasets/")
       val userdir = Paths.get(s"./.datastore/datasets/$user")
@@ -194,11 +193,13 @@ class WorkerActor(mediator: ActorRef) extends Actor {
         if (!Files.exists((dssdir))) Files.createDirectories((dssdir))
         if (!Files.exists(userdir)) Files.createDirectories(userdir)
         save(s"./.datastore/datasets/$user/$name.dat")
+        dsm ! AddDatasetRecord(user, DataSetEntry(name, "Result of mining job: "+job.logWrite, "dataset", al, "available", ""))
         mediator ! Log(OperationStatus.OpSuccess, user, "The mine operation was a success", job)
         mediator ! JobStatus(user, OperationStatus.OpSuccess)
       } catch {
-        case _: Throwable =>
+        case e: Throwable =>
           println("Something went wrong.") //Log here
+          println(e.getMessage)
           mediator ! Log(OperationStatus.OpFailure, user, "The mine operation failed, could'nt write to disk", job)
           mediator ! JobStatus(user, OperationStatus.OpFailure)
       }

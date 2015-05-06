@@ -51,11 +51,11 @@ app.controller 'LogController', ($scope) ->
     # It needs to call $scope.$apply or else the changes to scope may not be digested
     # by the model immediately as this function will be called outside the control of angularJs
     $scope.receiveFunction = (data) -> $scope.$apply () ->
-        if data.logs or data.log                                # we only accept logs or log messages
+        if data.hasOwnProperty("logs") or data.hasOwnProperty("log")                               # we only accept logs or log messages
             if data.log
                 $scope.logs.push(data.log)
             else $scope.logs = data.logs
-            loggingWell.scrollTop = loggingWell.scrollHeight    # scroll to the bottom of the well
+            loggingWell.scrollTop = loggingWell.scrollHeight    # scroll to the bottom of the well, TODO,not working
             true
         else
             false
@@ -68,7 +68,7 @@ app.controller 'LogController', ($scope) ->
 operations = [
     { name: "MnALS", pretty: "ALS mining" },
     { name: "MnClustering", pretty: "Cluster Mining" },
-    { name: "MnFPgrowth", pretty: "FP growth algorithm" },
+    { name: "MnFPM", pretty: "FP growth algorithm" },
     { name: "MnSVM", pretty: "Support Vector Machine" },
     { name: "DsAddDirect", pretty: "Upload data-set" },
     { name: "DsAddFromUrl", pretty: "Upload data-set from URL" },
@@ -131,6 +131,7 @@ app.controller 'BatchController', ($scope) ->
 
     $scope.addToBatch = () ->       # Add the job to the batch on button click
         $scope.batch.push( finaliseJob($scope.currentJob) )
+        #alert "$scope.batch = "+JSON.stringify($scope.batch)
         $scope.currentJob = newJob()
 
     $scope.clearBatch = () ->       # clear the current batch and lets start over. on button click
@@ -183,33 +184,35 @@ app.controller 'BatchController', ($scope) ->
 
     # this is for selecting data-sets for a perticular algorithm.. the system is a little fool proof you know :D
     $scope.getValidDs = (algoName) ->
-        ds.name for ds in $scope.getAllDs() when ds.algo is algoName && ds.status == "available" # TODO: confirm
+        ds.name for ds in $scope.getAllDs() when ds.algo is algoName && ds.status == "available"
 
     getDataSets = (dsList) ->            # filters out the result types
-        ds for ds in dsList when ds.type == "dataset" && ds.status != "removed" #TODO: confirm
+        ds for ds in dsList when ds.type == "dataset" && ds.status != "removed"
 
 
     # The BatchController's receiver
     $scope.receiveFunction = (data) -> $scope.$apply () ->
-        if data.datasets                                        # Only concerned with the data-set list
-            $scope.dsList = convertDataSets getDataSets data.datasets      # conversions necessary because of API difference (algo naming), courtesy of @Chetan
+        if data.hasOwnProperty("datasets")                   # Only concerned with the data-set list
+            if data.datasets == null
+                $scope.dsList = []
+            else $scope.dsList = getDataSets data.datasets      # conversions necessary because of API difference (algo naming), courtesy of @Chetan
         false   # The other controller needs this data
 
     receivers.push($scope.receiveFunction)     # Add this receiver to the line
     return
 
-## A conversion function to make up for the difference in API
-
-getOfficialName = (opname) ->           # Official as per me you know
-    switch opname
-        when "clustering" then "MnClustering"
-        when "svm" then "MnSVM"
-        when "als" then "MnALS"
-        else "MnFPgrowth"
-
-convertDataSets = (dsList) ->        # convert each data-set to correct format
-    for ds in dsList
-        ds.algo = getOfficialName(ds.algo)
+## A conversion function to make up for the difference in API TODO, no need now
+#
+#getOfficialName = (opname) ->           # Official as per me you know
+#    switch opname
+#        when "clustering" then "MnClustering"
+#        when "svm" then "MnSVM"
+#        when "als" then "MnALS"
+#        else "MnFPgrowth"
+#
+#convertDataSets = (dsList) ->        # convert each data-set to correct format
+#    for ds in dsList
+#        ds.algo = getOfficialName(ds.algo)
 # ---------------------------------
 
 
@@ -230,14 +233,15 @@ app.controller 'ResultController', ($scope) ->
         res for res in $scope.results when res.status is "available"
 
     $scope.getPretty = (opName) ->
-        actual = getOfficialName(opName)
-        return op.pretty for op in operations when op.name is actual
+        return op.pretty for op in operations when op.name is opName
 
     $scope.receiveFunction = (data) -> $scope.$apply () ->
-        if data.datasets
-            $scope.results = (ds for ds in data.datasets when ds.type is "result")
+        if data.hasOwnProperty("datasets")
+            if (data.datasets == null)
+                $scope.results = []
+            else $scope.results = (ds for ds in data.datasets when ds.type is "result")
             true
-        else if data.result
+        else if data.hasOwnProperty("result")
             chartMaker.makeChart(data.result)
             true
         else false   # The other controller needs this data

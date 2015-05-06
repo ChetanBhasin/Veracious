@@ -38,7 +38,8 @@ class ClientManager (val mediator: ActorRef) extends AppModule {
 
   def updateClientData(username: String) =
     (mediator ? GetUserDataSets(username)).asInstanceOf[Future[JsValue]].onComplete {
-      case Success(ds) => self ! PushData(username, Json.obj("datasets" -> ds))
+      case Success(ds) =>
+        self ! PushData(username, Json.obj("datasets" -> ds))
       case Failure(ex) => moduleError("Couldn't get Data-sets: exception =>"+ex)
     }
 
@@ -64,8 +65,9 @@ class ClientManager (val mediator: ActorRef) extends AppModule {
         case Some (act) => pushData match {
           case lg: Log =>
             act ! Push(Json.obj("log" -> Json.toJson(lg)))
-            if (lg.status == OperationStatus.OpSuccess)
+            if (lg.status == OperationStatus.OpSuccess) {
               updateClientData(user)
+            }
           case ds: DataSetEntry => Push(Json.obj("data-set" -> Json.toJson(ds))) // NOT needed actually
         }
         case None => Unit   // The client is unavailable, so no push

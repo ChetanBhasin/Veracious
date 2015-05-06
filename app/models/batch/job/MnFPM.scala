@@ -3,7 +3,7 @@ package models.batch.job
 /**
  * Created by basso on 07/04/15.
  */
-case class MnFPgrowth (
+case class MnFPM (
   ds_name: String,
   min_support: Double,
   id: String = " "
