@@ -4,16 +4,14 @@
  * while automatically detecting the type of the data, what charts are to be displayed
  * and how they must be displayed to the end user.
  */
-
 /**
-* Usage guide:
-* var chartMaker = new dataDisplay(<id of the container>);
-* chartmaker.makeChart(<incoming_data>);
-*/
-
+ * Usage guide:
+ * var chartMaker = new dataDisplay(<id of the container>);
+ * chartmaker.makeChart(<incoming_data>);
+ */
 function dataDisplay(containerid) {
 
-    var me = this;  // Pointer to self
+    var me = this; // Pointer to self
     /**
      * Final function to be called to create a scatter plot
      * on the screen with the given data
