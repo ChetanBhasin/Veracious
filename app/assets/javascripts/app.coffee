@@ -1,13 +1,22 @@
 # Main javascript file for the application
 # contains the angular module and its main controller
 
+# Recievers
+# A global set of receivers is in action which takes the data from an incomming we-socket push
+# One by one, each function in this array is evaluated against the data and the bolean result is taken. If true, the sequence stops
+# so, each function may do whatever it needs with the data, and if the data happens to be exclusive for it, then it returns true else false
 receivers = []      # Set of receiving functions
 
 app = angular.module('Veracious', [])
 
 # Navigation Controller
+# There are 4 sections of the interface:
+#   Logging: Where the user logs are constantly being displayed. Its directly tied to the LogController
+#   Data: Here the user data is shown. Which icludes the source data-sets (from the BatchController) and result data-sets (from the ResultController)
+#   Batch: This section is used to create and submit batches. Tied to the BatchController
+#   Result: This section is used to submit result requests and generate charts. Tied to the ResultController
 app.controller 'NavigationController', () ->
-    this.visible = "logging"
+    this.visible = "logging"        # We start with logging
 
     this.setLogging = () -> this.visible = "logging"
     this.setData = () -> this.visible = "data"      # Will have data-sets and results
@@ -30,58 +39,63 @@ app.controller 'LogController', ($scope) ->
                  message: String
                }
     ###
-    #$scope.showCtrl = true          # Show this controller by default
-    # Parts: #loggingWell -> The area of the log
-    loggingWell = $("#loggingWell")[0];
-    $scope.logs = []
+
+    loggingWell = $("#loggingWell")[0];     # The div id of the area of log
+    $scope.logs = []                        # Actual logs data
 
     # simple match for status
     $scope.isStatus = (status, log) ->
         log.status == status
 
-    #$scope.test = () ->
-    #    $scope.logs.push status: "SUCCESS", message: "Helloooo", activity: "Yohoooo"
-    #    console.log "DEBUG: running test, this.logs: "+JSON.stringify($scope.logs)
-
-    # Okay, trying out an IDEA
-    # Let us see, If we want to separate everything into different controllers, we need a common receiver for the
-    # web-socket...
-    # Now, each controller decides to make a function for itself (like a scala partial function) that accepts its kind of
-    # data and declares true if it is or else declares false
-    # If we add such receiver functions into an array and then make a master receiver that goes through the array with
-    # the received server data and stopping till it gets a true, then it might just work right??
-
-    # UPDATE, got it to work, FINALLLY!!
+    # Now for the recieve method
+    # It needs to call $scope.$apply or else the changes to scope may not be digested
+    # by the model immediately as this function will be called outside the control of angularJs
     $scope.receiveFunction = (data) -> $scope.$apply () ->
-        if data.logs or data.log
+        if data.logs or data.log                                # we only accept logs or log messages
             if data.log
                 $scope.logs.push(data.log)
             else $scope.logs = data.logs
-            loggingWell.scrollTop = loggingWell.scrollHeight
+            loggingWell.scrollTop = loggingWell.scrollHeight    # scroll to the bottom of the well
             true
         else
             false
 
-    #$scope.toggle = (b) -> $scope.$apply () -> $scope.showCtrl = b
-
-    receivers.push($scope.receiveFunction)     # Add this receiver to the
-    #toggleFunc.logging = $scope.toggle
-
+    receivers.push($scope.receiveFunction)     # Add this receiver to the global queue
     return
 
 
+# A global set for operations
 operations = [
     { name: "MnALS", pretty: "ALS mining" },
     { name: "MnClustering", pretty: "Cluster Mining" },
     { name: "MnFPgrowth", pretty: "FP growth algorithm" },
-    { name: "MnSVM", pretty: "State Vector Machine" },
+    { name: "MnSVM", pretty: "Support Vector Machine" },
     { name: "DsAddDirect", pretty: "Upload data-set" },
     { name: "DsAddFromUrl", pretty: "Upload data-set from URL" },
     { name: "DsDelete", pretty: "Delete data-set" },
     { name: "DsRefresh", pretty: "Refresh data-set" }]
 
 # Batch Controller
+# This heavy weight is responsible for handling batch creations, submissions and data-source updates
 app.controller 'BatchController', ($scope) ->
+    # -------------- Opertations ---------------
+    $scope.operations = operations      # Op names
+
+    # Get full name for UI perposes
+    $scope.getPretty = (opName) ->      # this function needs to be present in the Result controller as well, but with a different implementation
+        return op.pretty for op in $scope.operations when op.name is opName
+
+    $scope.algorithms = $scope.operations[0...4]        # Algorithm names,official
+
+    $scope.operationTypes = [          # OpTypes
+        { name: "MineOp", pretty: "Mining Operations"},
+        { name: "DataSetOp", pretty: "Data-set Operations"}]
+
+    $scope.getGroup = (op) ->          # Finding the opType from opName
+        if not op then {}
+        else if op.substr(0,2) == "Mn"
+            $scope.operationTypes[0]
+        else $scope.operationTypes[1]
 
     # Batch Manipulation
     newJob = () ->
@@ -91,56 +105,43 @@ app.controller 'BatchController', ($scope) ->
         textParams: []
         numParams: []
 
-    $scope.currentJob = newJob()
+    $scope.currentJob = newJob()        # We manipulate the current job to get the dynamic form
 
-    # -------------- Opertations ---------------
-    $scope.operations = operations
-
-    $scope.getPretty = (opName) ->      # todo: Need this one in the other controller as well
-        return op.pretty for op in $scope.operations when op.name is opName
-
-    $scope.algorithms = $scope.operations[0...4]
-
-    $scope.operationTypes = [
-        { name: "MineOp", pretty: "Mining Operations"},
-        { name: "DataSetOp", pretty: "Data-set Operations"}]
-
-    $scope.getGroup = (op) ->
-        if not op then {}
-        else if op.substr(0,2) == "Mn"
-            $scope.operationTypes[0]
-        else $scope.operationTypes[1]
-
-    $scope.checkName = (name) ->
+    $scope.checkName = (name) ->        # for UI perposes
         $scope.currentJob.opName == name
 
     # Setup batch here -----------------------------------
-    $scope.batch = []
+    $scope.batch = []                   # basically we add currentJob to this
+
+    # We did a lot of jugad, now we formalize the job description so that the batch
+    # is automatically submission ready
     finaliseJob = (job) ->
         job.opType = $scope.getGroup(job.opName).name
-        if (job.optionalTextParam == "")
+        if (job.optionalTextParam == "")    # The optionalTextParam is marked as Option[String] at server. A missing attribute will give None
             delete job.optionalTextParam
-        if (job.opName == "DsAddDirect")
+        if (job.opName == "DsAddDirect")    # The only operation where we allow for a file upload, we need to handle that appropriately
             job.file = $("#dsFile")[0].files[0]
 
+        # Adding a data-set means that the user may require it for a subsequent job in the batch
+        # so we add the data-set name to optimisticDsList (optimistic because we have no garuntee that the ds operation will succeed)
         if (job.opName == "DsAddDirect" || job.opName == "DsAddFromUrl")
             optimisticDsList.push({name: job.textParams[0], algo: job.textParams[2]})
-        # More
         return job
 
-    $scope.addToBatch = () ->
+    $scope.addToBatch = () ->       # Add the job to the batch on button click
         $scope.batch.push( finaliseJob($scope.currentJob) )
         $scope.currentJob = newJob()
 
-    $scope.clearBatch = () ->
-        $("#batchDisplay").remove()
+    $scope.clearBatch = () ->       # clear the current batch and lets start over. on button click
+        $("#batchDisplay").remove() # this was a trial hack that failed. I think we can delete this line, todo
         $scope.batch = []
         optimisticDsList = []
 
+    # Convert the batch to a multi-part form data in compliance with the joblist mapping in models.batch.job
     createUFormData = (batch) ->
         formData = new FormData()
         for job, i in batch
-            str = "jobs[#{i}]."
+            str = "jobs[#{i}]."                         # Don't ask, got this trough trial and error
             formData.append(str+"opType", job.opType)
             formData.append(str+"opName", job.opName)
             for text in job.textParams
@@ -154,10 +155,10 @@ app.controller 'BatchController', ($scope) ->
                 formData.append(str+"optionalTextParam", job.optionalTextParam)
         return formData
 
+    # Lets make the official submission
     $scope.submitBatch = () ->
-        # call the method on window from connect
         fData = createUFormData ($scope.batch)
-        window.submitBatch fData, (status) ->
+        window.submitBatch fData, (status) ->               # from connect.js
             if status == 200 then alert "Batch submitted successfully"
             else alert "There was a problem submitting the batch, status: "+status
         $scope.clearBatch()
@@ -166,37 +167,40 @@ app.controller 'BatchController', ($scope) ->
 
     # ----------- Data-set manipulation
     #$scope.dsList = []                     # Actual Ds list from server
-    $scope.dsList = [
+    $scope.dsList = [                       # Sample dsList for testing perposes
         { name: "SampleDsForALS", algo: "MnALS", desc: "Short description for the set", type: "dataset", status: "available", source: "http://som.sdf.com" },
         { name: "SampleDsForFP", desc: "Short description for the set", type: "dataset", status: "unavailable",  algo: "MnFPgrowth" },
         { name: "SampleDsForALS", algo: "MnALS", desc: "Short description for the set", type: "dataset", status: "available",  source: ""},
         { name: "SampleDsForClustering", desc: "Short description for the set", type: "dataset", status: "available",  algo: "MnClustering" },
         { name: "SampleDsForSVM", desc: "Short description for the set", type: "dataset", status: "unavailable",  algo: "MnSVM", source: "https://www.google.com" },
         { name: "SampleDsForALS", desc: "Short description for the set", type: "dataset", status: "removed",  algo: "MnALS" } ]
+
     optimisticDsList = []           # Names of ds that are entered from previous Job
 
     $scope.getAllDs = () -> $scope.dsList.concat(optimisticDsList)
     $scope.refreshables = () ->
         ds.name for ds in $scope.dsList when ds.source != ""
 
+    # this is for selecting data-sets for a perticular algorithm.. the system is a little fool proof you know :D
     $scope.getValidDs = (algoName) ->
         ds.name for ds in $scope.getAllDs() when ds.algo is algoName && ds.status == "available" # TODO: confirm
 
     getDataSets = (dsList) ->            # filters out the result types
         ds for ds in dsList when ds.type == "dataset" && ds.status != "removed" #TODO: confirm
 
-    $scope.receiveFunction = (data) -> $scope.$apply () ->
-        if data.datasets
-            $scope.dsList = convertDataSets getDataSets data.datasets
-        false   # The other controller needs this data
 
+    # The BatchController's receiver
+    $scope.receiveFunction = (data) -> $scope.$apply () ->
+        if data.datasets                                        # Only concerned with the data-set list
+            $scope.dsList = convertDataSets getDataSets data.datasets      # conversions necessary because of API difference (algo naming), courtesy of @Chetan
+        false   # The other controller needs this data
 
     receivers.push($scope.receiveFunction)     # Add this receiver to the line
     return
 
 ## A conversion function to make up for the difference in API
 
-getOfficialName = (opname) ->
+getOfficialName = (opname) ->           # Official as per me you know
     switch opname
         when "clustering" then "MnClustering"
         when "svm" then "MnSVM"
@@ -209,6 +213,7 @@ convertDataSets = (dsList) ->        # convert each data-set to correct format
 # ---------------------------------
 
 
+# Simple controller to show results, and request visualisation
 app.controller 'ResultController', ($scope) ->
     #$scope.results = []
     $scope.results = [
@@ -222,7 +227,7 @@ app.controller 'ResultController', ($scope) ->
     $scope.getAvailResults = () ->
         res for res in $scope.results when res.status is "available"
 
-    $scope.getPretty = (opName) ->      # todo: Need this one in the other controller as well
+    $scope.getPretty = (opName) ->
         actual = getOfficialName(opName)
         return op.pretty for op in operations when op.name is actual
 
