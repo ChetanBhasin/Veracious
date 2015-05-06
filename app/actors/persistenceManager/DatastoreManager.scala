@@ -36,12 +36,13 @@ object DatastoreManager {
    * @param line line of text
    * @return
    */
+  import models.mining.Algorithm
   def makeDsEntry(line: String) = {
     line split ("::") match {
       case Array(name: String, desc: String, dtype: String, targetAlgo: String, status: String, source: String) =>
-        DataSetEntry(name, desc, dtype, targetAlgo, status, source)
+        DataSetEntry(name, desc, dtype, Algorithm.withName(targetAlgo), status, source)
       case Array(name: String, desc: String, dtype: String, targetAlgo: String, status: String) =>
-        DataSetEntry(name, desc, dtype, targetAlgo, status, "")
+        DataSetEntry(name, desc, dtype, Algorithm.withName(targetAlgo), status, "")
       case _ => throw new Error("Got something of which I have no idea.")
     }
   }
@@ -53,7 +54,7 @@ object DatastoreManager {
    * @return
    */
   def makeEntryText(incoming: DataSetEntry): String = incoming match {
-    case DataSetEntry(name, desc, dtype, targetAlgo, status, source) => s"$name::$desc::$dtype::$targetAlgo::$status::$source"
+    case DataSetEntry(name, desc, dtype, targetAlgo, status, source) => s"$name::$desc::$dtype::${targetAlgo.toString}::$status::$source"
   }
 
   // Check on weather a single value exists or not
@@ -143,6 +144,7 @@ class DatastoreManager extends Actor {
    * @param dsName dataset to remove
    * @return unit
    */
+  // TODO: Delete Not working
   private def removeUserDataset(username: String, dsName: String) = {
     val filePath = Paths.get(s"./.datastore/meta/usersets/$username.dat")
     if (Files.exists(filePath)) {
@@ -174,7 +176,7 @@ class DatastoreManager extends Actor {
       val newset = items.map { item =>
         if (item == myEntry) {
           data match {
-            case DataSetEntry(name, desc, datatype, targetAlgo, status, source) => s"$name::$datatype::$targetAlgo::$newStatus::$source"
+            case DataSetEntry(name, desc, datatype, targetAlgo, status, source) => s"$name::$datatype::${targetAlgo.toString}::$newStatus::$source"
           }
         } else item
       }

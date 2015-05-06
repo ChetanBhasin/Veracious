@@ -78,7 +78,9 @@ class Persistence(val mediator: ActorRef) extends AppModule {
     /**
      * Perform a miner result operation
      */
-    case operation: MinerResult => router.route((operation, datastoreManager), sender)
+    case operation: MinerResult =>
+      println("Persistence received MinerResult")
+      router.route((operation, datastoreManager), sender)
 
     /**
      * Remove the user entirely
