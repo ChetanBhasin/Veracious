@@ -124,9 +124,10 @@ class WorkerActor(mediator: ActorRef) extends Actor {
      * Removes a dataset on a user's account
      */
     case DsDelete(name, id) =>
+      println(s"Got delete request: $username -> $name")
       val filepath = Paths.get(s"./.datastore/datasets/$username/$name")
       try {
-        if (!Files.exists(filepath)) {
+        if (Files.exists(filepath)) {                // Dumb mistake here !Files.exists(filepath)    ???
           dsm ! RemoveDatasetRecord(username, name)
           Files.delete(filepath)
           OperationStatus.OpSuccess
