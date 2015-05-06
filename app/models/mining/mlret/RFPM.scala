@@ -2,7 +2,7 @@ package models.mining.mlret
 
 import org.apache.spark.mllib.fpm.FPGrowth.FreqItemset
 import org.apache.spark.rdd.RDD
-import play.api.libs.json.{JsNumber, JsObject, JsString}
+import play.api.libs.json._
 
 /**
  * Created by chetan on 28/04/15.
@@ -24,14 +24,15 @@ class RFPM(filepath: String, name: String) extends MOutput {
     }.sortByKey(true).map(x => (x._2, x._1)).collect.toSeq
   }
 
-  // The data output in Json format
-  def tail = JsObject(getItemSet.map(x => x._1.mkString("[", ",", "]") -> JsNumber(x._2)))
+  def tail = Json.toJson(getItemSet.map(x => JsObject(Seq(
+    "lable" -> JsString(x._1.mkString("[", ",", "]")),
+    "y" -> JsNumber(x._2)))))
 
   // Json object that would be passed to the front end visual engine
   def output = JsObject(Seq(
-  "name" -> JsString(name),
-  "algorithm" -> JsString("fpm"),
-  "data" -> tail
+    "name" -> JsString(name),
+    "algorithm" -> JsString("fpm"),
+    "data" -> tail
   ))
 
 }
