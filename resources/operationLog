@@ -7,3 +7,15 @@
 {"user":"anish","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Wed, 06 May 2015, 11:59 PM::numberOfJobs-1"}}
 {"user":"anish","log":{"status":"FAILURE","message":"Fatal error: Operation could not be completed","activity":"Job:B20J1:Add data-set file::name-basdfsdf"}}
 {"user":"anish","log":{"status":"FAILURE","message":"The job B20J1 failed","activity":"Batch:B20::Wed, 06 May 2015, 11:59 PM::numberOfJobs-1"}}
+{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Thu, 07 May 2015, 12:04 AM::numberOfJobs-1"}}
+{"user":"chetan","log":{"status":"FAILURE","message":"Fatal error: Operation could not be completed","activity":"Job:B20J1:Add data-set file::name-retail"}}
+{"user":"chetan","log":{"status":"FAILURE","message":"The job B20J1 failed","activity":"Batch:B20::Thu, 07 May 2015, 12:04 AM::numberOfJobs-1"}}
+{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Thu, 07 May 2015, 12:06 AM::numberOfJobs-1"}}
+{"user":"chetan","log":{"status":"FAILURE","message":"Fatal error: Operation could not be completed","activity":"Job:B20J1:Add data-set file::name-noname"}}
+{"user":"chetan","log":{"status":"FAILURE","message":"The job B20J1 failed","activity":"Batch:B20::Thu, 07 May 2015, 12:06 AM::numberOfJobs-1"}}
+{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Thu, 07 May 2015, 12:07 AM::numberOfJobs-1"}}
+{"user":"chetan","log":{"status":"FAILURE","message":"Fatal error: Operation could not be completed","activity":"Job:B20J1:Add data-set file::name-again"}}
+{"user":"chetan","log":{"status":"FAILURE","message":"The job B20J1 failed","activity":"Batch:B20::Thu, 07 May 2015, 12:07 AM::numberOfJobs-1"}}
+{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Thu, 07 May 2015, 12:12 AM::numberOfJobs-1"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B20J1:Add data-set file::name-thistime"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B20::Thu, 07 May 2015, 12:12 AM::numberOfJobs-0"}}
