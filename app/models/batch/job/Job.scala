@@ -89,9 +89,9 @@ object Job {
           pred_ds = optionalTextParam,
           max_iter = numParams(0),
           cluster_count = numParams(1))
-      case "MnFPgrowth" =>
+      case "MnFPM" =>
         assert(textParams.length >= 2)
-        MnFPgrowth(
+        MnFPM(
           ds_name = textParams(0),
           min_support = textParams(1).toDouble)
       case "MnSVM" =>
@@ -111,7 +111,7 @@ object Job {
     case DsRefresh(ds,_) => Some("DataSetOp", "DsRefresh", None, List(ds), List[Int]())
     case MnALS(dt, dq, r, mit,_) => Some("MineOp", "MnALS", None, List(dt, dq), List(r, mit))
     case MnClustering(ds, pr, mit, cc,_) => Some("MineOp", "MnClustering", pr, List(ds), List(mit, cc))
-    case MnFPgrowth(ds, ms,_) => Some("MineOp", "MnFPgrowth", None, List(ds, ms.toString), List[Int]())
+    case MnFPM(ds, ms,_) => Some("MineOp", "MnFPgrowth", None, List(ds, ms.toString), List[Int]())
     case MnSVM(dt,dte, mit,_) => Some("MineOp", "MnSVM", None, List(dt, dte), List(mit))
   }
 }
