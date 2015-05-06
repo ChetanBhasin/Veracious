@@ -122,6 +122,12 @@ class DatastoreManager extends Actor {
    */
   private def addUserDataset(uname: String, dataset: DataSetEntry) = {
     val filePath = Paths.get(s"./datastore/meta/usersets/$uname.dat")
+    val dsdir = Paths.get("./datastore")
+    val dmdir = Paths.get("./datastore/meta")
+    val dudir = Paths.get(s"./datastore/meta/usersets")
+    if (!Files.exists(dsdir)) Files.createDirectories(dsdir)
+    if (!Files.exists(dmdir)) Files.createDirectories(dmdir)
+    if (!Files.exists(dudir)) Files.createDirectories(dudir)
     if (!Files.exists(filePath)) Files.createFile(filePath)
     try {
       Files.write(filePath, DatastoreManager.makeEntryText(dataset).getBytes, StandardOpenOption.APPEND)
