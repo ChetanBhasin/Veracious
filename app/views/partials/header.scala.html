@@ -5,9 +5,11 @@
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navigationLinks">
         <span class="sr-only">Toggle Navigation</span>
-        <span class="icon-bar"></span>    <!-- This gives those horizontal lines on the toggle button -->
+        <span class="glyphicon glyphicon-menu-hamburger"></span>
+        <!--
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
+        <span class="icon-bar"></span> -->
       </button>
       <a class="navbar-brand" href="#">Veracious</a>
     </div>
@@ -23,6 +25,14 @@
               ng-click="nCtrl.setBatch()" >New Batch</a></li>
         <li ng-class='{"active" : nCtrl.isResult()}'><a href="#"
               ng-click="nCtrl.setResult()" >Visualise</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <a href="@routes.Auth.logout">
+            <span class="glyphicon glyphicon-log-out"></span>
+            Logout
+          </a>
+        </li>
       </ul>
     </div>
   </div>

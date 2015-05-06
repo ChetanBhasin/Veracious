@@ -44,6 +44,11 @@ object Application extends Controller with Secured {
         Ok
     }
   }
+
+  def shutDown = Action {
+    appAccess.shutdown
+    Ok
+  }
   /*
   def index = isAuthenticated { username => implicit request =>
     Ok("helloo" + username)   // Test

@@ -219,9 +219,37 @@ app.controller 'ResultController', ($scope) ->
         { name: "sampless", desc: "Short description for the set", type: "dataset", status: "unavailable",  algo: "svm", source: "https://www.google.com" },
         { name: "res321", desc: "Short description for the set", type: "dataset", status: "removed",  algo: "als" } ]
 
+    $scope.getAvailResults = () ->
+        res for res in $scope.results when res.status is "available"
+
     $scope.getPretty = (opName) ->      # todo: Need this one in the other controller as well
         actual = getOfficialName(opName)
         return op.pretty for op in operations when op.name is actual
+
+    $scope.receiveFunction = (data) -> $scope.$apply () ->
+        if data.datasets
+            $scope.results = (ds for ds in data.datasets when ds.type is "result")
+            true
+        else if data.result
+            # Call the method to create the charts      # Todo: Implement
+            true
+        else false   # The other controller needs this data
+
+    $scope.target = ""
+
+    $scope.submit = () ->
+        # call window function
+        console.log "Calling submit with #{JSON.stringify($scope.target)}"
+        #formData = new FormData()
+        #formData.append("datasetName", $scope.target)
+        formData = { datasetName: $scope.target }
+        window.submitResultRequest formData, (status) ->
+            if status == 200 then alert "Request submitted successfuly"
+            else alert "Server error on receiving request"
+        $scope.target = ""
+
+    receivers.push($scope.receiveFunction)     # Add this receiver to the line
+    return
 
 # Now for setting up the websocket connection
 testReceiver = (data) ->
