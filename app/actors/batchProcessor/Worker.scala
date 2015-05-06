@@ -59,6 +59,7 @@ class Worker (val user: String, val mediator: ActorRef)
   when (Busy) {
       /** The current job has succeded, move on */
     case Event(OpSuccess | OpWarning, Work(b)) =>
+      println("batchWorker Got an OpSuccess")
       self ! NextJob
       stay using Work(b.copy(jobs = b.jobs.tail))       // Here we update the jobs
 
@@ -74,8 +75,12 @@ class Worker (val user: String, val mediator: ActorRef)
         goto(Available) using Uninitialized
       case job :: rest =>
         job match {
-          case j: DataSetOp => mediator ! SubmitDsOpJob(user, j)
-          case j: MineOp => mediator ! SubmitMineJob(user, j)
+          case j: DataSetOp =>
+            mediator ! SubmitDsOpJob(user, j)
+            println("batchWorker: sent dsOpJob")
+          case j: MineOp =>
+            mediator ! SubmitMineJob(user, j)
+            println("batchWorker: sent MineOpJob")
           case _ => throw new Exception("Unknown job type")
         }
         stay // The current job will be the head of the list
