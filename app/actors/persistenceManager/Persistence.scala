@@ -64,12 +64,16 @@ class Persistence(val mediator: ActorRef) extends AppModule {
     /**
      * Get a user owned datasets' meta records in private message formate
      */
-    case GetUserDataSets(username: String) => datastoreManager.tell(GiveUserData(username), sender)
+    case GetUserDataSets(username: String) =>
+      log.debug("Got user data-set request")
+      datastoreManager.tell(GiveUserData(username), sender)
 
     /**
      * Submit a DsOpJob
      */
-    case operation: SubmitDsOpJob => router.route((operation, datastoreManager), sender)
+    case operation: SubmitDsOpJob =>
+      println("at persistence, got a dsOpJob submit")
+      router.route((operation, datastoreManager), sender)
 
     /**
      * Perform a miner result operation

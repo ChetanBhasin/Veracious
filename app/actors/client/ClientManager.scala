@@ -37,7 +37,7 @@ class ClientManager (val mediator: ActorRef) extends AppModule {
   implicit val timeout = Timeout(30 seconds)
 
   def updateClientData(username: String) =
-    (mediator ? GetUserDataSets(username), timeout.duration).asInstanceOf[Future[JsValue]].onComplete {
+    (mediator ? GetUserDataSets(username)).asInstanceOf[Future[JsValue]].onComplete {
       case Success(ds) => self ! PushData(username, Json.obj("datasets" -> ds))
       case Failure(ex) => moduleError("Couldn't get Data-sets: exception =>"+ex)
     }

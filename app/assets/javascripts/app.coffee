@@ -167,14 +167,14 @@ app.controller 'BatchController', ($scope) ->
     #   ----------------------------------------------------
 
     # ----------- Data-set manipulation
-    #$scope.dsList = []                     # Actual Ds list from server
-    $scope.dsList = [                       # Sample dsList for testing perposes
-        { name: "SampleDsForALS", algo: "MnALS", desc: "Short description for the set", type: "dataset", status: "available", source: "http://som.sdf.com" },
-        { name: "SampleDsForFP", desc: "Short description for the set", type: "dataset", status: "unavailable",  algo: "MnFPgrowth" },
-        { name: "SampleDsForALS", algo: "MnALS", desc: "Short description for the set", type: "dataset", status: "available",  source: ""},
-        { name: "SampleDsForClustering", desc: "Short description for the set", type: "dataset", status: "available",  algo: "MnClustering" },
-        { name: "SampleDsForSVM", desc: "Short description for the set", type: "dataset", status: "unavailable",  algo: "MnSVM", source: "https://www.google.com" },
-        { name: "SampleDsForALS", desc: "Short description for the set", type: "dataset", status: "removed",  algo: "MnALS" } ]
+    $scope.dsList = []                     # Actual Ds list from server
+    #$scope.dsList = [                       # Sample dsList for testing perposes
+    #    { name: "SampleDsForALS", algo: "MnALS", desc: "Short description for the set", type: "dataset", status: "available", source: "http://som.sdf.com" },
+    #    { name: "SampleDsForFP", desc: "Short description for the set", type: "dataset", status: "unavailable",  algo: "MnFPgrowth" },
+    #    { name: "SampleDsForALS", algo: "MnALS", desc: "Short description for the set", type: "dataset", status: "available",  source: ""},
+    #    { name: "SampleDsForClustering", desc: "Short description for the set", type: "dataset", status: "available",  algo: "MnClustering" },
+    #    { name: "SampleDsForSVM", desc: "Short description for the set", type: "dataset", status: "unavailable",  algo: "MnSVM", source: "https://www.google.com" },
+    #    { name: "SampleDsForALS", desc: "Short description for the set", type: "dataset", status: "removed",  algo: "MnALS" } ]
 
 
     $scope.getAllDs = () -> $scope.dsList.concat(optimisticDsList)
@@ -217,14 +217,14 @@ convertDataSets = (dsList) ->        # convert each data-set to correct format
 app.controller 'ResultController', ($scope) ->
 
     chartMaker = new dataDisplay("chartCanvas")
-    #$scope.results = []
-    $scope.results = [
-        { name: "JobAres", algo: "als", desc: "Short description for the set", type: "dataset", status: "available", source: "http://som.sdf.com" },
-        { name: "Some other res", desc: "Short description for the set", type: "dataset", status: "unavailable",  algo: "fpm" },
-        { name: "res3", algo: "als", desc: "Short description for the set", type: "dataset", status: "available",  source: ""},
-        { name: "BatchRes3", desc: "Short description for the set", type: "dataset", status: "available",  algo: "clustering" },
-        { name: "sampless", desc: "Short description for the set", type: "dataset", status: "unavailable",  algo: "svm", source: "https://www.google.com" },
-        { name: "res321", desc: "Short description for the set", type: "dataset", status: "removed",  algo: "als" } ]
+    $scope.results = []
+    #$scope.results = [
+    #    { name: "JobAres", algo: "als", desc: "Short description for the set", type: "dataset", status: "available", source: "http://som.sdf.com" },
+    #    { name: "Some other res", desc: "Short description for the set", type: "dataset", status: "unavailable",  algo: "fpm" },
+    #    { name: "res3", algo: "als", desc: "Short description for the set", type: "dataset", status: "available",  source: ""},
+    #    { name: "BatchRes3", desc: "Short description for the set", type: "dataset", status: "available",  algo: "clustering" },
+    #    { name: "sampless", desc: "Short description for the set", type: "dataset", status: "unavailable",  algo: "svm", source: "https://www.google.com" },
+    #    { name: "res321", desc: "Short description for the set", type: "dataset", status: "removed",  algo: "als" } ]
 
     $scope.getAvailResults = () ->
         res for res in $scope.results when res.status is "available"
