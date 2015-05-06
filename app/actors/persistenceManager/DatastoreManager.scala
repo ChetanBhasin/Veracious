@@ -75,28 +75,29 @@ object DatastoreManager {
 
 import models.jsonWrites._
 import play.api.libs.json._
+
 /**
  * Class meant to br produced as a typed actor
  */
 class DatastoreManager extends Actor {
 
   /**
-   * Modified by Anish
-   * Get a JsArray of All the data-sets belonging to the user
-   *
+   * Get JSValue
+   * @param uname Username
+   * @return JsValue
    */
   private def getUserDatasets(uname: String): JsValue = try {
-    val stream = Source.fromFile(s"./.datastore/meta/usersets/$uname.dat")
-    if (stream isEmpty) JsNull
-    else {
-      val vals = stream.getLines.map {
-        line => DatastoreManager.makeDsEntry(line)
-      }
-      stream.close()
-      Json.toJson(vals.toSeq)   // Should work automagically with the JsonWrites available for DataSetEntry
+    val path = s"./.datastore/meta/usersets/$uname.dat"
+    val stream = Source.fromFile(path)
+    val vals = stream.getLines.map {
+      line => DatastoreManager.makeDsEntry(line)
     }
+    stream.close()
+    val output = Json.toJson(vals.toSeq)
+    println(output)
+    output
   } catch {
-    case ex: Throwable => JsNull
+    case _: Throwable => JsNull
   }
 
   /**
