@@ -130,7 +130,7 @@ class DatastoreManager extends Actor {
     if (!Files.exists(dudir)) Files.createDirectories(dudir)
     if (!Files.exists(filePath)) Files.createFile(filePath)
     try {
-      Files.write(filePath, DatastoreManager.makeEntryText(dataset).getBytes, StandardOpenOption.APPEND)
+      Files.write(filePath, (DatastoreManager.makeEntryText(dataset) + "\n").getBytes, StandardOpenOption.APPEND)
     } catch {
       case _: Throwable => println("This line is never executed")
     }
