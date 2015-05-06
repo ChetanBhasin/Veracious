@@ -97,6 +97,13 @@ class WorkerActor(mediator: ActorRef) extends Actor {
      * Add a file directly from the supplied resource
      */
     case DsAddDirect(name, desc, target_algo, file, id) =>
+      val targetalgo = target_algo match {
+        case Algorithm.ALS => "ALS"
+        case Algorithm.Clustering => "Clustering"
+        case Algorithm.FPgrowth => "FPM"
+        case Algorithm.SVM => "SVM"
+      }
+
       try {
         checkPathDir("/.datastore")
         checkPathDir("./datastore/datasets")
@@ -105,6 +112,7 @@ class WorkerActor(mediator: ActorRef) extends Actor {
         if (Files.exists(filepath)) OperationStatus.OpWarning
         else {
           file.moveTo(new File(s"./datastore/datasets/$username/$name"))
+          dsm ! AddDatasetRecord(username, DataSetEntry(name, desc, "dataset", targetalgo, "available", ""))
           OperationStatus.OpSuccess
         }
       } catch {
