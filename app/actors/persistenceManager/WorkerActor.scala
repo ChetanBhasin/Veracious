@@ -28,6 +28,26 @@ class WorkerActor(mediator: ActorRef) extends Actor {
   private implicit val timeout = Timeout(10 seconds)
 
   /**
+   * Checks if a particular file path exists
+   * @param incoming path value as string
+   * @return unit
+   */
+  private def checkPathFile(incoming: String) = {
+    val path = Paths.get(incoming)
+    if (!Files.exists(path)) Files.createFile(path)
+  }
+
+  /**
+   * Checkes if a particular directory path exists
+   * @param incoming path value as string
+   * @return unit
+   */
+  private def checkPathDir(incoming: String) = {
+    val path = Paths.get(incoming)
+    if (!Files.exists(path)) Files.createDirectories(path)
+  }
+
+  /**
    * Handles output operations of the mining results
    * @param operation Details of user and dataset wrapped in GetDsData case object Details of user and dataset wrapped in GetDsData case object Details of user and dataset wrapped in GetDsData case object Details of user and dataset wrapped in GetDsData case object
    * @param dsm Actor reference to datastore manager
@@ -63,6 +83,9 @@ class WorkerActor(mediator: ActorRef) extends Actor {
      */
     case DsAddFromUrl(name, desc, target_algo, url, id) =>
       try {
+        checkPathDir("./datastore")
+        checkPathDir("./datastore/datasets")
+        checkPathDir(s"./datastore/datasets/$username")
         val downloader = new URL(url) #> new File(s"./datasets/$username/$name")
         downloader.run()
         OperationStatus.OpSuccess
@@ -75,6 +98,9 @@ class WorkerActor(mediator: ActorRef) extends Actor {
      */
     case DsAddDirect(name, desc, target_algo, file, id) =>
       try {
+        checkPathDir("/.datastore")
+        checkPathDir("./datastore/datasets")
+        checkPathDir(s"./datastore/datasets/$username")
         val filepath = Paths.get(s"./datastore/datsets/$username/$name")
         if (Files.exists(filepath)) OperationStatus.OpWarning
         else {
@@ -129,16 +155,16 @@ class WorkerActor(mediator: ActorRef) extends Actor {
      * The reply should be a JobStatus message
      */
     case (dsm: ActorRef, SubmitDsOpJob(username: String, job: DataSetOp)) => handleDsJob(username, job, dsm) match {
-      case s@OperationStatus.OpSuccess =>
-        sender ! JobStatus(username, s)
+      case s @ OperationStatus.OpSuccess =>
+        sender ! JobStatus(username,s)
         mediator ! Log(s, username, "Dataset stored on disk successfully.", job)
 
-      case s@OperationStatus.OpWarning =>
-        sender ! JobStatus(username, s)
+      case s @ OperationStatus.OpWarning =>
+        sender ! JobStatus(username,s)
         mediator ! Log(s, username, "Warning: No fatal error, but operation could not be completed.", job)
 
-      case s@OperationStatus.OpFailure =>
-        sender ! JobStatus(username, s)
+      case s @ OperationStatus.OpFailure =>
+        sender ! JobStatus(username,s)
         mediator ! Log(s, username, "Fatal error: Operation could not be completed", job)
     }
 
