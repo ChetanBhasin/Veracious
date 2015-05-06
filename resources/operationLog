@@ -1,9 +1,9 @@
 {"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Wed, 06 May 2015, 10:45 PM::numberOfJobs-1"}}
-{"user":"anish","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Wed, 06 May 2015, 11:06 PM::numberOfJobs-2"}}
-{"user":"anish","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Wed, 06 May 2015, 11:13 PM::numberOfJobs-1"}}
-{"user":"anish","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Wed, 06 May 2015, 11:26 PM::numberOfJobs-1"}}
-{"user":"anish","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Wed, 06 May 2015, 11:29 PM::numberOfJobs-1"}}
-{"user":"anish","log":{"status":"FAILURE","message":"Fatal error: Operation could not be completed","activity":"Job:B20J1:Add data-set file::name-FPMtrial"}}
-{"user":"anish","log":{"status":"FAILURE","message":"The job B20J1 failed","activity":"Batch:B20::Wed, 06 May 2015, 11:29 PM::numberOfJobs-1"}}
-{"user":"anish","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Wed, 06 May 2015, 11:30 PM::numberOfJobs-1"}}
-{"user":"anish","log":{"status":"FAILURE","message":"Fatal error: Operation could not be completed","activity":"Job:B20J1:Add data-set file::name-FPMtrial"}}
+{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Wed, 06 May 2015, 11:04 PM::numberOfJobs-0"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B20::Wed, 06 May 2015, 11:04 PM::numberOfJobs-0"}}
+{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B21::Wed, 06 May 2015, 11:04 PM::numberOfJobs-1"}}
+{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Wed, 06 May 2015, 11:21 PM::numberOfJobs-2"}}
+{"user":"anish","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Wed, 06 May 2015, 11:56 PM::numberOfJobs-1"}}
+{"user":"anish","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Wed, 06 May 2015, 11:59 PM::numberOfJobs-1"}}
+{"user":"anish","log":{"status":"FAILURE","message":"Fatal error: Operation could not be completed","activity":"Job:B20J1:Add data-set file::name-basdfsdf"}}
+{"user":"anish","log":{"status":"FAILURE","message":"The job B20J1 failed","activity":"Batch:B20::Wed, 06 May 2015, 11:59 PM::numberOfJobs-1"}}
