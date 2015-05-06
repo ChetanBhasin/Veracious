@@ -75,28 +75,29 @@ object DatastoreManager {
 
 import models.jsonWrites._
 import play.api.libs.json._
+
 /**
  * Class meant to br produced as a typed actor
  */
 class DatastoreManager extends Actor {
 
   /**
-   * Modified by Anish
-   * Get a JsArray of All the data-sets belonging to the user
-   *
+   * Get JSValue
+   * @param uname Username
+   * @return JsValue
    */
   private def getUserDatasets(uname: String): JsValue = try {
-    val stream = Source.fromFile(s"./datastore/meta/usersets/$uname.dat")
-    if (stream isEmpty) JsNull
-    else {
-      val vals = stream.getLines.map {
-        line => DatastoreManager.makeDsEntry(line)
-      }
-      stream.close()
-      Json.toJson(vals.toSeq)   // Should work automagically with the JsonWrites available for DataSetEntry
+    val path = s"./.datastore/meta/usersets/$uname.dat"
+    val stream = Source.fromFile(path)
+    val vals = stream.getLines.map {
+      line => DatastoreManager.makeDsEntry(line)
     }
+    stream.close()
+    val output = Json.toJson(vals.toSeq)
+    println(output)
+    output
   } catch {
-    case ex: Throwable => JsNull
+    case _: Throwable => JsNull
   }
 
   /**
@@ -105,7 +106,7 @@ class DatastoreManager extends Actor {
    * @return
    */
   private def getRawUserDatasets(uname: String): Iterator[DataSetEntry] = try {
-    val stream = Source.fromFile(s"./datastore/meta/usersets/$uname.dat")
+    val stream = Source.fromFile(s"./.datastore/meta/usersets/$uname.dat")
     val vals: Iterator[DataSetEntry] = stream.getLines().map(DatastoreManager.makeDsEntry(_))
     stream.close()
     vals
@@ -121,16 +122,16 @@ class DatastoreManager extends Actor {
    * @return unit
    */
   private def addUserDataset(uname: String, dataset: DataSetEntry) = {
-    val filePath = Paths.get(s"./datastore/meta/usersets/$uname.dat")
-    val dsdir = Paths.get("./datastore")
-    val dmdir = Paths.get("./datastore/meta")
-    val dudir = Paths.get(s"./datastore/meta/usersets")
+    val filePath = Paths.get(s"./.datastore/meta/usersets/$uname.dat")
+    val dsdir = Paths.get("./.datastore")
+    val dmdir = Paths.get("./.datastore/meta")
+    val dudir = Paths.get(s"./.datastore/meta/usersets")
     if (!Files.exists(dsdir)) Files.createDirectories(dsdir)
     if (!Files.exists(dmdir)) Files.createDirectories(dmdir)
     if (!Files.exists(dudir)) Files.createDirectories(dudir)
     if (!Files.exists(filePath)) Files.createFile(filePath)
     try {
-      Files.write(filePath, DatastoreManager.makeEntryText(dataset).getBytes, StandardOpenOption.APPEND)
+      Files.write(filePath, (DatastoreManager.makeEntryText(dataset) + "\n").getBytes, StandardOpenOption.APPEND)
     } catch {
       case _: Throwable => println("This line is never executed")
     }
@@ -144,9 +145,9 @@ class DatastoreManager extends Actor {
    * @return unit
    */
   private def removeUserDataset(username: String, dsName: String) = {
-    val filePath = Paths.get(s"./datastore/meta/usersets/$username.dat")
+    val filePath = Paths.get(s"./.datastore/meta/usersets/$username.dat")
     if (Files.exists(filePath)) {
-      val stream = Source.fromFile(s"./datastore/meta/usersets/$username.dat")
+      val stream = Source.fromFile(s"./.datastore/meta/usersets/$username.dat")
       val items = for (lines <- stream.getLines()) yield lines
       stream.close()
       items.filter(_ contains dsName)
@@ -165,9 +166,9 @@ class DatastoreManager extends Actor {
    * @return unit
    */
   private def modifyStatus(username: String, data: DataSetEntry, newStatus: String) = {
-    val filePath = Paths.get(s"./datastore/meta/usersets/$username.dat")
+    val filePath = Paths.get(s"./.datastore/meta/usersets/$username.dat")
     if (Files.exists(filePath)) {
-      val stream = Source.fromFile(s"./datastore/meta/usersets/$username.dat")
+      val stream = Source.fromFile(s"./.datastore/meta/usersets/$username.dat")
       val items = for (lines <- stream.getLines()) yield lines
       stream.close()
       val myEntry = DatastoreManager.makeEntryText(data)
@@ -187,7 +188,7 @@ class DatastoreManager extends Actor {
    * @param name name of the user
    */
   private def removeUserEntirely(name: String): Unit = {
-    val filepath = Paths.get(s"./datastore/meta/usersets/$name")
+    val filepath = Paths.get(s"./.datastore/meta/usersets/$name")
     if (Files.exists(filepath)) Files.delete(filepath)
   }
 
@@ -198,7 +199,7 @@ class DatastoreManager extends Actor {
    * @return Option[DatasetEntry]
    */
   private def checkUserDataset(username: String, ds: String) = {
-    val stream = Source.fromFile(s"./datastore/meta/usersets/$username.dat")
+    val stream = Source.fromFile(s"./.datastore/meta/usersets/$username.dat")
     val vals = stream.getLines().find(_ == ds)
     stream.close()
     vals match {
