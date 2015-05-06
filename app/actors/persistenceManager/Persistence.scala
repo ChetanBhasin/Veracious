@@ -64,9 +64,7 @@ class Persistence(val mediator: ActorRef) extends AppModule {
     /**
      * Get a user owned datasets' meta records in private message formate
      */
-    case GetUserDataSets(username: String) =>
-      log.debug("Got request for user datasets, sender: " + sender)
-      datastoreManager ! (GiveUserData(username), sender)
+    case GetUserDataSets(username: String) => datastoreManager.tell(GiveUserData(username), sender)
 
     /**
      * Submit a DsOpJob
