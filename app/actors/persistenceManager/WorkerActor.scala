@@ -188,7 +188,7 @@ class WorkerActor(mediator: ActorRef) extends Actor {
     /**
      * Save the incoming miner result to the disk
      */
-    case MinerResult(al: Algorithm.Algorithm, user: String, name: String, save: (String => Unit), job) => {
+    case (MinerResult(al: Algorithm.Algorithm, user: String, name: String, save: (String => Unit), job), dsm: ActorRef) => {
       println("PersistenceWorker received MinerResult")
       val dsdir = Paths.get(s"./.datastore/")
       val dssdir = Paths.get(s"./.datastore/datasets/")
