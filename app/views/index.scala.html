@@ -1,8 +1,9 @@
 @()
 
 @core("Index"){
-  <!--<script type="text/javascript" src='@routes.Application.connectJs()'></script> -->
-  <script type="text/javascript" src='@routes.TestController.connectJs()'></script>
+  <script type="text/javascript" src='@routes.Application.connectJs()'></script>
+  <!--<script type="text/javascript" src='@routes.TestController.connectJs()'></script>-->
+  <script type="text/javascript" src='@routes.Assets.at("javascripts/datadisplay.js")'></script>
   <script type="text/javascript" src='@routes.Assets.at("javascripts/app.js")'></script> }{
 
   <div class="main-app" ng-app="Veracious" ng-controller="NavigationController as nCtrl">

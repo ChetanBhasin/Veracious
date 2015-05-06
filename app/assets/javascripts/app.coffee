@@ -215,6 +215,8 @@ convertDataSets = (dsList) ->        # convert each data-set to correct format
 
 # Simple controller to show results, and request visualisation
 app.controller 'ResultController', ($scope) ->
+
+    chartMaker = new dataDisplay("chartCanvas")
     #$scope.results = []
     $scope.results = [
         { name: "JobAres", algo: "als", desc: "Short description for the set", type: "dataset", status: "available", source: "http://som.sdf.com" },
@@ -236,7 +238,7 @@ app.controller 'ResultController', ($scope) ->
             $scope.results = (ds for ds in data.datasets when ds.type is "result")
             true
         else if data.result
-            # Call the method to create the charts      # Todo: Implement
+            chartMaker.makeChart(data.result)
             true
         else false   # The other controller needs this data
 
