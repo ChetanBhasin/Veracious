@@ -40,6 +40,8 @@ object DatastoreManager {
     line split ("::") match {
       case Array(name: String, desc: String, dtype: String, targetAlgo: String, status: String, source: String) =>
         DataSetEntry(name, desc, dtype, targetAlgo, status, source)
+      case Array(name: String, desc: String, dtype: String, targetAlgo: String, status: String) =>
+        DataSetEntry(name, desc, dtype, targetAlgo, status, "")
       case _ => throw new Error("Got something of which I have no idea.")
     }
   }
@@ -88,11 +90,8 @@ class DatastoreManager extends Actor {
    */
   private def getUserDatasets(uname: String): JsValue = try {
     val path = s"./.datastore/meta/usersets/$uname.dat"
-    val stream = Source.fromFile(path)
-    val vals = stream.getLines.map {
-      line => DatastoreManager.makeDsEntry(line)
-    }
-    stream.close()
+    val stream = Source.fromFile(path).getLines.toList
+    val vals = stream.map(line => DatastoreManager.makeDsEntry(line))
     val output = Json.toJson(vals.toSeq)
     println(output)
     output
