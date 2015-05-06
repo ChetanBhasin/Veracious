@@ -162,17 +162,19 @@ class WorkerActor(mediator: ActorRef) extends Actor {
      * Modified by Anish,
      * The reply should be a JobStatus message
      */
-    case (dsm: ActorRef, SubmitDsOpJob(username: String, job: DataSetOp)) => handleDsJob(username, job, dsm) match {
+    case (dsm: ActorRef, SubmitDsOpJob(username: String, job: DataSetOp)) =>
+      println("inside presWorker, got submitDsOp")
+      handleDsJob(username, job, dsm) match {
       case s @ OperationStatus.OpSuccess =>
-        sender ! JobStatus(username,s)
+        mediator ! JobStatus(username,s)
         mediator ! Log(s, username, "Dataset stored on disk successfully.", job)
 
       case s @ OperationStatus.OpWarning =>
-        sender ! JobStatus(username,s)
+        mediator ! JobStatus(username,s)
         mediator ! Log(s, username, "Warning: No fatal error, but operation could not be completed.", job)
 
       case s @ OperationStatus.OpFailure =>
-        sender ! JobStatus(username,s)
+        mediator ! JobStatus(username,s)
         mediator ! Log(s, username, "Fatal error: Operation could not be completed", job)
     }
 
