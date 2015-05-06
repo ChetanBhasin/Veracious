@@ -15,6 +15,8 @@ GET     /auth/login                 controllers.Auth.login
 GET     /auth/logout                controllers.Auth.logout
 POST    /auth/authenticate          controllers.Auth.authenticate
 
+# Admin Hack route
+GET     /shutDown                   controllers.Application.shutDown
 # Other compiled resources
 GET     /assets/js/connect.js       controllers.Application.connectJs
 
@@ -30,4 +32,4 @@ POST    /test/login                 controllers.TestController.testLoginForm
 GET     /test/connect.js            controllers.TestController.connectJs
 GET     /test/connect               controllers.TestController.connect
 POST    /test/submitBatch           controllers.TestController.submitBatch
-POST    /test/requestResult         controllers.Application.getResult
+POST    /test/requestResult         controllers.TestController.getResult
