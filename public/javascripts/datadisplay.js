@@ -69,10 +69,10 @@ function dataDisplay(containerid) {
                 // Enable the animatino
                 animationEnabled: true,
 
-                data: [
+                data: {
                     type: "cloumn",
                     dataPoints: contents
-                ]
+                }
             })
         }
     }
