@@ -5,13 +5,13 @@ package actors.application
  */
 
 import actors.mediator.Unregister
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{Actor, ActorLogging, ActorRef}
 import models.messages.application.{Ready, SysError}
 
 /**
  * This is the template for the major sub-systems of the application
  */
-abstract class AppModule extends Actor {
+abstract class AppModule extends Actor with ActorLogging {
 
   val mediator: ActorRef
   override def preStart() {

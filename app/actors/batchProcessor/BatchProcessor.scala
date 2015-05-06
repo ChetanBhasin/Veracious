@@ -54,6 +54,7 @@ class BatchProcessor (val mediator: ActorRef) extends AppModule {
         else {
           workerTable.put(user, wr.copy(workerFree = false))
           act ! batch
+          log.debug("Got a batch Submit and assigned it a worker")
         }
 
       case None =>

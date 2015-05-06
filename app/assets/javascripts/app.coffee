@@ -112,6 +112,7 @@ app.controller 'BatchController', ($scope) ->
 
     # Setup batch here -----------------------------------
     $scope.batch = []                   # basically we add currentJob to this
+    optimisticDsList = []           # Names of ds that are entered from previous Job
 
     # We did a lot of jugad, now we formalize the job description so that the batch
     # is automatically submission ready
@@ -125,7 +126,7 @@ app.controller 'BatchController', ($scope) ->
         # Adding a data-set means that the user may require it for a subsequent job in the batch
         # so we add the data-set name to optimisticDsList (optimistic because we have no garuntee that the ds operation will succeed)
         if (job.opName == "DsAddDirect" || job.opName == "DsAddFromUrl")
-            optimisticDsList.push({name: job.textParams[0], algo: job.textParams[2]})
+            optimisticDsList.push({name: job.textParams[0], algo: job.textParams[2], status: "available" })
         return job
 
     $scope.addToBatch = () ->       # Add the job to the batch on button click
@@ -175,7 +176,6 @@ app.controller 'BatchController', ($scope) ->
         { name: "SampleDsForSVM", desc: "Short description for the set", type: "dataset", status: "unavailable",  algo: "MnSVM", source: "https://www.google.com" },
         { name: "SampleDsForALS", desc: "Short description for the set", type: "dataset", status: "removed",  algo: "MnALS" } ]
 
-    optimisticDsList = []           # Names of ds that are entered from previous Job
 
     $scope.getAllDs = () -> $scope.dsList.concat(optimisticDsList)
     $scope.refreshables = () ->
