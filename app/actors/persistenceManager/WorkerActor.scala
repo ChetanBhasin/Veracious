@@ -56,7 +56,7 @@ class WorkerActor(mediator: ActorRef) extends Actor {
   private def handleDsOutput(operation: GetDsData, dsm: ActorRef) = {
     val (uname, name) = (operation.username, operation.Ds)
     val result = Await.result(dsm ? CheckUserDataset(uname, name), 10 seconds).asInstanceOf[Option[DataSetEntry]]
-    val filepath = s"./datastore/datasets/$uname/$name"
+    val filepath = s"./.datastore/datasets/$uname/$name"
     result match {
       case Some(x: DataSetEntry) => x.targetAlgorithm match {
         case "als" => new RALS(filepath, name).output
@@ -83,14 +83,18 @@ class WorkerActor(mediator: ActorRef) extends Actor {
      */
     case DsAddFromUrl(name, desc, target_algo, url, id) =>
       try {
-        checkPathDir("./datastore")
-        checkPathDir("./datastore/datasets")
-        checkPathDir(s"./datastore/datasets/$username")
+        checkPathDir("./.datastore")
+        checkPathDir("./.datastore/datasets")
+        checkPathDir(s"./.datastore/datasets/$username")
         val downloader = new URL(url) #> new File(s"./datasets/$username/$name")
         downloader.run()
         OperationStatus.OpSuccess
       } catch {
-        case _: Throwable => OperationStatus.OpFailure
+        case e: Throwable => {
+          println("Some error" + e.getMessage)
+          throw e
+          OperationStatus.OpFailure
+        }
       }
 
     /**
@@ -105,13 +109,13 @@ class WorkerActor(mediator: ActorRef) extends Actor {
       }
 
       try {
-        checkPathDir("/.datastore")
-        checkPathDir("./datastore/datasets")
-        checkPathDir(s"./datastore/datasets/$username")
-        val filepath = Paths.get(s"./datastore/datsets/$username/$name")
+        checkPathDir("./.datastore")
+        checkPathDir("./.datastore/datasets")
+        checkPathDir(s"./.datastore/datasets/$username")
+        val filepath = Paths.get(s"./.datastore/datsets/$username/$name")
         if (Files.exists(filepath)) OperationStatus.OpWarning
         else {
-          file.moveTo(new File(s"./datastore/datasets/$username/$name"))
+          file.moveTo(new File(s"./.datastore/datasets/$username/$name"))
           dsm ! AddDatasetRecord(username, DataSetEntry(name, desc, "dataset", targetalgo, "available", ""))
           OperationStatus.OpSuccess
         }
@@ -123,7 +127,7 @@ class WorkerActor(mediator: ActorRef) extends Actor {
      * Removes a dataset on a user's account
      */
     case DsDelete(name, id) =>
-      val filepath = Paths.get(s"./datastore/datasets/$username/$name")
+      val filepath = Paths.get(s"./.datastore/datasets/$username/$name")
       try {
         if (!Files.exists(filepath)) {
           dsm ! RemoveDatasetRecord(username, name)
@@ -144,7 +148,7 @@ class WorkerActor(mediator: ActorRef) extends Actor {
             case DataSetEntry(_, _, _, _, _, url: String) => url
           }
         }
-        val downloader = new URL(url) #> new File(s"./datastore/datasetes/$username/$name")
+        val downloader = new URL(url) #> new File(s"./.datastore/datasetes/$username/$name")
         downloader.run()
         OperationStatus.OpSuccess
       } catch {
@@ -182,14 +186,14 @@ class WorkerActor(mediator: ActorRef) extends Actor {
      * Save the incoming miner result to the disk
      */
     case MinerResult(al: Algorithm.Algorithm, user: String, name: String, save: (String => Unit), job) => {
-      val dsdir = Paths.get(s"./datastore/")
-      val dssdir = Paths.get(s"./datastore/datasets/")
-      val userdir = Paths.get(s"./datastore/datasets/$user")
+      val dsdir = Paths.get(s"./.datastore/")
+      val dssdir = Paths.get(s"./.datastore/datasets/")
+      val userdir = Paths.get(s"./.datastore/datasets/$user")
       try {
         if (!Files.exists(dsdir)) Files.createDirectory(dsdir)
         if (!Files.exists((dssdir))) Files.createDirectories((dssdir))
         if (!Files.exists(userdir)) Files.createDirectories(userdir)
-        save(s"./datastore/datasets/$user/$name.dat")
+        save(s"./.datastore/datasets/$user/$name.dat")
         mediator ! Log(OperationStatus.OpSuccess, user, "The mine operation was a success", job)
         mediator ! JobStatus(user, OperationStatus.OpSuccess)
       } catch {
