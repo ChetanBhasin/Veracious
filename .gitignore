@@ -36,4 +36,5 @@ target/
 .classpath
 .project
 .settings
+.datastore/*
 .datastore/
