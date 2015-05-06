@@ -131,6 +131,7 @@ app.controller 'BatchController', ($scope) ->
 
     $scope.addToBatch = () ->       # Add the job to the batch on button click
         $scope.batch.push( finaliseJob($scope.currentJob) )
+        alert "$scope.batch = "+JSON.stringify($scope.batch)
         $scope.currentJob = newJob()
 
     $scope.clearBatch = () ->       # clear the current batch and lets start over. on button click

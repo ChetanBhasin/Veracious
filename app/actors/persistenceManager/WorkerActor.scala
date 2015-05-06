@@ -105,7 +105,7 @@ class WorkerActor(mediator: ActorRef) extends Actor {
       }
 
       try {
-        checkPathDir("/.datastore")
+        checkPathDir("./datastore")
         checkPathDir("./datastore/datasets")
         checkPathDir(s"./datastore/datasets/$username")
         val filepath = Paths.get(s"./datastore/datsets/$username/$name")
@@ -116,7 +116,10 @@ class WorkerActor(mediator: ActorRef) extends Actor {
           OperationStatus.OpSuccess
         }
       } catch {
-        case _: Throwable => OperationStatus.OpFailure
+        case e: Throwable =>
+          println("DSM error: ")
+          println(e.getMessage)
+          OperationStatus.OpFailure
       }
 
     /**
@@ -181,7 +184,8 @@ class WorkerActor(mediator: ActorRef) extends Actor {
     /**
      * Save the incoming miner result to the disk
      */
-    case MinerResult(al: Algorithm.Algorithm, user: String, name: String, save: (String => Unit), job) => {
+    case (MinerResult(al: Algorithm.Algorithm, user: String, name: String, save: (String => Unit), job), dsm: ActorRef) => {
+      println("PersistenceWorker received MinerResult")
       val dsdir = Paths.get(s"./datastore/")
       val dssdir = Paths.get(s"./datastore/datasets/")
       val userdir = Paths.get(s"./datastore/datasets/$user")
@@ -190,6 +194,7 @@ class WorkerActor(mediator: ActorRef) extends Actor {
         if (!Files.exists((dssdir))) Files.createDirectories((dssdir))
         if (!Files.exists(userdir)) Files.createDirectories(userdir)
         save(s"./datastore/datasets/$user/$name.dat")
+        dsm ! AddDatasetRecord(user, DataSetEntry(name, "Result of mining job: "+job.logWrite, "dataset", al.toString.toLowerCase(), "available", "")) // TODO
         mediator ! Log(OperationStatus.OpSuccess, user, "The mine operation was a success", job)
         mediator ! JobStatus(user, OperationStatus.OpSuccess)
       } catch {

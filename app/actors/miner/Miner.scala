@@ -22,7 +22,7 @@ class Miner(val mediator: ActorRef) extends AppModule {
 
   def receive = {
     case work: SubmitMineJob =>
-      log.debug("Got a mine job: "+work.job)
+      println("Got a mine job: "+work.job)
       router.route(work, sender)
   }
 

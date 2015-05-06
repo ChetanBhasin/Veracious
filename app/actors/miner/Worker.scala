@@ -59,7 +59,9 @@ class Worker(mediator: ActorRef) extends Actor {
 
     case SubmitMineJob(username: String, job: MnALS) => handleALS(username, job.id, job)
     case SubmitMineJob(username: String, job: MnSVM) => handleSVM(username, job.id, job)
-    case SubmitMineJob(username: String, job: MnFPgrowth) => handleFPM(username, job.id, job)
+    case SubmitMineJob(username: String, job: MnFPgrowth) =>
+      println("Miner worker received MnFPgrowth")
+      handleFPM(username, job.id, job)
     case SubmitMineJob(username: String, job: MnClustering) => handleClustering(username, job.id, job)
   }
 

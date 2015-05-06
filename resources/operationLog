@@ -7,3 +7,22 @@
 {"user":"anish","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Wed, 06 May 2015, 11:59 PM::numberOfJobs-1"}}
 {"user":"anish","log":{"status":"FAILURE","message":"Fatal error: Operation could not be completed","activity":"Job:B20J1:Add data-set file::name-basdfsdf"}}
 {"user":"anish","log":{"status":"FAILURE","message":"The job B20J1 failed","activity":"Batch:B20::Wed, 06 May 2015, 11:59 PM::numberOfJobs-1"}}
+{"user":"anish","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Thu, 07 May 2015, 12:07 AM::numberOfJobs-1"}}
+{"user":"anish","log":{"status":"FAILURE","message":"Fatal error: Operation could not be completed","activity":"Job:B20J1:Add data-set file::name-FPMtrial"}}
+{"user":"anish","log":{"status":"FAILURE","message":"The job B20J1 failed","activity":"Batch:B20::Thu, 07 May 2015, 12:07 AM::numberOfJobs-1"}}
+{"user":"anish","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Thu, 07 May 2015, 12:10 AM::numberOfJobs-1"}}
+{"user":"anish","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B20J1:Add data-set file::name-FPMtrial"}}
+{"user":"anish","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B20::Thu, 07 May 2015, 12:10 AM::numberOfJobs-0"}}
+{"user":"anish","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Thu, 07 May 2015, 12:15 AM::numberOfJobs-1"}}
+{"user":"anish","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B20J1:Add data-set file::name-try2"}}
+{"user":"anish","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B20::Thu, 07 May 2015, 12:15 AM::numberOfJobs-0"}}
+{"user":"anish","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B21::Thu, 07 May 2015, 12:52 AM::numberOfJobs-2"}}
+{"user":"anish","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B21J1:Add data-set file::name-TryFinal"}}
+{"user":"anish","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Thu, 07 May 2015, 01:00 AM::numberOfJobs-2"}}
+{"user":"anish","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B20J1:Add data-set file::name-another Try"}}
+{"user":"anish","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Thu, 07 May 2015, 01:15 AM::numberOfJobs-2"}}
+{"user":"anish","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B20J1:Add data-set file::name-JustAnotherTry"}}
+{"user":"anish","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Thu, 07 May 2015, 01:16 AM::numberOfJobs-2"}}
+{"user":"anish","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B20J1:Add data-set file::name-DSFinalllh"}}
+{"user":"anish","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Thu, 07 May 2015, 01:22 AM::numberOfJobs-2"}}
+{"user":"anish","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B20J1:Add data-set file::name-dsdfasdf"}}
