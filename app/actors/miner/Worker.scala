@@ -20,7 +20,7 @@ class Worker(mediator: ActorRef) extends Actor {
       case MnALS(train: String, query: String, ranks: Int, maxIter: Int, id: String) => new VALS(getDsPath(username,train), ranks, maxIter)
     }
 
-    mediator ! MinerResult(mining.Algorithm.ALS, username, name, sparkWorker.saveToTextFile, als)
+    mediator ! MinerResult(mining.Algorithm.ALS, username, name, sparkWorker.saveToObjectFile, als)
   }
 
   private def handleSVM(username: String, name: String, svm: MnSVM) = {
@@ -28,7 +28,7 @@ class Worker(mediator: ActorRef) extends Actor {
       case MnSVM(trin: String, test: String, maxIter: Int, id: String) => new VSVM(getDsPath(username, trin), getDsPath(username, test), maxIter)
     }
 
-    mediator ! MinerResult(mining.Algorithm.SVM, username, name, sparkWorker.saveToTextFile, svm)
+    mediator ! MinerResult(mining.Algorithm.SVM, username, name, sparkWorker.saveToObjectFile, svm)
   }
 
   private def handleFPM(username: String, name: String, fpm: MnFPM) = {
@@ -36,7 +36,7 @@ class Worker(mediator: ActorRef) extends Actor {
       case MnFPM(name: String, minSupport: Double, id: String) => new VFPM(getDsPath(username,name), minSupport)
     }
 
-    mediator ! MinerResult(mining.Algorithm.FPM, username, name, sparkWorker.saveToTextFile, fpm)
+    mediator ! MinerResult(mining.Algorithm.FPM, username, name, sparkWorker.saveToObjectFile, fpm)
   }
 
   private def handleClustering(username: String, name: String, clustering: MnClustering) = {
@@ -45,7 +45,7 @@ class Worker(mediator: ActorRef) extends Actor {
         new VClustering(getDsPath(username,name), test.map{getDsPath(username, _)}, clusters, maxIter)
     }
 
-    mediator ! MinerResult(mining.Algorithm.Clustering, username, name, sparkWorker.saveToTextFile, clustering)
+    mediator ! MinerResult(mining.Algorithm.Clustering, username, name, sparkWorker.saveToObject, clustering)
   }
 
   def receive = {
