@@ -131,11 +131,11 @@ app.controller 'BatchController', ($scope) ->
 
     $scope.addToBatch = () ->       # Add the job to the batch on button click
         $scope.batch.push( finaliseJob($scope.currentJob) )
-        #alert "$scope.batch = "+JSON.stringify($scope.batch)
+        console.log "addToBatch called, $scope.batch = "+JSON.stringify($scope.batch)
         $scope.currentJob = newJob()
 
     $scope.clearBatch = () ->       # clear the current batch and lets start over. on button click
-        $("#batchDisplay").remove() # this was a trial hack that failed. I think we can delete this line, todo
+        #$("#batchDisplay").remove() # this was a trial hack that failed. I think we can delete this line, todo
         $scope.batch = []
         optimisticDsList = []
 
