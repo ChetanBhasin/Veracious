@@ -5,13 +5,13 @@
     <th>Name</th>
     <th>Target Algorithm</th>
     <th>Description</th>
-    <th>Source</th>
+    <th ng-if='"@lst" == "dsList"'>Source</th>
   </tr>
   <tr ng-repeat="ds in @(lst)" ng-class='{"warning": ds.status == "unavailable" }'>
     <th>{{$index + 1}}</th>
     <td>{{ds.name}}</td>
     <td>{{getPretty(ds.algo)}}</td>
     <td>{{ds.desc}}</td>
-    <td>{{ds.source}}</td>
+    <td ng-if='"@lst" == "dsList"'>{{ds.source}}</td>
   </tr>
 </table>
