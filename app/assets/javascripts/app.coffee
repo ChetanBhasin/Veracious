@@ -242,7 +242,9 @@ app.controller 'ResultController', ($scope) ->
             else $scope.results = (ds for ds in data.datasets when ds.type is "result")
             true
         else if data.hasOwnProperty("result")
-            chartMaker.makeChart(data.result)
+            if data.result == null
+                alert "No such result exists"
+            else chartMaker.makeChart(data.result)
             true
         else false   # The other controller needs this data
 
