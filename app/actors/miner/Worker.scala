@@ -13,9 +13,11 @@ import models.mining.mlops._
  */
 class Worker(mediator: ActorRef) extends Actor {
 
+  def getDsPath(user: String, ds: String) = s"./.datastore/datasets/$user/$ds"
+
   private def handleALS(username: String, name: String, als: MnALS) = {
     val sparkWorker = als match {
-      case MnALS(train: String, query: String, ranks: Int, maxIter: Int, id: String) => new VALS(train, ranks, maxIter)
+      case MnALS(train: String, query: String, ranks: Int, maxIter: Int, id: String) => new VALS(getDsPath(username,train), ranks, maxIter)
     }
 
     mediator ! MinerResult(mining.Algorithm.ALS, username, name, sparkWorker.saveToTextFile, als)
@@ -23,7 +25,7 @@ class Worker(mediator: ActorRef) extends Actor {
 
   private def handleSVM(username: String, name: String, svm: MnSVM) = {
     val sparkWorker = svm match {
-      case MnSVM(trin: String, test: String, maxIter: Int, id: String) => new VSVM(trin, test, maxIter)
+      case MnSVM(trin: String, test: String, maxIter: Int, id: String) => new VSVM(getDsPath(username, trin), getDsPath(username, test), maxIter)
     }
 
     mediator ! MinerResult(mining.Algorithm.SVM, username, name, sparkWorker.saveToTextFile, svm)
@@ -31,7 +33,7 @@ class Worker(mediator: ActorRef) extends Actor {
 
   private def handleFPM(username: String, name: String, fpm: MnFPM) = {
     val sparkWorker = fpm match {
-      case MnFPM(name: String, minSupport: Double, id: String) => new VFPM(name, minSupport)
+      case MnFPM(name: String, minSupport: Double, id: String) => new VFPM(getDsPath(username,name), minSupport)
     }
 
     mediator ! MinerResult(mining.Algorithm.FPM, username, name, sparkWorker.saveToTextFile, fpm)
@@ -39,7 +41,8 @@ class Worker(mediator: ActorRef) extends Actor {
 
   private def handleClustering(username: String, name: String, clustering: MnClustering) = {
     val sparkWorker = clustering match {
-      case MnClustering(name: String, test: Option[String], maxIter: Int, clusters: Int, id: String) => new VClustering(name, test, clusters, maxIter)
+      case MnClustering(name: String, test: Option[String], maxIter: Int, clusters: Int, id: String) =>
+        new VClustering(getDsPath(username,name), test.map{getDsPath(username, _)}, clusters, maxIter)
     }
 
     mediator ! MinerResult(mining.Algorithm.Clustering, username, name, sparkWorker.saveToTextFile, clustering)
