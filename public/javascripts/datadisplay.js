@@ -16,36 +16,34 @@ var chartGen = {
     genScatterPlot: function(container, labels, contents) {
 
         // Make sure that the function is used when the window is loaded properly
-        window.onload() = function() {
-            // Creating the chart
-            var chart = new CanvasJS.Chart(container, {
-                title: {
-                    text: labels.title,
-                    fontFamily: "arial black",
-                    fontColor: "DarkSlateGrey"
-                },
+        // Creating the chart
+        var chart = new CanvasJS.Chart(container, {
+            title: {
+                text: labels.title,
+                fontFamily: "arial black",
+                fontColor: "DarkSlateGrey"
+            },
 
-                // Enable the animation for pleasant surprise
-                animationEnabled: true,
+            // Enable the animation for pleasant surprise
+            animationEnabled: true,
 
-                axisX: {
-                    title: labels.xtitle
-                },
-                axisY: {
-                    title: labels.ytitle
-                },
+            axisX: {
+                title: labels.xtitle
+            },
+            axisY: {
+                title: labels.ytitle
+            },
 
-                // Data points with tooltip label all contents in one place
-                data: [{
-                    type: "scatter",
-                    toolTipContent: labels.tooltip,
-                    dataPoints: contents
-                }]
-            });
+            // Data points with tooltip label all contents in one place
+            data: [{
+                type: "scatter",
+                toolTipContent: labels.tooltip,
+                dataPoints: contents
+            }]
+        });
 
-            // Rendering the chart
-            chart.render();
-        }
+        // Rendering the chart
+        chart.render();
     },
 
     /**
@@ -53,25 +51,26 @@ var chartGen = {
      * lables on X-axis on the screen with given data
      */
     genBarChart: function(container, labels, contents) {
-        // Make sure that the function is used when the window is loaded properly
-        window.onload = function() {
-            // Creating the chart
-            var chart = new CanvasJS.chart(container, {
-                title: {
-                    text: labels.title,
-                    fontFamily: "arial black",
-                    fontColor: "DarkSlateGrey"
-                },
+        var chart = new CanvasJS.Chart(container, {
+            animationEnabled: true,
+            title: {
+                text: labels.title,
+                fontFamily: "arial black",
+                fontColor: "DarkSlateGrey"
+            },
+            axisX: {
+                title: labels.xtitle
+            },
+            axisY: {
+                title: labels.ytitle
+            },
+            data: [{
+                type: "column", //change type to bar, line, area, pie, etc
+                dataPoints: contents
+            }]
+        });
 
-                // Enable the animatino
-                animationEnabled: true,
-
-                data: {
-                    type: "cloumn",
-                    dataPoints: contents
-                }
-            })
-        }
+        chart.render();
     }
 }
 

@@ -25,7 +25,7 @@ class RFPM(filepath: String, name: String) extends MOutput {
   }
 
   def tail = Json.toJson(getItemSet.map(x => JsObject(Seq(
-    "lable" -> JsString(x._1.mkString("[", ",", "]")),
+    "label" -> JsString(x._1.mkString("[", ",", "]")),
     "y" -> JsNumber(x._2)))))
 
   // Json object that would be passed to the front end visual engine
