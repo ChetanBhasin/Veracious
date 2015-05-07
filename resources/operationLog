@@ -4,3 +4,7 @@
 {"user":"anishG","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B21::Thu, 07 May 2015, 09:38 AM::jobsRemaining-1"}}
 {"user":"anishG","log":{"status":"SUCCESS","message":"The mine operation was a success","activity":"Job:B21J1:Frequent Pattern Matching::dataSet-FPMdsSet,min_support-0.8"}}
 {"user":"anishG","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B21::Thu, 07 May 2015, 09:38 AM::jobsRemaining-0"}}
+{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Thu, 07 May 2015, 10:18 AM::jobsRemaining-2"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B20J1:Add data-set file::name-retail"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"The mine operation was a success","activity":"Job:B20J2:Frequent Pattern Matching::dataSet-retail,min_support-0.8"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B20::Thu, 07 May 2015, 10:18 AM::jobsRemaining-0"}}
