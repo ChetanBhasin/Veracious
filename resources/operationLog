@@ -1,10 +1,8 @@
-{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Thu, 07 May 2015, 02:29 PM::jobsRemaining-2"}}
-{"user":"chetan","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B20J1:Add data-set file::name-Retail"}}
-{"user":"chetan","log":{"status":"SUCCESS","message":"The mine operation was a success","activity":"Job:B20J2:Frequent Pattern Matching::dataSet-Retail,min_support-0.8"}}
-{"user":"chetan","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B20::Thu, 07 May 2015, 02:29 PM::jobsRemaining-0"}}
-{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B21::Thu, 07 May 2015, 02:31 PM::jobsRemaining-1"}}
-{"user":"chetan","log":{"status":"SUCCESS","message":"The mine operation was a success","activity":"Job:B21J1:Frequent Pattern Matching::dataSet-Retail,min_support-0.8"}}
-{"user":"chetan","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B21::Thu, 07 May 2015, 02:31 PM::jobsRemaining-0"}}
-{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B22::Thu, 07 May 2015, 02:33 PM::jobsRemaining-1"}}
-{"user":"chetan","log":{"status":"SUCCESS","message":"The mine operation was a success","activity":"Job:B22J1:Frequent Pattern Matching::dataSet-Retail,min_support-0.2"}}
-{"user":"chetan","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B22::Thu, 07 May 2015, 02:33 PM::jobsRemaining-0"}}
+{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Thu, 07 May 2015, 03:46 PM::jobsRemaining-2"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B20J1:Add data-set file::name-Kmeans"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"The mine operation was a success","activity":"Job:B20J2:Clustering::dataSet-Kmeans,prediction_DataSet-<None>,iterations-10,cluster_count-3"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B20::Thu, 07 May 2015, 03:46 PM::jobsRemaining-0"}}
+{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B21::Thu, 07 May 2015, 03:47 PM::jobsRemaining-2"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B21J1:Add data-set file::name-DeskCluster"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"The mine operation was a success","activity":"Job:B21J2:Clustering::dataSet-DeskCluster,prediction_DataSet-<None>,iterations-10,cluster_count-3"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B21::Thu, 07 May 2015, 03:47 PM::jobsRemaining-0"}}
