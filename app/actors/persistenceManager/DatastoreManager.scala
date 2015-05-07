@@ -201,7 +201,7 @@ class DatastoreManager extends Actor {
    */
   private def checkUserDataset(username: String, ds: String) = {
     val stream = Source.fromFile(s"./.datastore/meta/usersets/$username.dat")
-    val vals = stream.getLines().find(_ == ds)
+    val vals = stream.getLines().find(_.contains(ds))
     stream.close()
     vals match {
       case Some(x: String) => Some(DatastoreManager.makeDsEntry(x))
@@ -216,7 +216,7 @@ class DatastoreManager extends Actor {
     case RemoveDatasetRecord(username: String, dsName: String) => removeUserDataset(username, dsName)
     case ModifyDatasetStatus(username: String, data: DataSetEntry, newStatus: String) => modifyStatus(username, data, newStatus)
     case RemoveUserEntirely(username: String) => removeUserEntirely(username)
-    case CheckUserDataset(username: String, ds: String) => checkUserDataset(username, ds)
+    case CheckUserDataset(username: String, ds: String) => sender ! checkUserDataset(username, ds)
   }
 
 }
