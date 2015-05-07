@@ -6,3 +6,37 @@
 {"user":"chetan","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B21J1:Add data-set file::name-DeskCluster"}}
 {"user":"chetan","log":{"status":"SUCCESS","message":"The mine operation was a success","activity":"Job:B21J2:Clustering::dataSet-DeskCluster,prediction_DataSet-<None>,iterations-10,cluster_count-3"}}
 {"user":"chetan","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B21::Thu, 07 May 2015, 03:47 PM::jobsRemaining-0"}}
+{"user":"anishG","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Thu, 07 May 2015, 06:34 PM::jobsRemaining-1"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B20J1:Add data-set file::name-newFPM data"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B20::Thu, 07 May 2015, 06:34 PM::jobsRemaining-0"}}
+{"user":"anishG","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B21::Thu, 07 May 2015, 06:35 PM::jobsRemaining-1"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B21J1:Delete Data-set::name-newFPM data"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B21::Thu, 07 May 2015, 06:35 PM::jobsRemaining-0"}}
+{"user":"anishG","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Thu, 07 May 2015, 07:01 PM::jobsRemaining-1"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B20J1:Add data-set file::name-FPMdataset"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B20::Thu, 07 May 2015, 07:01 PM::jobsRemaining-0"}}
+{"user":"anishG","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Thu, 07 May 2015, 07:04 PM::jobsRemaining-1"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B20J1:Add data-set file::name-FPMtrial"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B20::Thu, 07 May 2015, 07:04 PM::jobsRemaining-0"}}
+{"user":"anishG","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B21::Thu, 07 May 2015, 07:05 PM::jobsRemaining-1"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B21J1:Delete Data-set::name-FPMtrial"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B21::Thu, 07 May 2015, 07:05 PM::jobsRemaining-0"}}
+{"user":"anishG","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B22::Thu, 07 May 2015, 07:06 PM::jobsRemaining-2"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B22J1:Add data-set file::name-FPM testDataa"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B22J2:Add data-set file::name-Another Test Data"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B22::Thu, 07 May 2015, 07:06 PM::jobsRemaining-0"}}
+{"user":"anishG","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B23::Thu, 07 May 2015, 07:06 PM::jobsRemaining-2"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B23J1:Delete Data-set::name-Another Test Data"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"The mine operation was a success","activity":"Job:B23J2:Frequent Pattern Matching::dataSet-FPM testDataa,min_support-0.14"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B23::Thu, 07 May 2015, 07:06 PM::jobsRemaining-0"}}
+{"user":"anishG","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20::Thu, 07 May 2015, 07:09 PM::jobsRemaining-1"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B20J1:Add data-set file::name-blah"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B20::Thu, 07 May 2015, 07:09 PM::jobsRemaining-0"}}
+{"user":"anishG","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B21::Thu, 07 May 2015, 07:09 PM::jobsRemaining-0"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B21::Thu, 07 May 2015, 07:09 PM::jobsRemaining-0"}}
+{"user":"anishG","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B22::Thu, 07 May 2015, 07:09 PM::jobsRemaining-2"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B22J1:Delete Data-set::name-blah"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B22J2:Add data-set file::name-newOnes"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B22::Thu, 07 May 2015, 07:09 PM::jobsRemaining-0"}}
+{"user":"anishG","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B23::Thu, 07 May 2015, 07:10 PM::jobsRemaining-2"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B23J1:Add data-set file::name-something"}}
