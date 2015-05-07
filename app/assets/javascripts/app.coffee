@@ -219,7 +219,7 @@ app.controller 'BatchController', ($scope) ->
 # Simple controller to show results, and request visualisation
 app.controller 'ResultController', ($scope) ->
 
-    chartMaker = new dataDisplay("chartCanvas")
+    #chartMaker = new dataDisplay("chartCanvas")
     $scope.results = []
     #$scope.results = [
     #    { name: "JobAres", algo: "als", desc: "Short description for the set", type: "dataset", status: "available", source: "http://som.sdf.com" },
@@ -244,7 +244,7 @@ app.controller 'ResultController', ($scope) ->
         else if data.hasOwnProperty("result")
             if data.result == null
                 alert "No such result exists"
-            else chartMaker.makeChart(data.result)
+            else makeChart(data.result, "chartCanvas")
             true
         else false   # The other controller needs this data
 
