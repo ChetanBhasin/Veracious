@@ -199,7 +199,7 @@ class WorkerActor(mediator: ActorRef) extends Actor {
         if (!Files.exists((dssdir))) Files.createDirectories((dssdir))
         if (!Files.exists(userdir)) Files.createDirectories(userdir)
         save(s"./.datastore/datasets/$user/$name.dat")
-        dsm ! AddDatasetRecord(user, DataSetEntry(name, "Result of mining job - "+job.id, "result", al, "available", ""))
+        dsm ! AddDatasetRecord(user, DataSetEntry(name, "Result of mining - "+job.logWrite, "result", al, "available", ""))
         mediator ! Log(OperationStatus.OpSuccess, user, "The mine operation was a success", job)
         mediator ! JobStatus(user, OperationStatus.OpSuccess)
       } catch {

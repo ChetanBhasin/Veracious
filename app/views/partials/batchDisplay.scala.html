@@ -10,8 +10,7 @@
             "glyphicon-refresh" : job.opName == "DsRefresh",
             "glyphicon-filter" : job.opType == "MineOp"
           }'></span>
-      <!--<small>{{ $index + 1}}.</small> {{getPretty(job.opName) }} -->
-      {{getPretty(job.opName) }}
+      <small>{{$index + 1}}.</small> {{getPretty(job.opName) }}
     </h3>
   </div>
   <div class="panel-body">
