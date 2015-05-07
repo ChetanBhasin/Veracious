@@ -131,7 +131,7 @@ class DatastoreManager extends Actor {
     if (!Files.exists(dudir)) Files.createDirectories(dudir)
     if (!Files.exists(filePath)) Files.createFile(filePath)
     try {
-      Files.write(filePath, (DatastoreManager.makeEntryText(dataset) + "\n").getBytes, StandardOpenOption.APPEND)
+      Files.write(filePath, (DatastoreManager.makeEntryText(dataset) + "\n").getBytes, StandardOpenOption.APPEND) // Testing
     } catch {
       case _: Throwable => println("This line is never executed")
     }
@@ -149,10 +149,10 @@ class DatastoreManager extends Actor {
     val filePath = Paths.get(s"./.datastore/meta/usersets/$username.dat")
     if (Files.exists(filePath)) {
       val stream = Source.fromFile(s"./.datastore/meta/usersets/$username.dat")
-      val items = for (lines <- stream.getLines()) yield lines
+      Files.write(filePath,
+        stream.getLines().filterNot(_ contains dsName).mkString("\n").getBytes,
+        StandardOpenOption.TRUNCATE_EXISTING)
       stream.close()
-      items.filter(_ contains dsName)
-      Files.write(filePath, items.mkString("\n").getBytes(), StandardOpenOption.TRUNCATE_EXISTING)
     }
   }
 
@@ -180,7 +180,7 @@ class DatastoreManager extends Actor {
           }
         } else item
       }
-      Files.write(filePath, newset.mkString("\n").getBytes(), StandardOpenOption.TRUNCATE_EXISTING)
+      Files.write(filePath, newset.mkString("\n").concat("\n").getBytes(), StandardOpenOption.TRUNCATE_EXISTING)
     }
   }
 
