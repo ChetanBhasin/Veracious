@@ -91,7 +91,9 @@ class Persistence(val mediator: ActorRef) extends AppModule {
     /**
      * Return a dataset's data to the user
      */
-    case operation: GetDsData => router.route((operation, datastoreManager), sender)
+    case operation: GetDsData =>
+      println("Got request for result at persitence")
+      router.route((operation, datastoreManager), sender)
 
     /**
      * Renew and reroute expired children actor

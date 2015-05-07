@@ -14,6 +14,7 @@ import models.messages.logger.Log
 import models.messages.persistenceManaging.DataSetEntry
 import models.mining.mlret._
 import models.mining.{Algorithm, MinerResult}
+import play.api.libs.json.{JsNull, JsValue}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -54,19 +55,24 @@ class WorkerActor(mediator: ActorRef) extends Actor {
    * @return Option[JSON-Output]
    */
   import models.mining.Algorithm._
-  private def handleDsOutput(operation: GetDsData, dsm: ActorRef) = {
+  /** Something is very wrong with this function **/
+  private def handleDsOutput(operation: GetDsData, dsm: ActorRef): JsValue = {
     val (uname, name) = (operation.username, operation.Ds)
     val result = Await.result(dsm ? CheckUserDataset(uname, name), 10 seconds).asInstanceOf[Option[DataSetEntry]]
-    val filepath = s"./.datastore/datasets/$uname/$name"
+    val filepath = s"./.datastore/datasets/$uname/$name.dat"
     result match {
       case Some(x: DataSetEntry) => x.targetAlgorithm match {
         case ALS => new RALS(filepath, name).output
         case Clustering => new RClustering(filepath, name).output
-        case FPM => new RFPM(filepath, name).output
+        case FPM =>
+          println("Got an FPM result, calling generator")
+          new RFPM(filepath, name).output
         case SVM => new RSVM(filepath, name).output
-        case _ => None
+        case _ => JsNull
       }
-      case None => None
+      case None =>
+        println("inside result, result doesn't exist")
+        JsNull
     }
   }
 
@@ -193,13 +199,14 @@ class WorkerActor(mediator: ActorRef) extends Actor {
         if (!Files.exists((dssdir))) Files.createDirectories((dssdir))
         if (!Files.exists(userdir)) Files.createDirectories(userdir)
         save(s"./.datastore/datasets/$user/$name.dat")
-        dsm ! AddDatasetRecord(user, DataSetEntry(name, "Result of mining job: "+job.logWrite, "dataset", al, "available", ""))
+        dsm ! AddDatasetRecord(user, DataSetEntry(name, "Result of mining job - "+job.id, "result", al, "available", ""))
         mediator ! Log(OperationStatus.OpSuccess, user, "The mine operation was a success", job)
         mediator ! JobStatus(user, OperationStatus.OpSuccess)
       } catch {
         case e: Throwable =>
           println("Something went wrong.") //Log here
           println(e.getMessage)
+          println(e.printStackTrace)
           mediator ! Log(OperationStatus.OpFailure, user, "The mine operation failed, could'nt write to disk", job)
           mediator ! JobStatus(user, OperationStatus.OpFailure)
       }
@@ -208,7 +215,10 @@ class WorkerActor(mediator: ActorRef) extends Actor {
     /**
      * Manage the request for mine operation results
      */
-    case (operation: GetDsData, dsm: ActorRef) => handleDsOutput(operation, dsm)
+    case (operation: GetDsData, dsm: ActorRef) =>
+      println("Got resultReq at Worker, sender: "+sender)
+      sender ! handleDsOutput(operation, dsm)
+      println("We have sent it back")
 
   }
 
