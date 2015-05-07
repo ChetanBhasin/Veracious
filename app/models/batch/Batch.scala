@@ -95,5 +95,5 @@ case class Batch (id: String, date: LocalDateTime, jobs: List[Job]) extends LogE
   import Batch._
 
   // important for it to be a val
-  val logWrite = s"Batch:$id::${date.format(DateTimeFormatter.ofPattern(dateTimeFormat))}::jobsRemaining-${jobs.length}"
+  val logWrite = s"Batch:$id | ${date.format(DateTimeFormatter.ofPattern(dateTimeFormat))} | jobsRemaining-${jobs.length}"
 }

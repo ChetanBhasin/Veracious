@@ -161,7 +161,7 @@ app.controller 'BatchController', ($scope) ->
     $scope.submitBatch = () ->
         fData = createUFormData ($scope.batch)
         window.submitBatch fData, (status) ->               # from connect.js
-            if status == 200 then alert "Batch submitted successfully"
+            if status == 200 then console.log "Batch submitted successfully"
             else alert "There was a problem submitting the batch, status: "+status
         $scope.clearBatch()
         return
@@ -257,7 +257,7 @@ app.controller 'ResultController', ($scope) ->
         #formData.append("datasetName", $scope.target)
         formData = { datasetName: $scope.target }
         window.submitResultRequest formData, (status) ->
-            if status == 200 then alert "Request submitted successfuly"
+            if status == 200 then console.log "Request submitted successfuly"
             else alert "Server error on receiving request"
         $scope.target = ""
 
