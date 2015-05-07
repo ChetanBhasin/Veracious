@@ -12,6 +12,7 @@ import models.batch.job._
 import models.messages.batchProcessing._
 import models.messages.logger.Log
 import models.messages.persistenceManaging.DataSetEntry
+import models.mining.Algorithm._
 import models.mining.mlret._
 import models.mining.{Algorithm, MinerResult}
 import play.api.libs.json.{JsNull, JsValue}
@@ -48,14 +49,13 @@ class WorkerActor(mediator: ActorRef) extends Actor {
     if (!Files.exists(path)) Files.createDirectories(path)
   }
 
+  /** Something is very wrong with this function **/
   /**
    * Handles output operations of the mining results
    * @param operation Details of user and dataset wrapped in GetDsData case object Details of user and dataset wrapped in GetDsData case object Details of user and dataset wrapped in GetDsData case object Details of user and dataset wrapped in GetDsData case object
    * @param dsm Actor reference to datastore manager
    * @return Option[JSON-Output]
    */
-  import models.mining.Algorithm._
-  /** Something is very wrong with this function **/
   private def handleDsOutput(operation: GetDsData, dsm: ActorRef): JsValue = {
     val (uname, name) = (operation.username, operation.Ds)
     val result = Await.result(dsm ? CheckUserDataset(uname, name), 10 seconds).asInstanceOf[Option[DataSetEntry]]
