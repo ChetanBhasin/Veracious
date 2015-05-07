@@ -200,6 +200,7 @@ class WorkerActor(mediator: ActorRef) extends Actor {
         case e: Throwable =>
           println("Something went wrong.") //Log here
           println(e.getMessage)
+          println(e.printStackTrace)
           mediator ! Log(OperationStatus.OpFailure, user, "The mine operation failed, could'nt write to disk", job)
           mediator ! JobStatus(user, OperationStatus.OpFailure)
       }
