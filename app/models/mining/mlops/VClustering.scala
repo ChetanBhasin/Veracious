@@ -1,6 +1,6 @@
 package models.mining.mlops
 
-import org.apache.spark.mllib.clustering._
+import org.apache.spark.mllib.clustering.KMeans
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.rdd.RDD
 
@@ -17,10 +17,13 @@ class VClustering(file: String, test: Option[String], numClusters: Int, numItera
 
   lazy val data: (RDD[String]) = sc.textFile(file)
 
-  private lazy val supply = data.map(Vectors.parse(_))
+  private lazy val supply = data.map {
+    line => Vectors.dense(line.split(' ').map(_.toDouble))
+  }.cache()
+
   private lazy val preds = {
     test match {
-      case Some(element: String) => sc.textFile(element).map(Vectors.parse(_))
+      case Some(element: String) => sc.textFile(element).map(line => Vectors.dense(line.split(' ').map(_.toDouble)))
       case None => supply
     }
   }

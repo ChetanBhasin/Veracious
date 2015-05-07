@@ -15,9 +15,17 @@ class RSVM(filepath: String, name: String) extends MOutput {
 
   val obj = sc.objectFile[(Double, linalg.Vector)](filepath)
 
-  def getData = obj.collect()
+  def getData = obj.collect().map(x => (x._1, x._2.toArray))
 
-  def tail = JsObject(getData.toSeq.map(x => x._1.toString -> Json.toJson(x._2.toArray.toList)))
+  def me = getData.map {
+    x =>
+      JsObject(Seq("name" -> JsString(x._1.toString),
+        "x" -> JsNumber(x._2(0)),
+        "y" -> JsNumber(x._2(1))
+      ))
+  }.toSeq
+
+  def tail = Json.toJson(me)
 
   def output = JsObject(Seq(
     "name" -> JsString(name),

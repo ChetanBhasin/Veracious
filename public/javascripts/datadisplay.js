@@ -15,35 +15,37 @@
 var chartGen = {
     genScatterPlot: function(container, labels, contents) {
 
-        // Make sure that the function is used when the window is loaded properly
-        // Creating the chart
-        var chart = new CanvasJS.Chart(container, {
-            title: {
-                text: labels.title,
-                fontFamily: "arial black",
-                fontColor: "DarkSlateGrey"
-            },
+    var chart = new CanvasJS.Chart(container,
+    		{
+    			title:{
+    				text: labels.title,
+    				fontFamily: "arial black",
+    				fontColor: "DarkSlateGrey"
+    			},
+    			exportEnabled: true,
+                animationEnabled: true,
+    			axisX: {
+    				title: labels.xtitle,
+    				titleFontFamily: "arial"
 
-            // Enable the animation for pleasant surprise
-            animationEnabled: true,
+    			},
+    			axisY:{
+    				title: labels.ytitle,
+    				titleFontFamily: "arial",
+    				valueFormatString:"",
+    				titleFontSize: 12
+    			},
 
-            axisX: {
-                title: labels.xtitle
-            },
-            axisY: {
-                title: labels.ytitle
-            },
+    			data: [
+    			{
+    			    type : "scatter",
+    			    tooltip : labels.tooltip,
+    			    dataPoints : contents
+    			}
+    			]
+    		});
 
-            // Data points with tooltip label all contents in one place
-            data: [{
-                type: "scatter",
-                toolTipContent: labels.tooltip,
-                dataPoints: contents
-            }]
-        });
-
-        // Rendering the chart
-        chart.render();
+    chart.render();
     },
 
     /**
@@ -58,6 +60,7 @@ var chartGen = {
                 fontFamily: "arial black",
                 fontColor: "DarkSlateGrey"
             },
+            exportEnabled: true,
             axisX: {
                 title: labels.xtitle
             },
@@ -67,7 +70,12 @@ var chartGen = {
             data: [{
                 type: "column", //change type to bar, line, area, pie, etc
                 dataPoints: contents
-            }]
+            },
+            {
+                type: "line",
+                dataPoints: contents
+            }
+            ]
         });
 
         chart.render();
@@ -84,12 +92,12 @@ function makeChart(incoming, containerid) {
         // Matching for K-Means clustering algorithm
         // Genereate the scatter plot
         chartGen.genScatterPlot(containerid, {
-                title: incoming.title,
+                title: incoming.name,
                 xtitle: "",
                 ytitle: "",
                 tooltip: "Cluster {name}"
             },
-            incoming.data.defaults);
+            incoming.data);
     } else if (incoming.algorithm == "fpm") {
         // Matching for FP-Growth algorithm
         // Generating the bar chart
@@ -98,5 +106,14 @@ function makeChart(incoming, containerid) {
             xtitle: "Itemsets",
             ytitle: "Frequence"
         }, incoming.data);
+    } else if (incoming.algorithm === "svm") {
+        // Matching for SVM
+        // Generating scatter plot
+        chartGen.genScatterPlot(containerid, {
+            title: incoming.name,
+            xtitle: "",
+            ytitle: "",
+            tooltip: "Point {name}"
+        }, incoming.data)
     }
 }
