@@ -40,3 +40,9 @@
 {"user":"anishG","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B22::Thu, 07 May 2015, 07:09 PM::jobsRemaining-0"}}
 {"user":"anishG","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B23::Thu, 07 May 2015, 07:10 PM::jobsRemaining-2"}}
 {"user":"anishG","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B23J1:Add data-set file::name-something"}}
+{"user":"anishG","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20 | Mon, 11 May 2015, 04:25 PM | jobsRemaining-3"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B20J1:Add data-set file | name-retail"}}
+{"user":"anishG","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20 | Mon, 11 May 2015, 04:28 PM | jobsRemaining-1"}}
+{"user":"anishG","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20 | Tue, 12 May 2015, 10:35 PM | jobsRemaining-1"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"The mine operation was a success","activity":"Job:B20J1:Frequent Pattern Matching | dataSet-retail,min_support-0.17"}}
+{"user":"anishG","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B20 | Tue, 12 May 2015, 10:35 PM | jobsRemaining-0"}}

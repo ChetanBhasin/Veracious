@@ -177,6 +177,11 @@ app.controller 'BatchController', ($scope) ->
     #    { name: "SampleDsForSVM", desc: "Short description for the set", type: "dataset", status: "unavailable",  algo: "MnSVM", source: "https://www.google.com" },
     #    { name: "SampleDsForALS", desc: "Short description for the set", type: "dataset", status: "removed",  algo: "MnALS" } ]
 
+    resList = []
+    addToResList = (nm) ->
+        resList push name:nm
+
+    $scope.deletables = () -> $scope.getAllDs().concat(resList)
 
     $scope.getAllDs = () -> $scope.dsList.concat(optimisticDsList)
     $scope.refreshables = () ->
@@ -195,7 +200,10 @@ app.controller 'BatchController', ($scope) ->
         if data.hasOwnProperty("datasets")                   # Only concerned with the data-set list
             if data.datasets == null
                 $scope.dsList = []
-            else $scope.dsList = getDataSets data.datasets      # conversions necessary because of API difference (algo naming), courtesy of @Chetan
+                resList = []
+            else
+                $scope.dsList = getDataSets data.datasets      # conversions necessary because of API difference (algo naming), courtesy of @Chetan
+                resList = (name: ds.name for ds in data.datasets when ds.type is "result")
         false   # The other controller needs this data
 
     receivers.push($scope.receiveFunction)     # Add this receiver to the line
