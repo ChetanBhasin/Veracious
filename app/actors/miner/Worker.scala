@@ -60,12 +60,12 @@ class Worker(mediator: ActorRef) extends Actor {
       * 4. And then send JobStatus back to sender
       */
 
-    case SubmitMineJob(username: String, job: MnALS) => handleALS(username, job.id, job)
-    case SubmitMineJob(username: String, job: MnSVM) => handleSVM(username, job.id, job)
+    case SubmitMineJob(username: String, job: MnALS) => handleALS(username, s"Res_${job.id}", job)
+    case SubmitMineJob(username: String, job: MnSVM) => handleSVM(username, s"Res_${job.id}", job)
     case SubmitMineJob(username: String, job: MnFPM) =>
       println("Miner worker received MnFPgrowth")
-      handleFPM(username, job.id, job)
-    case SubmitMineJob(username: String, job: MnClustering) => handleClustering(username, job.id, job)
+      handleFPM(username, s"Res_${job.id}", job)
+    case SubmitMineJob(username: String, job: MnClustering) => handleClustering(username, s"Res_${job.id}", job)
   }
 
 }

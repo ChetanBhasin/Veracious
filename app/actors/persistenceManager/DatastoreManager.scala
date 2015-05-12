@@ -150,7 +150,7 @@ class DatastoreManager extends Actor {
     if (Files.exists(filePath)) {
       val stream = Source.fromFile(s"./.datastore/meta/usersets/$username.dat")
       Files.write(filePath,
-        stream.getLines().filterNot(_ contains dsName).mkString("\n").getBytes,
+        stream.getLines().filterNot(x => x.split("::").head == dsName).mkString("\n").concat("\n").getBytes, // TODO: have to change the filter
         StandardOpenOption.TRUNCATE_EXISTING)
       stream.close()
     }
