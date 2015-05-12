@@ -46,3 +46,6 @@
 {"user":"anishG","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20 | Tue, 12 May 2015, 10:35 PM | jobsRemaining-1"}}
 {"user":"anishG","log":{"status":"SUCCESS","message":"The mine operation was a success","activity":"Job:B20J1:Frequent Pattern Matching | dataSet-retail,min_support-0.17"}}
 {"user":"anishG","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B20 | Tue, 12 May 2015, 10:35 PM | jobsRemaining-0"}}
+{"user":"anishG","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20 | Tue, 12 May 2015, 11:07 PM | jobsRemaining-1"}}
+{"user":"anishG","log":{"status":"FAILURE","message":"The mine operation failed, could'nt write to disk","activity":"Job:B20J1:Frequent Pattern Matching | dataSet-retail,min_support-0.14"}}
+{"user":"anishG","log":{"status":"FAILURE","message":"The job B20J1 failed","activity":"Batch:B20 | Tue, 12 May 2015, 11:07 PM | jobsRemaining-1"}}
