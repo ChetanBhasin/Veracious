@@ -102,8 +102,9 @@ quickOp = (opN, target) ->       # Support only for DsDelete and DsRefresh
         opType: "DataSetOp"
         opName: opN
         textParams: [target]
+        numParams: []
 
-    res push jb
+    res.push jb
     fData = createUFormData (res)
     window.submitBatch fData, (status) ->               # from connect.js
         if status == 200 then console.log "Batch submitted successfully"
