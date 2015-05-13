@@ -75,6 +75,43 @@ operations = [
     { name: "DsDelete", pretty: "Delete data-set" },
     { name: "DsRefresh", pretty: "Refresh data-set" }]
 
+
+# Made this global for a simple hack
+# Convert the batch to a multi-part form data in compliance with the joblist mapping in models.batch.job
+createUFormData = (batch) ->
+    formData = new FormData()
+    for job, i in batch
+        str = "jobs[#{i}]."                         # Don't ask, got this trough trial and error
+        formData.append(str+"opType", job.opType)
+        formData.append(str+"opName", job.opName)
+        for text in job.textParams
+            formData.append(str+"textParams[]", text)
+        job.numParams.push(1) # just to be safe, a hack
+        for num in job.numParams
+            formData.append(str+"numParams[]", num)
+        if (job.file)
+            formData.append(str+"file", job.file, job.file.name)
+        if (job.optionalTextParam)
+            formData.append(str+"optionalTextParam", job.optionalTextParam)
+    return formData
+
+# For quick delete and quick refresh buttons (in tables)
+quickOp = (opN, target) ->       # Support only for DsDelete and DsRefresh
+    res = []
+    jb =
+        opType: "DataSetOp"
+        opName: opN
+        textParams: [target]
+        numParams: []
+
+    res.push jb
+    fData = createUFormData (res)
+    window.submitBatch fData, (status) ->               # from connect.js
+        if status == 200 then console.log "Batch submitted successfully"
+        else alert "There was a problem submitting the batch, status: "+status
+    return
+
+
 # Batch Controller
 # This heavy weight is responsible for handling batch creations, submissions and data-source updates
 app.controller 'BatchController', ($scope) ->
@@ -139,23 +176,6 @@ app.controller 'BatchController', ($scope) ->
         $scope.batch = []
         optimisticDsList = []
 
-    # Convert the batch to a multi-part form data in compliance with the joblist mapping in models.batch.job
-    createUFormData = (batch) ->
-        formData = new FormData()
-        for job, i in batch
-            str = "jobs[#{i}]."                         # Don't ask, got this trough trial and error
-            formData.append(str+"opType", job.opType)
-            formData.append(str+"opName", job.opName)
-            for text in job.textParams
-                formData.append(str+"textParams[]", text)
-            job.numParams.push(1) # just to be safe, a hack
-            for num in job.numParams
-                formData.append(str+"numParams[]", num)
-            if (job.file)
-                formData.append(str+"file", job.file, job.file.name)
-            if (job.optionalTextParam)
-                formData.append(str+"optionalTextParam", job.optionalTextParam)
-        return formData
 
     # Lets make the official submission
     $scope.submitBatch = () ->
@@ -165,6 +185,8 @@ app.controller 'BatchController', ($scope) ->
             else alert "There was a problem submitting the batch, status: "+status
         $scope.clearBatch()
         return
+    $scope.quickDelete = (name) -> quickOp "DsDelete", name       # Todo, add the modal warning javascript
+    $scope.quickRefresh = (name) -> quickOp "DsRefresh", name
     #   ----------------------------------------------------
 
     # ----------- Data-set manipulation
@@ -177,6 +199,11 @@ app.controller 'BatchController', ($scope) ->
     #    { name: "SampleDsForSVM", desc: "Short description for the set", type: "dataset", status: "unavailable",  algo: "MnSVM", source: "https://www.google.com" },
     #    { name: "SampleDsForALS", desc: "Short description for the set", type: "dataset", status: "removed",  algo: "MnALS" } ]
 
+    resList = []
+    addToResList = (nm) ->
+        resList push name:nm
+
+    $scope.deletables = () -> $scope.getAllDs().concat(resList)
 
     $scope.getAllDs = () -> $scope.dsList.concat(optimisticDsList)
     $scope.refreshables = () ->
@@ -195,7 +222,10 @@ app.controller 'BatchController', ($scope) ->
         if data.hasOwnProperty("datasets")                   # Only concerned with the data-set list
             if data.datasets == null
                 $scope.dsList = []
-            else $scope.dsList = getDataSets data.datasets      # conversions necessary because of API difference (algo naming), courtesy of @Chetan
+                resList = []
+            else
+                $scope.dsList = getDataSets data.datasets      # conversions necessary because of API difference (algo naming), courtesy of @Chetan
+                resList = (name: ds.name for ds in data.datasets when ds.type is "result")
         false   # The other controller needs this data
 
     receivers.push($scope.receiveFunction)     # Add this receiver to the line
@@ -260,6 +290,8 @@ app.controller 'ResultController', ($scope) ->
             if status == 200 then console.log "Request submitted successfuly"
             else alert "Server error on receiving request"
         $scope.target = ""
+
+    $scope.quickDelete = (name) -> quickOp "DsDelete", name       # Todo, add the modal warning javascript
 
     receivers.push($scope.receiveFunction)     # Add this receiver to the line
     return

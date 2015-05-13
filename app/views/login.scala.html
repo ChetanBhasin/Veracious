@@ -1,4 +1,4 @@
-@()
+@()(implicit flash: Flash)
 
 @core("Login Page")() {
   <div class="jumbotron text-center">
@@ -15,42 +15,63 @@
   <!--- Rest of the Page --->
   <div class="container">
     <div class="row">
-      <div class="page-header">
-        <h1>Welcome to the Veracious project</h1>
+      <div class="col-md-offset-4 col-md-4 col-xs-12">
+        @for( (k, v) <- flash.data ){
+        <div class="panel panel-default text-center">
+          @if(k == "success"){
+          <div class="panel-body bg-success"><h4>@v</h4></div>
+          } else {
+          <div class="panel-body bg-danger"><h4>@v</h4></div>
+          }
+        </div>
       </div>
-      <p>Veracious is a web based application for mining massive datasets by combining datasets brought from different resources using a visual archecture.</p>
-      <p>Veracious is different from other data mining tools because it allows you to distribute the data processing over several nodes without touching any code.</p>
-      <p>We utilize the power of Apache Spark -- a framework written in Scala which uses a concept called Resilient Distributed Datasets (or RDDs) that are known for working really fast.</p>
+      }
     </div>
-    <div class="row bg-info">
-      <div class="col-md-4">
-        <h3>Apache Spark</h3>
-        <p><a href="https://github.com/apache/spark">Apache Spark</a> is a top level Apache project created by <a href="https://github.com/mateiz">Matei Zharia</a>
-          that aims to provide a simple alternative to Hadoop MapReduce framework to easily allow Big Data Engineers to create applications for solving problems pretaining to massive datastes.</p>
-      </div>
-      <div class="col-md-4">
-        <h3>Play Framework</h3>
-        <p>
-          <a href="https://www.playframework.com">Play Framework</a> is a web-application framework for building Scala and Java applications. It is based on a lightweight, stateless, web-friendly architecture.
-        </p>
-        <p>Built on Akka, Play provides predictable and minimal resource consumption (CPU, memory, threads) for highly-scalable applications.</p>
-        <p>Veracious is built on Play using the <a href="http://www.scala-lang.org">Scala</a> language.</p>
-      </div>
-      <div class="col-md-4">
-        <h3>Akka toolkit</h3>
-        <p>
-          <a href="http://akka.io">Akka</a> is a toolkit and runtime or building highly concurrent, distributed, and resilient message-driven applications
-          on the JVM.
-        </p>
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="page-header">
+          <h1>Welcome to the Veracious project</h1>
+        </div>
+        <p class="lead">Veracious is a web based application for mining massive datasets by combining datasets brought from different resources using a visual archecture.</p>
+        <p>Veracious is different from other data mining tools because it allows you to distribute the data processing over several nodes without touching any code.</p>
+        <p>We utilize the power of Apache Spark -- a framework written in Scala which uses a concept called Resilient Distributed Datasets (or RDDs) that are known for working really fast.</p>
       </div>
     </div>
     <div class="row">
-      <h3>User Documentation</h3>
-      <p>Coming soon ....</p>
+      <div class="panel panel-info">
+        <div class="panel-body bg-info">
+          <div class="col-md-4">
+            <h3>Apache Spark</h3>
+            <p><a href="https://github.com/apache/spark">Apache Spark</a> is a top level Apache project created by <a href="https://github.com/mateiz">Matei Zharia</a>
+              that aims to provide a simple alternative to Hadoop MapReduce framework to easily allow Big Data Engineers to create applications for solving problems pretaining to massive datastes.</p>
+          </div>
+          <div class="col-md-4">
+            <h3>Play Framework</h3>
+            <p>
+              <a href="https://www.playframework.com">Play Framework</a> is a web-application framework for building Scala and Java applications. It is based on a lightweight, stateless, web-friendly architecture.
+            </p>
+            <p>Built on Akka, Play provides predictable and minimal resource consumption (CPU, memory, threads) for highly-scalable applications.</p>
+            <p>Veracious is built on Play using the <a href="http://www.scala-lang.org">Scala</a> language.</p>
+          </div>
+          <div class="col-md-4">
+            <h3>Akka toolkit</h3>
+            <p>
+              <a href="http://akka.io">Akka</a> is a toolkit and runtime or building highly concurrent, distributed, and resilient message-driven applications
+              on the JVM.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+        <h3>User Documentation</h3>
+        <p>Coming soon ....</p>
 
-      <h1>Authors and Contributors</h1>
-      <p>The project is maintained by <a href="http://github.com/chetanbhasin">@@ChetanBhasin</a> and <a href="http://github.com/bassoGeorge">@@bassoGeorge</a> in 2015 for Major Project Report during Bach. Computer Applications program at IP University, New Delhi.</p>
-      <p>The repository for the project can be visited <a href="http://github.com/ChetanBhasin/Veracious">here</a>.</p>
+        <h1>Authors and Contributors</h1>
+        <p>The project is maintained by <a href="http://github.com/chetanbhasin">@@ChetanBhasin</a> and <a href="http://github.com/bassoGeorge">@@bassoGeorge</a> in 2015 for Major Project Report during Bach. Computer Applications program at IP University, New Delhi.</p>
+        <p>The repository for the project can be visited <a href="http://github.com/ChetanBhasin/Veracious">here</a>.</p>
+      </div>
     </div>
   </div>
 
@@ -71,4 +92,5 @@
       </div>
     </div>
   </div>
+
 }

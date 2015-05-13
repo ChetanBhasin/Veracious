@@ -22,10 +22,10 @@ object Auth extends Controller {
     appAccess.authenticate(username, password)
 
   /** Here we need to check whether the application is ready or not */
-  def login = Action {
+  def login = Action { implicit request =>
     debug("Got login request")
     if (appAccess.appStatus == AppRunning)
-      Ok(views.html.login())
+      Ok(views.html.login()(request.flash))
     else Ok("Application is not running")
   }
 
@@ -52,7 +52,7 @@ object Auth extends Controller {
 
   def authenticate = Action.async { implicit request =>
     loginForm.bindFromRequest.fold(
-      formWithErrros => Future(BadRequest(views.html.login())),
+      formWithErrros => Future(BadRequest(views.html.login()).flashing("failure" -> "Authentication Failure")),
       lgForm =>
         if (lgForm.signUp.toBoolean)
           appAccess.signUp(lgForm.username, lgForm.password) map {
