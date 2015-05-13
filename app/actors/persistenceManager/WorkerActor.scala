@@ -135,11 +135,21 @@ class WorkerActor(mediator: ActorRef) extends Actor {
       try {
         if (Files.exists(filepath)) {                // Dumb mistake here !Files.exists(filepath)    ???
           dsm ! RemoveDatasetRecord(username, name)
-          Files.delete(filepath)
+          if (!Files.isDirectory(filepath)) {
+            println("Debug: ---------- file not a directory")
+            Files.delete(filepath)                     // Problematic, does not delete non-empty directories as in cases or Results
+          } else {
+            val dir = filepath.toFile                   // Got It!
+            dir.listFiles().toList.foreach{_.delete()}
+            dir.delete()
+          }
           OperationStatus.OpSuccess
         } else OperationStatus.OpWarning
       } catch {
-        case _: Throwable => OperationStatus.OpFailure
+        case e: Throwable =>                          // Note: Bad technique, if exception raises in or after lin 138, then metadata is already
+                                                      // updated for delete but the file actually is not deleted
+          println("Debug:: ------ exception: "+e.getMessage)
+          OperationStatus.OpFailure
       }
 
     /**
