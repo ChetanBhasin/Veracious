@@ -91,10 +91,12 @@ class DatastoreManager extends Actor {
    */
   private def getUserDatasets(uname: String): JsValue = try {
     val path = s"./.datastore/meta/usersets/$uname.dat"
-    val stream = Source.fromFile(path).getLines.toList
+    val stream = Source.fromFile(path).getLines.toList.withFilter(_.length > 0)
+    println("Debug: user datasets: "+stream)
     val vals = stream.map(line => DatastoreManager.makeDsEntry(line))
+    println("Debug: user data-set vals: "+vals)
     val output = Json.toJson(vals.toSeq)
-    println(output)
+    println("Debug: in json: "+output)
     output
   } catch {
     case _: Throwable => JsNull
