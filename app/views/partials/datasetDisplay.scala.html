@@ -2,13 +2,24 @@
 <table class="table table-responsive">
   <tr>
     <th>#</th>
+    <th>Operations</th>
     <th>Name</th>
-    <th>Target Algorithm</th>
+    <th ng-if='"@lst" == "dsList"'>Target Algorithm</th>
+    <th ng-if='"@lst" == "results"'>Source Algorithm</th>
     <th>Description</th>
     <th ng-if='"@lst" == "dsList"'>Source</th>
   </tr>
   <tr ng-repeat="ds in @(lst)" ng-class='{"warning": ds.status == "unavailable" }'>
     <th>{{$index + 1}}</th>
+    <td><button type="button" ng-click="quickDelete(ds.name)"
+                class="btn btn-default btn-sm">
+      <span class="glyphicon glyphicon-trash"></span>
+    </button>
+      <button ng-if='"@lst" == "dsList" && ds.source' type="button"
+              class="btn btn-default btn-sm"
+              ng-click="quickRefresh(ds.name)">
+        <span class="glyphicon glyphicon-refresh"></span>
+      </button></td>
     <td>{{ds.name}}</td>
     <td>{{getPretty(ds.algo)}}</td>
     <td>{{ds.desc}}</td>
