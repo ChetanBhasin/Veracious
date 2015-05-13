@@ -96,6 +96,19 @@ createUFormData = (batch) ->
     return formData
 
 # For quick delete and quick refresh buttons (in tables)
+mconf = false
+window.modalConfirm = () -> mconf = true
+
+requestConfirm = (msg, func) ->
+    mconf = false
+    $("#confirmModalMessage").text(msg)
+    $("#confirmModal").on("hidden.bs.modal", (e) ->
+        func(mconf)
+    )
+    $("#confirmModal").modal('show')
+    return
+deletionMessage = (name) -> "Are you sure you want to delete the dataset: #{name}? This is an irreversible operation"
+
 quickOp = (opN, target) ->       # Support only for DsDelete and DsRefresh
     res = []
     jb =
@@ -110,6 +123,11 @@ quickOp = (opN, target) ->       # Support only for DsDelete and DsRefresh
         if status == 200 then console.log "Batch submitted successfully"
         else alert "There was a problem submitting the batch, status: "+status
     return
+
+quickDeleteOp = (name) ->
+    requestConfirm deletionMessage(name), (res) ->
+        if (res) then  quickOp "DsDelete", name
+        return
 
 
 # Batch Controller
@@ -185,7 +203,8 @@ app.controller 'BatchController', ($scope) ->
             else alert "There was a problem submitting the batch, status: "+status
         $scope.clearBatch()
         return
-    $scope.quickDelete = (name) -> quickOp "DsDelete", name       # Todo, add the modal warning javascript
+    $scope.quickDelete = quickDeleteOp
+
     $scope.quickRefresh = (name) -> quickOp "DsRefresh", name
     #   ----------------------------------------------------
 
@@ -230,21 +249,6 @@ app.controller 'BatchController', ($scope) ->
 
     receivers.push($scope.receiveFunction)     # Add this receiver to the line
     return
-
-## A conversion function to make up for the difference in API TODO, no need now
-#
-#getOfficialName = (opname) ->           # Official as per me you know
-#    switch opname
-#        when "clustering" then "MnClustering"
-#        when "svm" then "MnSVM"
-#        when "als" then "MnALS"
-#        else "MnFPgrowth"
-#
-#convertDataSets = (dsList) ->        # convert each data-set to correct format
-#    for ds in dsList
-#        ds.algo = getOfficialName(ds.algo)
-# ---------------------------------
-
 
 # Simple controller to show results, and request visualisation
 app.controller 'ResultController', ($scope) ->
@@ -291,7 +295,7 @@ app.controller 'ResultController', ($scope) ->
             else alert "Server error on receiving request"
         $scope.target = ""
 
-    $scope.quickDelete = (name) -> quickOp "DsDelete", name       # Todo, add the modal warning javascript
+    $scope.quickDelete = quickDeleteOp
 
     receivers.push($scope.receiveFunction)     # Add this receiver to the line
     return
