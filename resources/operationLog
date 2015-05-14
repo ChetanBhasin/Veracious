@@ -1,0 +1,23 @@
+{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20 | Thu, 14 May 2015, 03:32 PM | jobsRemaining-2"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B20J1:Add data-set file | name-SVM"}}
+{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20 | Thu, 14 May 2015, 03:43 PM | jobsRemaining-2"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B20J1:Add data-set file | name-FPM"}}
+{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20 | Thu, 14 May 2015, 03:44 PM | jobsRemaining-1"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"The mine operation was a success","activity":"Job:B20J1:Frequent Pattern Matching | dataSet-FPM,min_support-0.2"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B20 | Thu, 14 May 2015, 03:44 PM | jobsRemaining-0"}}
+{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B20 | Thu, 14 May 2015, 03:57 PM | jobsRemaining-1"}}
+{"user":"chetan","log":{"status":"FAILURE","message":"The mine operation failed, could'nt write to disk","activity":"Job:B20J1:Frequent Pattern Matching | dataSet-FPM,min_support-0.8"}}
+{"user":"chetan","log":{"status":"FAILURE","message":"The job B20J1 failed","activity":"Batch:B20 | Thu, 14 May 2015, 03:57 PM | jobsRemaining-1"}}
+{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B21 | Thu, 14 May 2015, 03:58 PM | jobsRemaining-1"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"The mine operation was a success","activity":"Job:B21J1:Frequent Pattern Matching | dataSet-FPM,min_support-0.8"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B21 | Thu, 14 May 2015, 03:58 PM | jobsRemaining-0"}}
+{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B22 | Thu, 14 May 2015, 03:58 PM | jobsRemaining-1"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"The mine operation was a success","activity":"Job:B22J1:Frequent Pattern Matching | dataSet-FPM,min_support-0.5"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B22 | Thu, 14 May 2015, 03:58 PM | jobsRemaining-0"}}
+{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B23 | Thu, 14 May 2015, 03:59 PM | jobsRemaining-1"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"The mine operation was a success","activity":"Job:B23J1:Frequent Pattern Matching | dataSet-FPM,min_support-0.6"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B23 | Thu, 14 May 2015, 03:59 PM | jobsRemaining-0"}}
+{"user":"chetan","log":{"status":"INFO","message":"Started working on the Batch","activity":"Batch:B24 | Thu, 14 May 2015, 04:00 PM | jobsRemaining-2"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"Dataset stored on disk successfully.","activity":"Job:B24J1:Add data-set file | name-retail"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"The mine operation was a success","activity":"Job:B24J2:Frequent Pattern Matching | dataSet-retail,min_support-0.2"}}
+{"user":"chetan","log":{"status":"SUCCESS","message":"The batch completed successfully","activity":"Batch:B24 | Thu, 14 May 2015, 04:00 PM | jobsRemaining-0"}}
