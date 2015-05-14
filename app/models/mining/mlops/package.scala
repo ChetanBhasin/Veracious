@@ -7,7 +7,14 @@ package object mlops {
 
   import org.apache.spark._
 
-  val conf = new SparkConf().setAppName("Veracion-Algorithms").setMaster("local")
-  val sc = new SparkContext(conf)
+  val confmain = new SparkConf().setAppName("Veracious-App").setMaster("spark://Chetan-MacBook-Air.local:7077")
+  val confother = new SparkConf().setAppName("Veracious-App").setMaster("local")
+
+  /*val sc: SparkContext = try {
+    new SparkContext(confmain)
+  } catch {
+    case _: Throwable => new SparkContext(confother)
+  }*/
+  val sc = new SparkContext(confother)
 
 }

@@ -59,7 +59,7 @@ class WorkerActor(mediator: ActorRef) extends Actor {
   private def handleDsOutput(operation: GetDsData, dsm: ActorRef): JsValue = {
     val (uname, name) = (operation.username, operation.Ds)
     val result = Await.result(dsm ? CheckUserDataset(uname, name), 10 seconds).asInstanceOf[Option[DataSetEntry]]
-    val filepath = s"./.datastore/datasets/$uname/$name.dat"
+    val filepath = s"./.datastore/datasets/$uname/$name"
     result match {
       case Some(x: DataSetEntry) => x.targetAlgorithm match {
         case ALS => new RALS(filepath, name).output
