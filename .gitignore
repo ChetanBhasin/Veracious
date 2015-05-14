@@ -38,4 +38,5 @@ target/
 .settings
 .datastore/*
 .datastore/
-./resource/
+./resources/
+./resources/*
