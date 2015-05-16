@@ -23,11 +23,14 @@ object Batch {
   // The file that contains the run-count of the application
   private val filePath = "./resources/runCount"
   // Get the current run count
-  private lazy val runCount = {
+  private val runCount = {
     try {
       val source = Source.fromFile(filePath)
       val res = source.getLines().toList.head.toInt + 1
       source.close()    // safe as the iterater from getLines() has already been converted to list
+      val writer = new PrintWriter(new File(filePath))
+      writer.write((res).toString)
+      writer.close()
       res
     } catch {
       case ex: Exception => 0
@@ -39,17 +42,6 @@ object Batch {
 
   /** create unique id for the batches. **/
   private def getUID = "B" + runCount + rNum.getAndIncrement
-
-  /**
-   * Store the application run count back to the file
-   * TODO: A major actor (maybe the Batch processor) should call this function when the
-   * application is closing
-   */
-  def storeRunCount() {
-    val writer = new PrintWriter(new File(filePath))
-    writer.write((runCount).toString)
-    writer.close()
-  }
 
     /** formatter used to print the date (inside Batch class) in the logs **/
   private val dateTimeFormat = "eee, dd MMM yyyy, hh:mm a"
