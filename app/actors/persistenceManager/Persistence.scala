@@ -22,7 +22,6 @@ case class GetDsData(username: String, Ds: String) extends PersistenceMessage
  * Persistence actor
  * Role: Communicate directly with the disk and perform read/write operations.
  */
-//TODO:: All messed up this one is
 class Persistence(val mediator: ActorRef) extends AppModule {
 
   mediator ! RegisterForReceive (self, classOf[PersistenceMessage])
